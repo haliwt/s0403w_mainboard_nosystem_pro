@@ -435,11 +435,11 @@ void Tencent_Cloud_Rx_Handler(void)
 	      run_t.set_beijing_time_flag =0; //WT.EDIT 2023.06.12
 		 // wifi_t.get_rx_beijing_time_enable=0; //enable beijing times
 	
-     if(wifi_t.received_data_from_tencent_cloud ==0x25){
+     if(wifi_t.received_data_from_tencent_cloud > 22){ //==0x25){
 	    wifi_t.received_data_from_tencent_cloud=0;
 		wifi_t.get_rx_beijing_time_enable=0;
 		run_t.response_wifi_signal_label = APP_TIMER_POWER_ON_REF;
-	    __HAL_UART_CLEAR_OREFLAG(&huart2);
+	   // __HAL_UART_CLEAR_OREFLAG(&huart2);
 		strcpy((char*)TCMQTTRCVPUB,(char *)wifi_usart_data.UART_Data);
 	    
 	
@@ -806,11 +806,11 @@ void Json_Parse_Command_Fun(void)
 		   
 		        run_t.app_timer_power_off_flag = 1;
 			    run_t.app_timer_power_on_flag = 0;
-                __HAL_UART_CLEAR_OREFLAG(&huart2);
+                //__HAL_UART_CLEAR_OREFLAG(&huart2);
 		 			MqttData_Publish_SetOpen(0);  
 			       HAL_Delay(350);
 			run_t.rx_command_tag= RUN_COMMAND;
-	         run_t.RunCommand_Label=POWER_OFF;
+	        run_t.RunCommand_Label=POWER_OFF;
 
 			SendWifiCmd_To_Order(WIFI_POWER_OFF);
 			HAL_Delay(10);

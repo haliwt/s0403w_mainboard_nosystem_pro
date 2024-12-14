@@ -327,7 +327,7 @@ void Get_Fan_Adc_Fun(uint32_t channel,uint8_t times)
 //    else{
 
 
-  if(fan_detect_voltage < 350){ //500  now and then is bug false alarm rate  .
+  if(fan_detect_voltage < 450){ //500  now and then is bug false alarm rate  .
        detect_error_times++;
 	   if(detect_error_times >2){
 	   	
@@ -338,6 +338,10 @@ void Get_Fan_Adc_Fun(uint32_t channel,uint8_t times)
           MqttData_Publis_SetFan(0);
 	      HAL_Delay(350);
 
+          run_t.gDry =0 ;
+		  PTC_SetLow(); //turn off
+          MqttData_Publish_SetPtc(0);
+		  HAL_Delay(350);  
 
 
 

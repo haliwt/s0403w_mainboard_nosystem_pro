@@ -51,7 +51,7 @@ void InitWifiModule(void)
 	if(run_t.wifi_config_net_lable==0){
 		 run_t.wifi_config_net_lable++;
 			
-			WIFI_IC_ENABLE();
+			//WIFI_IC_ENABLE();
 	
 	
 			at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
@@ -64,7 +64,7 @@ void InitWifiModule_Hardware(void)
 {
 	//WIFI_IC_DISABLE();
 	//HAL_Delay(1000);
-	WIFI_IC_ENABLE();
+	//WIFI_IC_ENABLE();
 	at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
 	HAL_Delay(1000);
 			//at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
@@ -73,11 +73,11 @@ void InitWifiModule_Hardware(void)
 
 void ReConnect_Wifi_Net_ATReset_Hardware(void)
 {
-	    WIFI_IC_DISABLE();
-		HAL_Delay(1000);
+	   // WIFI_IC_DISABLE();
 		//HAL_Delay(1000);
 		//HAL_Delay(1000);
-		WIFI_IC_ENABLE();
+		//HAL_Delay(1000);
+		//WIFI_IC_ENABLE();
 		//at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
 		at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
 		HAL_Delay(1000);
@@ -116,7 +116,7 @@ void Wifi_SoftAP_Config_Handler(void)
 
 
 	 case wifi_set_cwmode:
-    	    WIFI_IC_ENABLE();
+    	   // WIFI_IC_ENABLE();
          	HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
         	HAL_Delay(1000);
             Decode_Function();
@@ -130,7 +130,7 @@ void Wifi_SoftAP_Config_Handler(void)
 	 break;
 
 	  case wifi_set_softap:
-            WIFI_IC_ENABLE();
+            //WIFI_IC_ENABLE();
 			
             sprintf((char *)device_massage, "AT+TCPRDINFOSET=1,\"%s\",\"%s\",\"UYIJIA01-%d\"\r\n", PRODUCT_ID, DEVICE_SECRET,run_t.randomName[0]);
 			usart2_flag = at_send_data(device_massage, strlen((const char *)device_massage));
@@ -268,7 +268,7 @@ void PowerOn_Self_Auto_Link_Tencent_Cloud(void)
 
 
 	 case wifi_set_cwmode:
-    	    WIFI_IC_ENABLE();
+    	    ///WIFI_IC_ENABLE();
          	HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
         	Decode_Function();
             HAL_Delay(1000);

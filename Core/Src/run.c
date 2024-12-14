@@ -282,7 +282,7 @@ static void Single_Command_ReceiveCmd(uint8_t cmd)
 
        case DRY_ON:
          run_t.gDry = 1;
-	      run_t.gFan_continueRun =0;
+	     run_t.gFan_continueRun =0;
 	   if(run_t.noBuzzer_sound_dry_flag !=1){
 		     Buzzer_KeySound();
 		 }
@@ -600,15 +600,13 @@ void RunCommand_MainBoard_Fun(void)
 
 	case FAN_CONTINUCE_RUN_ONE_MINUTE: //7
 
-	 if(run_t.power_off_fan_state==1){
+	 if(run_t.power_off_fan_state==1){ //WT.EDIT 2024.14
 		 run_t.power_off_fan_state++;
 	     run_t.RunCommand_Label = POWER_NULL;
 
 
 	 }
-	else{
-
-         if(run_t.gPower_On == POWER_OFF && run_t.app_timer_power_off_flag ==0){
+	else if(run_t.gPower_On == POWER_OFF && run_t.app_timer_power_off_flag ==0){
 		  if(run_t.gFan_counter < 60){
           
                    // Fan_One_Speed();
@@ -627,8 +625,8 @@ void RunCommand_MainBoard_Fun(void)
 				  
 	         }
 	  
-         }
-	}
+     }
+	
 	break;
 
 	case POWER_ON_FAN_CONTINUCE_RUN_ONE_MINUTE:

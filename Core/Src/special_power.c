@@ -151,7 +151,7 @@ void ActionEvent_Handler(void)
 if(run_t.works_break_power_on==0) { 
 
     
-	if(run_t.gDry == 1 && run_t.ptc_warning ==0){
+	if(run_t.gDry == 1 && run_t.fan_warning == 0 && run_t.ptc_warning ==0){
 
 	   PTC_SetHigh();
 
