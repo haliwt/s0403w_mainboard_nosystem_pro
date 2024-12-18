@@ -19,7 +19,7 @@ RUN_T run_t;
 
 static void Single_Power_ReceiveCmd(uint8_t cmd);
 static void Single_Command_ReceiveCmd(uint8_t cmd); 
-uint8_t tencent_cloud_flag;
+uint8_t tencent_cloud_flag;//,dc_power_on_flag;
 
 
 
@@ -402,7 +402,7 @@ void SystemReset(void)
 void RunCommand_MainBoard_Fun(void)
 {
    uint8_t i;
-   static uint8_t fan_continuce,tm,power_on_flag;
+   static uint8_t tm,power_on_flag;//dc_power_on_flag;
     
     if(run_t.buzzer_sound_flag == 1){
 	 	run_t.buzzer_sound_flag = 0;
@@ -439,7 +439,7 @@ void RunCommand_MainBoard_Fun(void)
        
 	     run_t.gPower_On=POWER_OFF;
         run_t.gPower_flag = POWER_OFF;
-        run_t.RunCommand_Label = POWER_OFF;
+       // run_t.RunCommand_Label = POWER_OFF;
 		 run_t.set_wind_speed_value=10;
 		 run_t.gModel =1;
 		run_t.app_timer_power_on_flag =0;
@@ -454,10 +454,11 @@ void RunCommand_MainBoard_Fun(void)
 		 run_t.gTimer_fan_adc_times=0;
 		 run_t.ptc_first_detected_times=0;
 		
-		fan_continuce =0;
-
+		
+       if(esp8266data.esp8266_login_cloud_success==1){
         MqttData_Publish_PowerOff_Ref(); 
 	    HAL_Delay(200);
+        
 
         if( run_t.ptc_remove_warning_send_data ==0){
 		 	run_t.ptc_remove_warning_send_data++;
@@ -466,13 +467,15 @@ void RunCommand_MainBoard_Fun(void)
 			Publish_Data_Warning(fan_warning,0);
 			HAL_Delay(200);
 			
+            }
+            Subscriber_Data_FromCloud_Handler();
+		    HAL_Delay(200);
         }
        
          run_t.gFan_counter=0;
 	    run_t.RunCommand_Label = FAN_CONTINUCE_RUN_ONE_MINUTE;
 
-		Subscriber_Data_FromCloud_Handler();
-		HAL_Delay(200);
+		
 		 
          
        if(run_t.app_timer_power_off_flag==1){ 
@@ -489,9 +492,9 @@ void RunCommand_MainBoard_Fun(void)
 	break;
 
 
-   case UPDATE_TO_PANEL_DATA: //5
+   case UPDATE_TO_PANEL_DATA: //05
 
-      if(power_on_flag ==0){
+      if(power_on_flag ==0 && esp8266data.esp8266_login_cloud_success==1){
 	  	power_on_flag++;
     	Subscriber_Data_FromCloud_Handler();
 		HAL_Delay(350);
@@ -541,10 +544,10 @@ void RunCommand_MainBoard_Fun(void)
 			MqttData_Publish_SetOpen(0x01);
 			HAL_Delay(100);
 			Publish_Data_ToTencent_Initial_Data();
-			HAL_Delay(350);
+			HAL_Delay(100);
 	
 		   Subscriber_Data_FromCloud_Handler();
-		   HAL_Delay(350);
+		   HAL_Delay(100);
 	   }
     
 
@@ -592,21 +595,19 @@ void RunCommand_MainBoard_Fun(void)
 
      }
      
-    
-
-
-	
     break;
 
 	case FAN_CONTINUCE_RUN_ONE_MINUTE: //7
 
-	 if(run_t.power_off_fan_state==1){ //WT.EDIT 2024.14
-		 run_t.power_off_fan_state++;
-	     run_t.RunCommand_Label = POWER_NULL;
+//	 if(dc_power_on_flag==0){ //WT.EDIT 2024.14
+//	     dc_power_on_flag ++ ;
+//	     run_t.RunCommand_Label = POWER_NULL;
+//
+//
+//	}
+//	else 
 
-
-	 }
-	else if(run_t.gPower_On == POWER_OFF && run_t.app_timer_power_off_flag ==0){
+   if((run_t.gPower_On == POWER_OFF) && run_t.gFan_continueRun ==1){ //WT.EIDT 2024.12.18//run_t.app_timer_power_off_flag ==0){
 		  if(run_t.gFan_counter < 60){
           
                    // Fan_One_Speed();
@@ -615,42 +616,24 @@ void RunCommand_MainBoard_Fun(void)
            }       
            else{
 		           
-				   run_t.gFan_counter=0;
-				  run_t.RunCommand_Label = POWER_NULL;
+		     run_t.gFan_counter=0;
+		     run_t.RunCommand_Label = POWER_NULL;
 			      
 				   FAN_Stop();
-                   if(fan_continuce == 0){
-		 	         fan_continuce ++;
-			       }
+                   run_t.gFan_continueRun ++;
+                  
 				  
-	         }
+	       }
 	  
      }
 	
 	break;
 
-	case POWER_ON_FAN_CONTINUCE_RUN_ONE_MINUTE:
-  
-	    
-	 if(run_t.gPower_On ==POWER_ON && run_t.gFan_continueRun ==1){
+	
 
-              if(run_t.gFan_counter < 60){
-          
-                      Fan_One_Power_Off_Speed();//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
-                  }       
+    default:
 
-	           if(run_t.gFan_counter > 59){
-		           
-				   run_t.gFan_counter=0;
-				
-				   run_t.gFan_continueRun++;
-				   FAN_Stop();
-	           }
-
-	 }
-
-
-	break;
+    break;
 
 
 
@@ -778,7 +761,7 @@ void RunCommand_Connect_Handler(void)
          run_t.rx_command_tag= RUN_COMMAND;
 	   break;
 
-	   case RUN_COMMAND:
+	   case RUN_COMMAND: //0x03
            if( run_t.decodeFlag ==0)
 	     	 RunCommand_MainBoard_Fun();
 

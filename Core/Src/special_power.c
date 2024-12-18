@@ -32,17 +32,18 @@ void SetPowerOn_ForDoing(void)
 		run_t.gPlasma =1;       //"杀菌"
 		run_t.gUlransonic = 1; // "驱虫"
 	    run_t.gFan_counter=0;
+        if(esp8266data.esp8266_login_cloud_success==1){
     
 		   MqttData_Publish_SetOpen(1);  
-			HAL_Delay(200);
+		   HAL_Delay(50);
 		     Update_DHT11_Value();
-			 HAL_Delay(200);
+			 HAL_Delay(50);
 	         run_t.set_wind_speed_value =100;
 			run_t.wifi_gPower_On=1;
 			MqttData_Publish_Update_Data();
-			 HAL_Delay(200);
+			 HAL_Delay(50);
        	
-			
+        }
 	    Fan_RunSpeed_Fun();//FAN_CCW_RUN();
 	    PLASMA_SetHigh(); //
 	    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
@@ -53,8 +54,10 @@ void SetPowerOn_ForDoing(void)
 	case 1: //app timer timing power of 
 	       run_t.gModel =1;
 		  
+           if(esp8266data.esp8266_login_cloud_success==1){
+	          Parse_Json_Statement();
 
-	       Parse_Json_Statement();
+           }
 
 	  
 		    if( run_t.gPlasma==1){ //Anion
@@ -99,8 +102,11 @@ void SetPowerOn_ForDoing(void)
 
 		     run_t.set_wind_speed_value =100;
 			 run_t.wifi_gPower_On=1;
-		     MqttData_Publish_Update_Data();
-		     HAL_Delay(200);
+             if(esp8266data.esp8266_login_cloud_success==1){
+    		     MqttData_Publish_Update_Data();
+    		     HAL_Delay(50);
+
+             }
 
 			
 	     break;
@@ -114,9 +120,16 @@ void SetPowerOn_ForDoing(void)
 
 void SetPowerOff_ForDoing(void)
 {
-   
+    static uint8_t dc_switch_on;
 	run_t.gPower_flag = 0; //bool 
-	run_t.gFan_continueRun =1; //the fan still run 60s
+	if(dc_switch_on==0){
+
+       dc_switch_on++;
+       run_t.gFan_continueRun =0;
+
+    }
+    else 
+	    run_t.gFan_continueRun =1; //the fan still run 60s
 	run_t.gPower_On = POWER_OFF;
 	run_t.wifi_gPower_On = 0;
     run_t.set_wind_speed_value =10;
@@ -184,7 +197,7 @@ if(run_t.works_break_power_on==0) {
 	if(run_t.gPlasma ==0 && run_t.gDry==0){
 
         run_t.gFan_counter=0;
-		run_t.gFan_continueRun=1;        
+		//run_t.gFan_continueRun=1;        
 
 	}
 
