@@ -21,12 +21,6 @@ static void Single_Power_ReceiveCmd(uint8_t cmd);
 static void Single_Command_ReceiveCmd(uint8_t cmd); 
 uint8_t tencent_cloud_flag;//,dc_power_on_flag;
 
-
-
-
-
-
-
 /**********************************************************************
 *
 *Function Name:void Decode_RunCmd(void)
@@ -167,42 +161,29 @@ void Decode_RunCmd(void)
 static void Single_Power_ReceiveCmd(uint8_t cmd)
 {
     static uint8_t buzzer_sound,buzzer_power_Off_sound;
+    
 
     
     switch(cmd){
 
     case 0x01: // power on
 
-           
-              
-                buzzer_power_Off_sound=0;
+        buzzer_power_Off_sound=1;
+        if(buzzer_sound==0){ 
+            buzzer_sound++;
 
-               
-                if(buzzer_sound==0){ 
-                    buzzer_sound++;
-                  
-                   Buzzer_KeySound();
-                        
-                   
-                    
-                }
-              //  if(buzzer_sound==5)Buzzer_KeySound();
+            Buzzer_KeySound();
+        }
 
-                
-                run_t.decodeFlag =0;
-               
-                SendWifiData_To_Cmd(0x54); //0x52= 'R'
-    		    PTC_SetHigh();
-                Update_DHT11_Value(); 
-               
-                run_t.rx_command_tag=POWER_ON;
-               
-    	     
-                
+        run_t.decodeFlag =0;
 
-            
-           
-      run_t.gTimer_send_dit=60;
+        SendWifiData_To_Cmd(0x54); //0x52= 'R'
+        PTC_SetHigh();
+        Update_DHT11_Value(); 
+
+        run_t.rx_command_tag=POWER_ON;
+
+        run_t.gTimer_send_dit=60;
 	 
 	cmd=0xff;  
      break;
@@ -213,10 +194,10 @@ static void Single_Power_ReceiveCmd(uint8_t cmd)
     case 0x00: //power off
 
          buzzer_sound=0;
-        if(buzzer_power_Off_sound==0){
+       if(buzzer_power_Off_sound==1){
             buzzer_power_Off_sound++;
-        Buzzer_KeySound();
-        HAL_Delay(100);
+           Buzzer_KeySound();
+           //HAL_Delay(100);
 
         }
         run_t.decodeFlag =0;
@@ -403,12 +384,13 @@ void RunCommand_MainBoard_Fun(void)
 {
    uint8_t i;
    static uint8_t tm,power_on_flag;//dc_power_on_flag;
-    
+  
     if(run_t.buzzer_sound_flag == 1){
 	 	run_t.buzzer_sound_flag = 0;
 	    Buzzer_KeySound();
 
 	 }
+    
   
    switch(run_t.RunCommand_Label){
 
@@ -656,11 +638,12 @@ void MainBoard_Self_Inspection_PowerOn_Fun(void)
 	if(self_power_on_flag==0){
         self_power_on_flag ++ ;
 	
-        Buzzer_KeySound();
+      //  Buzzer_KeySound();
 
     
 		InitWifiModule_Hardware();//InitWifiModule();
 		HAL_Delay(1000);
+        Buzzer_KeySound();
         SmartPhone_TryToLink_TencentCloud();
          run_t.gTimer_ptc_adc_times=0;
 		if(esp8266data.esp8266_login_cloud_success==1){

@@ -135,7 +135,7 @@ int main(void)
 	
     	RunCommand_Connect_Handler();
     	
-        RunWifi_Command_Handler();
+       RunWifi_Command_Handler();
         if(wifi_t.get_rx_beijing_time_enable==0){
     	     Tencent_Cloud_Rx_Handler();
     		 Json_Parse_Command_Fun();
