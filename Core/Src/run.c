@@ -411,6 +411,7 @@ void RunCommand_MainBoard_Fun(void)
 		 run_t.ptc_first_detected_times=0;
 		 
 	    power_on_flag=0;
+        run_t.gFan_continueRun =1; //WT.EDIT .2024.12.23
 	   run_t.RunCommand_Label= UPDATE_TO_PANEL_DATA;
 	   
     
@@ -418,10 +419,9 @@ void RunCommand_MainBoard_Fun(void)
         
     case POWER_OFF: //2
      
-       
-	     run_t.gPower_On=POWER_OFF;
+        run_t.gPower_On=POWER_OFF;
         run_t.gPower_flag = POWER_OFF;
-       // run_t.RunCommand_Label = POWER_OFF;
+       
 		 run_t.set_wind_speed_value=10;
 		 run_t.gModel =1;
 		run_t.app_timer_power_on_flag =0;
@@ -455,7 +455,7 @@ void RunCommand_MainBoard_Fun(void)
         }
        
          run_t.gFan_counter=0;
-	    run_t.RunCommand_Label = FAN_CONTINUCE_RUN_ONE_MINUTE;
+	  
 
 		
 		 
@@ -470,7 +470,7 @@ void RunCommand_MainBoard_Fun(void)
 
 	     SetPowerOff_ForDoing();
 	  
-      
+      run_t.RunCommand_Label = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
 	break;
 
 
@@ -581,15 +581,7 @@ void RunCommand_MainBoard_Fun(void)
 
 	case FAN_CONTINUCE_RUN_ONE_MINUTE: //7
 
-//	 if(dc_power_on_flag==0){ //WT.EDIT 2024.14
-//	     dc_power_on_flag ++ ;
-//	     run_t.RunCommand_Label = POWER_NULL;
-//
-//
-//	}
-//	else 
-
-   if((run_t.gPower_On == POWER_OFF) && run_t.gFan_continueRun ==1){ //WT.EIDT 2024.12.18//run_t.app_timer_power_off_flag ==0){
+     if((run_t.gPower_On == POWER_OFF) && run_t.gFan_continueRun ==1){ //WT.EIDT 2024.12.18//run_t.app_timer_power_off_flag ==0){
 		  if(run_t.gFan_counter < 60){
           
                    // Fan_One_Speed();

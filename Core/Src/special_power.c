@@ -117,19 +117,29 @@ void SetPowerOn_ForDoing(void)
 
 	
  }
-
+/***********************************************************************
+*
+*Function Name: void SetPowerOff_ForDoing(void)
+*
+*
+*
+*
+*
+************************************************************************/
 void SetPowerOff_ForDoing(void)
 {
     static uint8_t dc_switch_on;
 	run_t.gPower_flag = 0; //bool 
-	if(dc_switch_on==0){
-
-       dc_switch_on++;
-       run_t.gFan_continueRun =0;
-
-    }
-    else 
-	    run_t.gFan_continueRun =1; //the fan still run 60s
+#if 0
+//	if(dc_switch_on==0){
+//
+//       dc_switch_on++;
+//       run_t.gFan_continueRun =0;
+//
+//    }
+//    else 
+//	    run_t.gFan_continueRun =1; //the fan still run 60s
+#endif 
 	run_t.gPower_On = POWER_OFF;
 	run_t.wifi_gPower_On = 0;
     run_t.set_wind_speed_value =10;
