@@ -14,7 +14,6 @@ static void SetLevel_Fan_PWMA(uint8_t levelval);
 void FAN_CCW_RUN(void)
 {
    FAN_CW_SetLow();
-   //SetLevel_Fan_PWMA(100);
    FAN_RUN_SetHigh();
   
 }
@@ -37,6 +36,35 @@ void Fan_One_Power_Off_Speed(void)
 
 
 }
+
+void fan_first_run_fun(void)
+{
+
+   static uint8_t fan_default = 0xff;
+
+   if(fan_default != run_t.fan_first_run_flag){
+        fan_default = run_t.fan_first_run_flag;
+
+         
+       FAN_CW_SetLow(); //PA6
+       FAN_RUN_SetHigh(); //brake
+       HAL_Delay(100);
+       FAN_RUN_SetLow(); //brake//FAN_CCW_SetLow(); //brake
+       HAL_Delay(100);//osDelay(100);
+       FAN_RUN_SetHigh();
+       HAL_Delay(300);
+
+   }
+   FAN_CW_SetLow();
+   FAN_RUN_SetHigh();
+
+
+
+}
+
+
+
+
 #if 1
 void Fan_One_Speed(void)
 {
@@ -50,8 +78,10 @@ void Fan_One_Speed(void)
 void Fan_Two_Speed(void)
 {
 	
-	FAN_CW_SetLow();
-  
+ 
+
+
+   FAN_CW_SetLow();
    FAN_RUN_SetHigh();
 }
 
@@ -117,7 +147,10 @@ void Dry_Function(uint8_t sel)
 
 void Fan_RunSpeed_Fun(void)
 {
-         if(run_t.set_wind_speed_value < 34 ){
+    
+    fan_first_run_fun();
+  
+     if(run_t.set_wind_speed_value < 34 ){
               Fan_One_Speed();
 		 }
 		 else if(run_t.set_wind_speed_value > 33  && run_t.set_wind_speed_value < 67 ){

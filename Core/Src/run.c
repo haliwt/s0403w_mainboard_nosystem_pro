@@ -539,6 +539,7 @@ void RunCommand_MainBoard_Fun(void)
          run_t.interval_time_stop_run =1;
 	     run_t.gFan_continueRun =1;
 		 run_t.gFan_counter=0;
+         run_t.fan_first_run_flag++;   //WT.EDIT 2024.12.23
     }
     
 	 break;
@@ -684,7 +685,9 @@ void RunCommand_Connect_Handler(void)
      switch(run_t.rx_command_tag){
 
         case POWER_ON:
-		   PTC_SetHigh();
+          run_t.fan_first_run_flag++;   //WT.EDIT 2024.12.23
+		  fan_first_run_fun() ; //WT.EDIT,2024.12.23 AT ONCE OPEN FAN 
+          PTC_SetHigh();
           run_t.gPower_flag = POWER_ON;
 		 run_t.gPower_On = POWER_ON;
          run_t.RunCommand_Label= POWER_ON;
@@ -698,6 +701,7 @@ void RunCommand_Connect_Handler(void)
 		 run_t.gTimer_ptc_adc_times=0;
 		 run_t.gTimer_fan_adc_times=0;
 		 run_t.ptc_first_detected_times=0;
+      
         
 
 		

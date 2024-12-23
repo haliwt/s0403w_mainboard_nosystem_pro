@@ -55,6 +55,7 @@ void Fan_One_Speed(void);
 void Fan_Two_Speed(void);
 void Fan_One_Power_Off_Speed(void);
 
+void fan_first_run_fun(void);
 
 void Fan_RunSpeed_Fun(void);
 void Fan_Full_Speed(void);

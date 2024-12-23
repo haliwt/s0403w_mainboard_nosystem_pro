@@ -92,6 +92,9 @@ typedef struct _RUN_T{
 
     uint8_t wifi_run_set_restart_flag ;
 
+    //
+    uint8_t fan_first_run_flag;
+
 	
  
 

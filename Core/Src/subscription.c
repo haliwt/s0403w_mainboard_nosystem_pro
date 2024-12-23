@@ -587,6 +587,7 @@ void Json_Parse_Command_Fun(void)
 		run_t.fan_warning =0;
 		run_t.ptc_remove_warning_send_data =0;
 		run_t.rx_command_tag= POWER_ON;
+        run_t.fan_first_run_flag++;   //WT.EDIT 2024.12.23
 	    SendWifiCmd_To_Order(WIFI_POWER_ON);
 		HAL_Delay(5);
       

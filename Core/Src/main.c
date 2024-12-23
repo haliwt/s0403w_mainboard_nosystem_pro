@@ -8,10 +8,11 @@
   *
   * Copyright (c) 2022 STMicroelectronics.
   * UYIJIA Version 4.2  DATA.2023.07.27
+  * S0403W and S03 the same software version: 2.2 .DATA.2024.12.23
   *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
+  * 
+  * 
+  * 
   *
   ******************************************************************************
   */
@@ -133,7 +134,7 @@ int main(void)
 
     if( run_t.decodeFlag ==0){
 	
-    	RunCommand_Connect_Handler();
+       RunCommand_Connect_Handler();
     	
        RunWifi_Command_Handler();
         if(wifi_t.get_rx_beijing_time_enable==0){
