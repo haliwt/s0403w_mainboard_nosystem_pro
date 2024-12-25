@@ -219,7 +219,7 @@ static void Single_Power_ReceiveCmd(uint8_t cmd)
 
         
        
-       // SendWifiData_To_Cmd(0x53); //0x52= 'R'
+       // SendWifiData_To_Cmd(0x53); //0x52= 'R' WT.EDIT 2024.12.25
         PTC_SetLow();
       
         run_t.rx_command_tag=POWER_OFF;
