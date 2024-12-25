@@ -44,7 +44,7 @@ void SetPowerOn_ForDoing(void)
 			 HAL_Delay(50);
        	
         }
-	    Fan_RunSpeed_Fun();//FAN_CCW_RUN();
+	  //  Fan_RunSpeed_Fun();//FAN_CCW_RUN(); //WT.EDIT 2024.12.24
 	    PLASMA_SetHigh(); //
 	    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
 	    PTC_SetHigh();
@@ -128,7 +128,7 @@ void SetPowerOn_ForDoing(void)
 ************************************************************************/
 void SetPowerOff_ForDoing(void)
 {
-    static uint8_t dc_switch_on;
+   // static uint8_t dc_switch_on;
 	run_t.gPower_flag = 0; //bool 
 #if 0
 //	if(dc_switch_on==0){
@@ -155,8 +155,8 @@ void SetPowerOff_ForDoing(void)
 	PLASMA_SetLow(); //
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
 	PTC_SetLow();
-	FAN_Stop();
-	HAL_Delay(10);
+	//FAN_Stop(); //WT.EDIT 
+	//HAL_Delay(10);
 
 }
 

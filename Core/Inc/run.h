@@ -30,7 +30,10 @@ typedef enum{
    POWER_CONNECTOR_WIFI,
    UPDATE_TO_PANEL_DATA,
    WIFI_RESTART_INIT,  //07
+   POWER_OFF_RUN_FAN,
+   
    FAN_CONTINUCE_RUN_ONE_MINUTE,//08
+   
   
   
    POWER_NULL, //9
@@ -221,6 +224,9 @@ void MainBoard_Self_Inspection_PowerOn_Fun(void);
 
 void RunCommand_Connect_Handler(void);
 
+void power_off_handler(void);
+
+void run_init(void);
 
 #endif 
 

@@ -110,6 +110,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  
    HAL_TIM_Base_Start_IT(&htim3);//HAL_TIM_Base_Start(&htim3);
    UART_Start_Receive_IT(&huart1,inputBuf,1);
    //DMA usart2
@@ -119,7 +120,8 @@ int main(void)
     __HAL_UART_ENABLE_IT(&huart1,UART_IT_ERR);
     __HAL_UART_ENABLE_IT(&huart2,UART_IT_ERR);
 	
-    run_t.rx_command_tag= POWER_OFF;
+    //run_t.rx_command_tag= POWER_OFF;
+    run_init();
   
 
   /* USER CODE BEGIN WHILE */

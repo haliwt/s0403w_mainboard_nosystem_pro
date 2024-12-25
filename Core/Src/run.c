@@ -19,8 +19,23 @@ RUN_T run_t;
 
 static void Single_Power_ReceiveCmd(uint8_t cmd);
 static void Single_Command_ReceiveCmd(uint8_t cmd); 
-uint8_t tencent_cloud_flag;//,dc_power_on_flag;
 
+static void power_on_handler(void);
+
+uint8_t tencent_cloud_flag;//,dc_power_on_flag;
+uint8_t power_on_process_step;
+uint8_t  power_off_step;
+
+
+void run_init(void)
+{
+   power_on_process_step = 1;
+   power_off_step=2;
+   run_t.rx_command_tag = POWER_OFF;
+
+   
+
+}
 /**********************************************************************
 *
 *Function Name:void Decode_RunCmd(void)
@@ -204,7 +219,7 @@ static void Single_Power_ReceiveCmd(uint8_t cmd)
 
         
        
-        SendWifiData_To_Cmd(0x53); //0x52= 'R'
+       // SendWifiData_To_Cmd(0x53); //0x52= 'R'
         PTC_SetLow();
       
         run_t.rx_command_tag=POWER_OFF;
@@ -416,65 +431,8 @@ void RunCommand_MainBoard_Fun(void)
 	   
     
 	break;
-        
-    case POWER_OFF: //2
-     
-        run_t.gPower_On=POWER_OFF;
-        run_t.gPower_flag = POWER_OFF;
-       
-		 run_t.set_wind_speed_value=10;
-		 run_t.gModel =1;
-		run_t.app_timer_power_on_flag =0;
-		
-		run_t.interval_time_stop_run =0;
-		run_t.gTimer_continuce_works_time=0;
-		wifi_t.gTimer_subscriber_send=0;
 
-		  run_t.ptc_warning =0;
-		 run_t.fan_warning =0;
-		 run_t.gTimer_ptc_adc_times=0;
-		 run_t.gTimer_fan_adc_times=0;
-		 run_t.ptc_first_detected_times=0;
-		
-		
-       if(esp8266data.esp8266_login_cloud_success==1){
-        MqttData_Publish_PowerOff_Ref(); 
-	    HAL_Delay(200);
-        
-
-        if( run_t.ptc_remove_warning_send_data ==0){
-		 	run_t.ptc_remove_warning_send_data++;
-		  	Publish_Data_Warning(ptc_temp_warning,0);
-		  	HAL_Delay(200);
-			Publish_Data_Warning(fan_warning,0);
-			HAL_Delay(200);
-			
-            }
-            Subscriber_Data_FromCloud_Handler();
-		    HAL_Delay(200);
-        }
-       
-         run_t.gFan_counter=0;
-	  
-
-		
-		 
-         
-       if(run_t.app_timer_power_off_flag==1){ 
-         	run_t.app_timer_power_off_flag=0;
-		      for(i=0;i<36;i++){
-		      TCMQTTRCVPUB[i]=0;
-		     }
-
-		}
-
-	     SetPowerOff_ForDoing();
-	  
-      run_t.RunCommand_Label = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
-	break;
-
-
-   case UPDATE_TO_PANEL_DATA: //05
+     case UPDATE_TO_PANEL_DATA: //05
 
       if(power_on_flag ==0 && esp8266data.esp8266_login_cloud_success==1){
 	  	power_on_flag++;
@@ -580,25 +538,114 @@ void RunCommand_MainBoard_Fun(void)
      
     break;
 
+    }
+}
+
+
+void power_off_handler(void)
+{
+     uint8_t i;
+      switch(run_t.RunCommand_Label){
+
+      case POWER_OFF: //2
+     
+        run_t.gPower_On=POWER_OFF;
+        run_t.gPower_flag = POWER_OFF;
+       
+		 run_t.set_wind_speed_value=10;
+		 run_t.gModel =1;
+		run_t.app_timer_power_on_flag =0;
+		
+		run_t.interval_time_stop_run =0;
+		run_t.gTimer_continuce_works_time=0;
+		wifi_t.gTimer_subscriber_send=0;
+
+		  run_t.ptc_warning =0;
+		 run_t.fan_warning =0;
+		 run_t.gTimer_ptc_adc_times=0;
+		 run_t.gTimer_fan_adc_times=0;
+		 run_t.ptc_first_detected_times=0;
+		
+		
+       
+         run_t.gFan_counter=0;
+	     run_t.RunCommand_Label = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
+
+		
+		 
+         
+       if(run_t.app_timer_power_off_flag==1){ 
+         	run_t.app_timer_power_off_flag=0;
+		      for(i=0;i<36;i++){
+		      TCMQTTRCVPUB[i]=0;
+		     }
+
+		}
+
+	     //SetPowerOff_ForDoing();
+
+    run_t.gPower_On = POWER_OFF;
+	run_t.wifi_gPower_On = 0;
+    run_t.set_wind_speed_value =10;
+ 
+    run_t.gFan = 0;
+    run_t.gDry = 0;
+	run_t.gPlasma =0;       //"杀菌"
+	run_t.gUlransonic = 0; // "驱虫"
+	run_t.gModel =1;
+    run_t.gFan_counter=0;
+
+    
+	PLASMA_SetLow(); //
+	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+	PTC_SetLow();
+	  
+     run_t.RunCommand_Label = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
+
+     if(esp8266data.esp8266_login_cloud_success==1){
+        MqttData_Publish_PowerOff_Ref(); 
+	    HAL_Delay(200);
+        
+
+        if( run_t.ptc_remove_warning_send_data ==0){
+		 	run_t.ptc_remove_warning_send_data++;
+		  	Publish_Data_Warning(ptc_temp_warning,0);
+		  	HAL_Delay(200);
+			Publish_Data_Warning(fan_warning,0);
+			HAL_Delay(200);
+			
+            }
+            Subscriber_Data_FromCloud_Handler();
+		    HAL_Delay(200);
+        }
+       
+	break;
+
+
+  
+
 	case FAN_CONTINUCE_RUN_ONE_MINUTE: //7
 
-     if((run_t.gPower_On == POWER_OFF) && run_t.gFan_continueRun ==1){ //WT.EIDT 2024.12.18//run_t.app_timer_power_off_flag ==0){
-		  if(run_t.gFan_counter < 60){
+     if(run_t.gFan_continueRun ==1){ //WT.EIDT 2024.12.18//run_t.app_timer_power_off_flag ==0){
+		 if(run_t.gFan_counter < 60){
           
                    // Fan_One_Speed();
-					Fan_One_Power_Off_Speed();
+			Fan_One_Power_Off_Speed();
                   
-           }       
-           else{
+        } 
+       }
+
+      if(run_t.gFan_counter > 60){
+        
 		           
 		     run_t.gFan_counter=0;
-		     run_t.RunCommand_Label = POWER_NULL;
+		    // run_t.RunCommand_Label = POWER_NULL;
 			      
-				   FAN_Stop();
-                   run_t.gFan_continueRun ++;
+		     FAN_Stop();
+             run_t.gFan_continueRun =2; //WT.EDIT 2024.12.24
                   
 				  
-	       }
+	       
 	  
      }
 	
@@ -682,11 +729,158 @@ void MainBoard_Self_Inspection_PowerOn_Fun(void)
 **************************************************************/
 void RunCommand_Connect_Handler(void)
 {
-     switch(run_t.rx_command_tag){
+   uint8_t i;
+   if(run_t.rx_command_tag == POWER_ON){
+       power_off_step = 2;
+       
+       power_on_handler();
+       
+
+
+   }
+   else{
+      power_on_process_step=01;
+
+     switch(power_off_step){
+      case POWER_OFF:
+		  PTC_SetLow();
+           run_t.wifi_run_set_restart_flag =0;
+          run_t.ptc_remove_warning_send_data =0;
+	      run_t.gPower_On=POWER_OFF;
+          run_t.gPower_flag = POWER_OFF;
+        
+		 run_t.set_wind_speed_value=10;
+		 run_t.gModel =1;
+	
+          power_off_step= POWER_OFF_RUN_FAN;
+         run_t.RunCommand_Label = POWER_OFF;
+        
+       break;
+
+       case POWER_OFF_RUN_FAN:
+            //power_off_handler();
+               run_t.gPower_On=POWER_OFF;
+               run_t.gPower_flag = POWER_OFF;
+              
+                run_t.set_wind_speed_value=10;
+                run_t.gModel =1;
+               run_t.app_timer_power_on_flag =0;
+               
+               run_t.interval_time_stop_run =0;
+               run_t.gTimer_continuce_works_time=0;
+               wifi_t.gTimer_subscriber_send=0;
+        
+                 run_t.ptc_warning =0;
+                run_t.fan_warning =0;
+                run_t.gTimer_ptc_adc_times=0;
+                run_t.gTimer_fan_adc_times=0;
+                run_t.ptc_first_detected_times=0;
+               
+               
+              
+                run_t.gFan_counter=0;
+                power_off_step = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
+        
+               
+                
+                
+              if(run_t.app_timer_power_off_flag==1){ 
+                   run_t.app_timer_power_off_flag=0;
+                     for(i=0;i<36;i++){
+                     TCMQTTRCVPUB[i]=0;
+                    }
+        
+               }
+        
+                //SetPowerOff_ForDoing();
+        
+           run_t.gPower_On = POWER_OFF;
+           run_t.wifi_gPower_On = 0;
+           run_t.set_wind_speed_value =10;
+        
+           run_t.gFan = 0;
+           run_t.gDry = 0;
+           run_t.gPlasma =0;       //"杀菌"
+           run_t.gUlransonic = 0; // "驱虫"
+           run_t.gModel =1;
+           run_t.gFan_counter=0;
+        
+           
+           PLASMA_SetLow(); //
+           HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+           PTC_SetLow();
+             
+           
+        
+            if(esp8266data.esp8266_login_cloud_success==1){
+               MqttData_Publish_PowerOff_Ref(); 
+               HAL_Delay(200);
+               
+        
+               if( run_t.ptc_remove_warning_send_data ==0){
+                   run_t.ptc_remove_warning_send_data++;
+                   Publish_Data_Warning(ptc_temp_warning,0);
+                   HAL_Delay(200);
+                   Publish_Data_Warning(fan_warning,0);
+                   HAL_Delay(200);
+                   
+                   }
+                   Subscriber_Data_FromCloud_Handler();
+                   HAL_Delay(200);
+               }
+              
+           break;
+        
+        
+         
+        
+           case FAN_CONTINUCE_RUN_ONE_MINUTE: //7
+        
+            if(run_t.gFan_continueRun ==1){ //WT.EIDT 2024.12.18//run_t.app_timer_power_off_flag ==0){
+                if(run_t.gFan_counter < 60){
+                 
+                          // Fan_One_Speed();
+                   Fan_One_Power_Off_Speed();
+                         
+               } 
+              }
+        
+             if(run_t.gFan_counter > 60){
+               
+                          
+                    run_t.gFan_counter=0;
+                   // run_t.RunCommand_Label = POWER_NULL;
+                         
+                    FAN_Stop();
+                    run_t.gFan_continueRun =2; //WT.EDIT 2024.12.24
+                         
+                         
+                  
+             
+            }
+           
+           break;
+        
+           
+
+        }
+
+
+
+   }
+
+}
+
+static  void power_on_handler(void)
+{
+
+
+    switch(power_on_process_step){
 
         case POWER_ON:
           run_t.fan_first_run_flag++;   //WT.EDIT 2024.12.23
-		  fan_first_run_fun() ; //WT.EDIT,2024.12.23 AT ONCE OPEN FAN 
+		//  fan_first_run_fun() ; //WT.EDIT,2024.12.23 AT ONCE OPEN FAN 
+		  Fan_One_Speed();
           PTC_SetHigh();
           run_t.gPower_flag = POWER_ON;
 		 run_t.gPower_On = POWER_ON;
@@ -702,10 +896,7 @@ void RunCommand_Connect_Handler(void)
 		 run_t.gTimer_fan_adc_times=0;
 		 run_t.ptc_first_detected_times=0;
       
-        
-
-		
-		 if( run_t.decodeFlag ==0){
+         if( run_t.decodeFlag ==0){
 		 Update_DHT11_Value();
 		 HAL_Delay(10);
 		 if(esp8266data.esp8266_login_cloud_success==1){
@@ -722,38 +913,31 @@ void RunCommand_Connect_Handler(void)
 	         HAL_Delay(350);
 	      
 		 }
-         
-		 run_t.rx_command_tag=RUN_COMMAND ;//KEY_NULL;
+        
+        
+		 power_on_process_step =RUN_COMMAND ;//KEY_NULL;
+		  run_t.RunCommand_Label= POWER_ON;
          }
 	    break;
 
-	   case POWER_OFF:
-		  PTC_SetLow();
-           run_t.wifi_run_set_restart_flag =0;
-          run_t.ptc_remove_warning_send_data =0;
-	      run_t.gPower_On=POWER_OFF;
-        run_t.gPower_flag = POWER_OFF;
-        run_t.RunCommand_Label = POWER_OFF;
-		 run_t.set_wind_speed_value=10;
-		 run_t.gModel =1;
-	
-         run_t.rx_command_tag= RUN_COMMAND;
-	   break;
 
-	   case RUN_COMMAND: //0x03
-           if( run_t.decodeFlag ==0)
-	     	 RunCommand_MainBoard_Fun();
-
-
-	   break;
-
-
-
-	 }
-
-
-
+        
+         case RUN_COMMAND: //0x03
+            if( run_t.decodeFlag ==0){
+              RunCommand_MainBoard_Fun();
+  
+           }
+  
+  
+        break;
+  }
 }
+
+	   
+
+       
+
+	  
 
 
 
