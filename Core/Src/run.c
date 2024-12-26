@@ -22,16 +22,20 @@ static void Single_Command_ReceiveCmd(uint8_t cmd);
 
 static void power_on_handler(void);
 
+uint8_t power_on_enable_flag;
+
+
 uint8_t tencent_cloud_flag;//,dc_power_on_flag;
 uint8_t power_on_process_step;
 uint8_t  power_off_step;
+uint8_t run_main_process_flag;
 
 
 void run_init(void)
 {
    power_on_process_step = 1;
    power_off_step=2;
-   run_t.rx_command_tag = POWER_OFF;
+   power_on_enable_flag = POWER_OFF;
 
    
 
@@ -196,7 +200,7 @@ static void Single_Power_ReceiveCmd(uint8_t cmd)
         PTC_SetHigh();
         Update_DHT11_Value(); 
 
-        run_t.rx_command_tag=POWER_ON;
+        power_on_enable_flag=POWER_ON;
 
         run_t.gTimer_send_dit=60;
 	 
@@ -222,7 +226,7 @@ static void Single_Power_ReceiveCmd(uint8_t cmd)
        // SendWifiData_To_Cmd(0x53); //0x52= 'R' WT.EDIT 2024.12.25
         PTC_SetLow();
       
-        run_t.rx_command_tag=POWER_OFF;
+        power_on_enable_flag=POWER_OFF;
        
         
         cmd = 0xff;
@@ -407,7 +411,7 @@ void RunCommand_MainBoard_Fun(void)
 	 }
     
   
-   switch(run_t.RunCommand_Label){
+   switch(run_main_process_flag){
 
 	case POWER_ON: //1
 	     
@@ -427,7 +431,7 @@ void RunCommand_MainBoard_Fun(void)
 		 
 	    power_on_flag=0;
         run_t.gFan_continueRun =1; //WT.EDIT .2024.12.23
-	   run_t.RunCommand_Label= UPDATE_TO_PANEL_DATA;
+	   run_main_process_flag= UPDATE_TO_PANEL_DATA;
 	   
     
 	break;
@@ -545,7 +549,7 @@ void RunCommand_MainBoard_Fun(void)
 void power_off_handler(void)
 {
      uint8_t i;
-      switch(run_t.RunCommand_Label){
+      switch(run_main_process_flag){
 
       case POWER_OFF: //2
      
@@ -569,7 +573,7 @@ void power_off_handler(void)
 		
        
          run_t.gFan_counter=0;
-	     run_t.RunCommand_Label = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
+	     run_main_process_flag = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
 
 		
 		 
@@ -600,7 +604,7 @@ void power_off_handler(void)
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
 	PTC_SetLow();
 	  
-     run_t.RunCommand_Label = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
+     run_main_process_flag = FAN_CONTINUCE_RUN_ONE_MINUTE;  //FAN_CONTINUCE_RUN_ONE_MINUTE: //7
 
      if(esp8266data.esp8266_login_cloud_success==1){
         MqttData_Publish_PowerOff_Ref(); 
@@ -639,7 +643,7 @@ void power_off_handler(void)
         
 		           
 		     run_t.gFan_counter=0;
-		    // run_t.RunCommand_Label = POWER_NULL;
+		    // run_main_process_flag = POWER_NULL;
 			      
 		     FAN_Stop();
              run_t.gFan_continueRun =2; //WT.EDIT 2024.12.24
@@ -705,8 +709,8 @@ void MainBoard_Self_Inspection_PowerOn_Fun(void)
        
            if(send_power_off_flag==0){
             send_power_off_flag++;
-		    //run_t.RunCommand_Label=POWER_OFF;
-		    run_t.rx_command_tag= POWER_OFF;
+		    //run_main_process_flag=POWER_OFF;
+		    power_on_enable_flag= POWER_OFF;
 			//wifi_t.runCommand_order_lable = wifi_publish_update_tencent_cloud_data
 			SendWifiData_To_Cmd(0x01) ;
 			HAL_Delay(50);
@@ -730,7 +734,7 @@ void MainBoard_Self_Inspection_PowerOn_Fun(void)
 void RunCommand_Connect_Handler(void)
 {
    uint8_t i;
-   if(run_t.rx_command_tag == POWER_ON){
+   if(power_on_enable_flag == POWER_ON){
        power_off_step = 2;
        
        power_on_handler();
@@ -753,7 +757,7 @@ void RunCommand_Connect_Handler(void)
 		 run_t.gModel =1;
 	
           power_off_step= POWER_OFF_RUN_FAN;
-         run_t.RunCommand_Label = POWER_OFF;
+         run_main_process_flag = POWER_OFF;
         
        break;
 
@@ -849,7 +853,7 @@ void RunCommand_Connect_Handler(void)
                
                           
                     run_t.gFan_counter=0;
-                   // run_t.RunCommand_Label = POWER_NULL;
+                   // run_main_process_flag = POWER_NULL;
                          
                     FAN_Stop();
                     run_t.gFan_continueRun =2; //WT.EDIT 2024.12.24
@@ -884,7 +888,7 @@ static  void power_on_handler(void)
           PTC_SetHigh();
           run_t.gPower_flag = POWER_ON;
 		 run_t.gPower_On = POWER_ON;
-         run_t.RunCommand_Label= POWER_ON;
+         run_main_process_flag= POWER_ON;
 		 run_t.gModel =1;
 		 run_t.set_wind_speed_value=100;
          run_t.wifi_run_set_restart_flag =0;
@@ -916,7 +920,7 @@ static  void power_on_handler(void)
         
         
 		 power_on_process_step =RUN_COMMAND ;//KEY_NULL;
-		  run_t.RunCommand_Label= POWER_ON;
+		  run_main_process_flag= POWER_ON;
          }
 	    break;
 

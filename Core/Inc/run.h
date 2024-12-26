@@ -203,6 +203,10 @@ typedef struct _RUN_T{
 extern uint8_t ReceiveBuffer[1];
 extern RUN_T run_t; 
 
+extern uint8_t power_on_enable_flag;
+extern uint8_t run_main_process_flag;
+
+
 
 
 void RunCommand_MainBoard_Fun(void);

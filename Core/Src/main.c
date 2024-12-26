@@ -120,7 +120,7 @@ int main(void)
     __HAL_UART_ENABLE_IT(&huart1,UART_IT_ERR);
     __HAL_UART_ENABLE_IT(&huart2,UART_IT_ERR);
 	
-    //run_t.rx_command_tag= POWER_OFF;
+    //power_on_enable_flag= POWER_OFF;
     run_init();
   
 
