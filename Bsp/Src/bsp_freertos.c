@@ -101,20 +101,35 @@ void freeRTOS_Handler(void)
 static void vTaskMsgPro(void *pvParameters)
 {
   
-	// BaseType_t xResult;
-	// const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.测试设定�?-设置�?大等待时间为50ms */
-    // uint32_t ulValue;
-    // static uint8_t power_on_sound_flag ;
+	BaseType_t xResult;
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
+    uint32_t ulValue;
+    static uint8_t power_on_sound_flag ;
 	
     while(1)
     {
-    for (;;)
-    {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);//PB4�����
-        osDelay(250);//�ȴ�250ms
-    }
 
-    }
+      
+         xResult = xTaskNotifyWait(0x00000000,      
+						           0xFFFFFFFF,      
+						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
+						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
+        if(xResult == pdPASS){
+             if((ulValue & DECODER_BIT_0 ) != 0)
+             {
+                gpro_t.disp_rx_cmd_done_flag = 0;
+
+             //   check_code =  bcc_check(gl_tMsg.usData,uid);
+
+               if(check_code == bcc_check_code ){
+               
+                 // receive_data_fromm_display(gl_tMsg.usData);
+                  
+                }
+                
+            }
+        }
+	}
        
 }
 /**********************************************************************************************************
@@ -136,8 +151,8 @@ static void vTaskStart(void *pvParameters)
     {
     for (;;)
         {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);//PB4�����
-        osDelay(100);//�ȴ�100ms
+        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);//PB4�����
+        vTaskDelay(200);//�ȴ�100ms
 
         }
 
@@ -261,21 +276,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
                 bcc_check_code=inputBuf[0];
 
-                #if 0
-
-                /* ???????? */
-                xQueueSendFromISR(xQueue2,
-                (void *)&gl_tMsg.usData,
-                &xHigherPriorityTaskWoken);
-
-                /* ??xHigherPriorityTaskWoken = pdTRUE,???????????????????? */
-                portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-
-                 #endif 
+           
 
                 #if 1
 
-                xTaskNotifyFromISR(xHandleTaskStart,  /* ???? */
+                xTaskNotifyFromISR(xHandleTaskMsgPro,  /* ???? */
                 DECODER_BIT_0,     /* ???????????bit0  */
                 eSetBits,  /* ????????????BIT_0?????, ??????????? */
                 &xHigherPriorityTaskWoken);
