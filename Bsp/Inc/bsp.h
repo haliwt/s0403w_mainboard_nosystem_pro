@@ -21,6 +21,10 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+
+#include "bsp_cmd_link.h"
+#include "bsp_buzzer.h"
+#include "bsp_fan.h"
 #define WIFI_RX_NUMBERS         1
 
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
@@ -70,5 +74,7 @@ typedef struct PROCESS_T{
 }process_t;
 
 extern process_t gpro_t;
+
+uint8_t bcc_check(const unsigned char *data, int len) ;
 
 #endif 

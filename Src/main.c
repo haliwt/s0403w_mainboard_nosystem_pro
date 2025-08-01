@@ -103,6 +103,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_4);
    HAL_TIM_Base_Start_IT(&htim17);
    UART_Start_Receive_IT(&huart1,inputBuf,1);
    UART_Start_Receive_IT(&huart2,wifi_rx_inputBuf,1);
@@ -120,7 +121,7 @@ osThreadDef(THREAD1, LED_Thread1, osPriorityNormal, 0, 128);//������
   while (1)
   {
     /* USER CODE END WHILE */
-
+HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -186,21 +187,21 @@ void SystemClock_Config(void)
 //void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //{
 //  /* USER CODE BEGIN Callback 0 */
-//////////  static uint16_t tim17_counter;
+////////////  static uint16_t tim17_counter;
 //  /* USER CODE END Callback 0 */
 //  if (htim->Instance == TIM14)
 //  {
 //    HAL_IncTick();
 //  }
 //  /* USER CODE BEGIN Callback 1 */
-//////////  else if (htim->Instance == TIM17)
-//////////  {
-//////////    tim17_counter++;
-//////////	if(tim17_counter>999){
-//////////		tim17_counter=0;
-//////////		counter_flag++;
-//////////	}
-//////////  }
+////////////  else if (htim->Instance == TIM17)
+////////////  {
+////////////    tim17_counter++;
+////////////	if(tim17_counter>999){
+////////////		tim17_counter=0;
+////////////		counter_flag++;
+////////////	}
+////////////  }
 
 //  /* USER CODE END Callback 1 */
 //}

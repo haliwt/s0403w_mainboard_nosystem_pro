@@ -152,7 +152,10 @@ static void vTaskStart(void *pvParameters)
     for (;;)
         {
         HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);//PB4�����
-        vTaskDelay(200);//�ȴ�100ms
+     
+		fan_run_fun();
+		buzzer_sound();
+		vTaskDelay(200);//�ȴ�100ms
 
         }
 

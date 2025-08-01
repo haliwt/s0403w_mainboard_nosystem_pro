@@ -25,3 +25,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
   /* USER CODE END Callback 1 */
 }
+
+/**********************************************************************
+    *
+    *Function Name:uint8_t bcc_check(const unsigned char *data, int len) 
+    *Function: BCC????
+    *Input Ref:NO
+    *Return Ref:NO
+    *
+**********************************************************************/
+uint8_t bcc_check(const unsigned char *data, int len) 
+{
+    unsigned char bcc = 0;
+    for (int i = 0; i < len; i++) {
+        bcc ^= data[i];
+    }
+    return bcc;
+}
