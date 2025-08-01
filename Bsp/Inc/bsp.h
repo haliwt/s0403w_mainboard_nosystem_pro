@@ -41,6 +41,7 @@ typedef struct PROCESS_T{
 
    uint8_t receive_copy_cmd ;
    uint8_t send_ack_cmd;
+   uint8_t gFan_pwm_duty_level;
   
    
 
