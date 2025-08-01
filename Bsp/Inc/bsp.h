@@ -30,6 +30,14 @@
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 extern uint8_t inputBuf[1];
 
+typedef enum{
+
+
+  power_off,
+  power_on
+
+}power_state_t;
+
 
 typedef struct PROCESS_T{
 

@@ -121,17 +121,18 @@ static void vTaskMsgPro(void *pvParameters)
 
              //   check_code =  bcc_check(gl_tMsg.usData,uid);
 
-               if(check_code == bcc_check_code ){
+              // if(check_code == bcc_check_code ){
                
-                 // receive_data_fromm_display(gl_tMsg.usData);
+                  receive_data_fromm_display(gl_tMsg.usData);
+                 
                   
                 }
                 
             }
         }
-	}
-       
 }
+       
+
 /**********************************************************************************************************
 *	�?1�?7 �?1�?7 �?1�?7: vTaskStart
 *	功能说明: 启动任务，也就是朢�高优先级任务，这里用作按键扫描��?1�?7
@@ -142,22 +143,17 @@ static void vTaskMsgPro(void *pvParameters)
 static void vTaskStart(void *pvParameters)
 {
   
-	// BaseType_t xResult;
-	// const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.测试设定�?-设置�?大等待时间为50ms */
-    // uint32_t ulValue;
-    // static uint8_t power_on_sound_flag ;
-	
-    while(1)
+	while(1)
     {
-    for (;;)
-        {
-        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);//PB4�����
-     
+  
+       
+        if(gpro_t.gpower_on == power_on){
 		fan_run_fun();
 		buzzer_sound();
-		vTaskDelay(200);//�ȴ�100ms
-
+		
         }
+		
+	vTaskDelay(20);//�ȴ�100ms
 
     }
        
@@ -264,7 +260,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	          gl_tMsg.usData[rx_data_counter] = inputBuf[0];
               
 
-              if(rx_end_flag == 1){
+               
+              if(gl_tMsg.usData[rx_data_counter] ==0xFE && rx_end_flag == 0 &&  rx_data_counter > 4){
+                     
+				     gpro_t.disp_rx_cmd_done_flag = 1 ;
+         
 
                 state = 0;
             
@@ -273,8 +273,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
                 rx_data_counter =0;
 
-                gpro_t.disp_rx_cmd_done_flag = 1 ;
-
+             
                 state=0;
 
                 bcc_check_code=inputBuf[0];
@@ -296,12 +295,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
               }
 
-              if(gl_tMsg.usData[rx_data_counter] ==0xFE && rx_end_flag == 0 &&  rx_data_counter > 4){
-                     
-                          rx_end_flag = 1 ;
-                          
-                        
-               }
 
         break;
 
