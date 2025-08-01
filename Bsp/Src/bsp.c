@@ -1,5 +1,7 @@
 #include "bsp.h"
 
+process_t gpro_t;
+
 uint8_t counter_flag;
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)

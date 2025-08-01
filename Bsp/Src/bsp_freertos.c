@@ -1,6 +1,6 @@
 #include "bsp.h"
 
-
+#define DECODER_BIT_0        (1<< 0)
 
 /***********************************************************************************************************
 											函数声明
@@ -54,7 +54,22 @@ void LED_Thread2(void const * argument)
   /* USER CODE END LED_Thread2 */
 }
 #endif
+typedef struct Msg
+{
+	uint8_t  ucMessageID;
+	uint8_t usData[12];
+	uint8_t link_wifi_net_flag;
+}MSG_T;
 
+MSG_T   gl_tMsg; /* ?????????????? */
+
+uint8_t rx_data_counter,rx_end_flag;
+
+uint8_t  rx_end_counter,uid;
+
+uint8_t check_code;
+
+uint8_t bcc_check_code;
 
 /**********************************************************************************************************
 *
@@ -155,4 +170,145 @@ void AppTaskCreate (void)
                  1,              		/* 任务优先�?1�?7 数��越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskStart );   /* 任务句柄  */
 }
+
+
+/********************************************************************************
+	**
+	*Function Name:void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+	*Function :UART callback function  for UART interrupt for receive data
+	*Input Ref: structure UART_HandleTypeDef pointer
+	*Return Ref:NO
+	*
+*******************************************************************************/
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+     static uint8_t state;
+     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+   //  MSG_T *ptMsg;
+
+    if(huart->Instance==USART2)
+    {
+	#if 0
+   //  DISABLE_INT();
+     if(net_t.linking_tencent_cloud_doing ==1){
+
+			gpro_t.wifi_rx_data_array[gpro_t.wifi_rx_data_counter] =wifi_rx_inputBuf[0];
+			gpro_t.wifi_rx_data_counter++;
+
+			if(*wifi_rx_inputBuf==0x0A) // 0x0A = "\n"
+			{
+				
+				Wifi_Rx_InputInfo_Handler();
+				gpro_t.wifi_rx_data_counter=0;
+			}
+
+	 } 
+     else{
+
+		    if(wifi_t.get_rx_beijing_time_enable==1){
+					gpro_t.wifi_rx_data_array[gpro_t.wifi_rx_data_counter] = wifi_rx_inputBuf[0];
+					gpro_t.wifi_rx_data_counter++;
+					
+			}
+			else
+			    Subscribe_Rx_Interrupt_Handler();
+	 }
+	 #endif 
+     //  ENABLE_INT();
+	  __HAL_UART_CLEAR_OREFLAG(&huart2);
+      HAL_UART_Receive_IT(&huart2,wifi_rx_inputBuf,1);
+	}
+
+	
+   if(huart->Instance==USART1)//if(huart==&huart1) // Motor Board receive data (filter)
+	{
+      // DISABLE_INT();
+		switch(state)
+		{
+		case 0:  //#0
+			if(inputBuf[0] == 0xA5){  // 0xA5 --didplay command head
+               rx_data_counter=0;
+               gl_tMsg.usData[rx_data_counter] = inputBuf[0];
+			   state=1; //=1
+
+             }
+            else
+                state=0;
+		break;
+
+       
+		case 1: //#1
+
+            if(gpro_t.disp_rx_cmd_done_flag ==0){
+              /* ???????? */
+               rx_data_counter++;
+		     
+	          gl_tMsg.usData[rx_data_counter] = inputBuf[0];
+              
+
+              if(rx_end_flag == 1){
+
+                state = 0;
+            
+                uid = rx_data_counter;
+                rx_end_flag=0;
+
+                rx_data_counter =0;
+
+                gpro_t.disp_rx_cmd_done_flag = 1 ;
+
+                state=0;
+
+                bcc_check_code=inputBuf[0];
+
+                #if 0
+
+                /* ???????? */
+                xQueueSendFromISR(xQueue2,
+                (void *)&gl_tMsg.usData,
+                &xHigherPriorityTaskWoken);
+
+                /* ??xHigherPriorityTaskWoken = pdTRUE,???????????????????? */
+                portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+                 #endif 
+
+                #if 1
+
+                xTaskNotifyFromISR(xHandleTaskStart,  /* ???? */
+                DECODER_BIT_0,     /* ???????????bit0  */
+                eSetBits,  /* ????????????BIT_0?????, ??????????? */
+                &xHigherPriorityTaskWoken);
+
+                /* ??xHigherPriorityTaskWoken = pdTRUE,???????????????????? */
+                portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+                #endif 
+                  
+              }
+
+              }
+
+              if(gl_tMsg.usData[rx_data_counter] ==0xFE && rx_end_flag == 0 &&  rx_data_counter > 4){
+                     
+                          rx_end_flag = 1 ;
+                          
+                        
+               }
+
+        break;
+
+
+			
+		}
+
+      //  ENABLE_INT();
+	    __HAL_UART_CLEAR_OREFLAG(&huart1);
+		HAL_UART_Receive_IT(&huart1,inputBuf,1);//UART receive data interrupt 1 byte
+		
+	 }
+    
+    
+  
+ }
+
 
