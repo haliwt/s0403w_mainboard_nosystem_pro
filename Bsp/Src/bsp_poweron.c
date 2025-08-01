@@ -29,7 +29,7 @@ void power_on_handler(void)
 		 //error detected times 
 		 gctl_t.ptc_warning =0;
 		// gctl_t.fan_warning =0;
-      //   fan_warning_flag =0;
+         fan_warning_flag =0;
 		 gctl_t.gTimer_ptc_adc_times=0;
 		 gctl_t.gTimer_fan_adc_times=0;
 		
@@ -40,14 +40,13 @@ void power_on_handler(void)
         powerOffFanRun_flag =1;
         //
         gctl_t.first_link_tencent_cloud_flag=1;
-        //check_time=0;
+        check_time=0;
         gpro_t.stopTwoHours_flag =0;
         stopHours_flag =0;
         gpro_t.gTimer_detect_fan_error=0;
+        gpro_t.fan_run_initial_times = 0; //WT.EDIT 2025.07.31
         
-      
-       
-         Update_DHT11_Value();
+         updateDht11_sensorData_toDisp();
 	   
 
         every_power_on_run();
@@ -59,15 +58,17 @@ void power_on_handler(void)
 
         
         fan_run_fun(); //WT.EDIT .2025.02.14
+
+		 //read_ntc_value_init();
        
         gpro_t.process_run_step= 1;
 	break;
         
     case 1: //5
 
-     if(send_dht11 ==0){
+     if(send_dht11 <2){
        send_dht11 ++;
-       Update_DHT11_Value();
+       updateDht11_sensorData_toDisp();
 
      }
 
@@ -77,10 +78,7 @@ void power_on_handler(void)
 	
 		  gctl_t.first_link_tencent_cloud_flag++;
 
-            
-            
-
-			Publish_Data_ToTencent_Initial_Data();
+            Publish_Data_ToTencent_Initial_Data();
 			osDelay(100);//HAL_Delay(200);
 
             MqttData_Publish_SetOpen(0x01);
@@ -92,14 +90,14 @@ void power_on_handler(void)
              SendWifiData_To_Data(0x1F,0x01);
              osDelay(20);
 
-             Update_DHT11_Value();
+             updateDht11_sensorData_toDisp();
               osDelay(20);
 	
 	  }
       else if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==0){
 
            gctl_t.first_link_tencent_cloud_flag++;
-           //Update_DHT11_Value();
+           //updateDht11_sensorData_toDisp();
            Update_Dht11_Totencent_Value();
            osDelay(20);
       }
@@ -134,7 +132,7 @@ void power_on_first_handler(void)
              SendWifiData_To_Data(0x1F,0x01);
              osDelay(20);
 
-             Update_DHT11_Value();
+             updateDht11_sensorData_toDisp();
               osDelay(20);
 	
 	  }

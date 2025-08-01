@@ -215,7 +215,7 @@ void Fan_RunSpeed_Fun(void)
 ********************************************************/
 static void SetLevel_Fan_PWMA(uint8_t levelval)
 {
-   gpro_t.gFan_pwm_duty_level = levelval;
+   gctl_t.gFan_pwm_duty_level = levelval;
    MX_TIM16_Init();
    HAL_TIM_PWM_Start(&htim16,TIM_CHANNEL_1);
 	

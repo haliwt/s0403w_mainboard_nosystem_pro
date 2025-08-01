@@ -104,7 +104,7 @@ static void vTaskMsgPro(void *pvParameters)
 	BaseType_t xResult;
 	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
     uint32_t ulValue;
-    static uint8_t power_on_sound_flag ;
+  
 	
     while(1)
     {
@@ -142,22 +142,72 @@ static void vTaskMsgPro(void *pvParameters)
 **********************************************************************************************************/
 static void vTaskStart(void *pvParameters)
 {
-  
+    static uint8_t power_on_sound_flag ;
 	while(1)
     {
   
-       
-        if(gpro_t.gpower_on == power_on){
-		fan_run_fun();
-		buzzer_sound();
-		
-        }
-		
-	vTaskDelay(20);//�ȴ�100ms
+       	if(power_on_sound_flag==0){
+            power_on_sound_flag ++;
+            FAN_Stop();  //WT.EDIT.2025.01.03
+            buzzer_sound();//buzzer_sound();
 
-    }
+        };
+
+         switch(gpro_t.gpower_on){ 
+
+            case power_on:
+            power_on_handler();
+            works_run_two_hours_state();
+            link_wifi_to_tencent_handler(gpro_t.wifi_led_fast_blink_flag); //detected ADC of value 
+            if(wifi_link_net_state() ==1 && gl_tMsg.link_wifi_net_flag ==0){
+              gl_tMsg.link_wifi_net_flag ++;
+              Update_Dht11_Totencent_Value();
+              osDelay(20);//HAL_Delay(200) //WT.EDIT 2024.08.10
+             }
+		
+          
+            if(gpro_t.answer_buzzer_flag == 1){//WT.EDIT 2025.07.28
+                gpro_t.answer_buzzer_flag ++;
+			    SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+			    osDelay(5);
+
+
+            }
+			
+			if(gpro_t.gTimer_update_todisplay > 6){
+			 	gpro_t.gTimer_update_todisplay=0;
+                updateDht11_sensorData_toDisp();
+              
+			 }
+			
+			
+           break;
+
+            case power_off:
+      
+              gpro_t.process_run_step=0;
+              gl_tMsg.link_wifi_net_flag=0;
+              power_off_handler();
+             break;
+          }
+         
+          if(gpro_t.wifi_led_fast_blink_flag==0 ){
+             wifi_communication_tnecent_handler();//
+             getBeijingTime_cofirmLinkNetState_handler();
+             wifi_auto_detected_link_state();
+          }
+         
+          send_cmd_ack_hanlder();
+		  vTaskDelay(20);//�ȴ�100ms
+
+
+        }
        
-}
+		
+	
+ }
+       
+
   
  /*
 *********************************************************************************************************
@@ -202,7 +252,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     if(huart->Instance==USART2)
     {
-	#if 0
+	
    //  DISABLE_INT();
      if(net_t.linking_tencent_cloud_doing ==1){
 
@@ -227,7 +277,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			else
 			    Subscribe_Rx_Interrupt_Handler();
 	 }
-	 #endif 
+	
      //  ENABLE_INT();
 	  __HAL_UART_CLEAR_OREFLAG(&huart2);
       HAL_UART_Receive_IT(&huart2,wifi_rx_inputBuf,1);

@@ -82,6 +82,7 @@ typedef struct PROCESS_T{
    uint8_t disp_rx_cmd_done_flag;
    uint8_t  wifi_rx_data_array[150];
    uint8_t wifi_rx_data_counter;
+   uint8_t fan_run_initial_times;
 
 
    uint8_t get_beijing_flag;
@@ -89,7 +90,8 @@ typedef struct PROCESS_T{
 
    uint8_t receive_copy_cmd ;
    uint8_t send_ack_cmd;
-   uint8_t gFan_pwm_duty_level;
+   //uint8_t gFan_pwm_duty_level;
+   uint8_t answer_buzzer_flag ;
 	
   
    
@@ -113,6 +115,7 @@ typedef struct PROCESS_T{
    uint8_t gTimer_detect_fan_error;
    uint8_t gTimer_again_send_power_on_off;
    uint8_t  gTimer_power_on_auto_link;
+   uint8_t gTimer_update_todisplay;
 
 
 
@@ -120,6 +123,14 @@ typedef struct PROCESS_T{
 
 extern process_t gpro_t;
 
+void bsp_init(void);
+
 uint8_t bcc_check(const unsigned char *data, int len) ;
+
+void link_wifi_to_tencent_handler(uint8_t data);
+
+void wifi_communication_tnecent_handler(void);
+
+void wifi_auto_detected_link_state(void);
 
 #endif 

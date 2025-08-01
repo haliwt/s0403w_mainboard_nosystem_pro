@@ -17,8 +17,8 @@ void smartphone_timer_power_on_and_normal_handler(void)
 	    gctl_t.gFan = 1;
 		dry_open_flag = 1;//gctl_t.gDry = 1;
         //g_dry_open_flag =1;
-		plasma_open_flag=1;//gctl_t.gPlasma =1;       //"杀菌"
-		ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "驱虫"
+		plasma_open_flag=1;//gctl_t.gPlasma =1;       //"鏉?鑿?"
+		ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "椹辫櫕"
 	    gctl_t.gTimer_fan_run_one_minute=0;
 
    
@@ -33,7 +33,7 @@ void smartphone_timer_power_on_and_normal_handler(void)
     
 		     MqttData_Publish_SetOpen(1);  
 			 HAL_Delay(200);
-		     Update_DHT11_Value();
+		     updateDht11_sensorData_toDisp();
 			 HAL_Delay(200);
 	         gctl_t.set_wind_speed_value =100;
 		
@@ -108,8 +108,8 @@ void SetPowerOff_ForDoing(void)
     gctl_t.gFan = 0;
     dry_open_flag=0;//gctl_t.gDry = 0;
   
-	plasma_open_flag=0;//gctl_t.gPlasma =0;       //"杀菌"
-	ultrasonic_open_flag=0;//gctl_t.gUlransonic = 0; // "驱虫"
+	plasma_open_flag=0;//gctl_t.gPlasma =0;       //"鏉?鑿?"
+	ultrasonic_open_flag=0;//gctl_t.gUlransonic = 0; // "椹辫櫕"
 	gctl_t.gModel =1;
 
 
@@ -117,8 +117,7 @@ void SetPowerOff_ForDoing(void)
 	PLASMA_SetLow(); //
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
 	PTC_SetLow();
-	//FAN_Stop();  //WT.EDIT.2025.01.03
-	//HAL_Delay(10);
+	
 
 }
 
@@ -137,13 +136,13 @@ void ActionEvent_Handler(void)
 
  
 
-    //  if(fan_warning_flag ==0){
+    if(fan_warning_flag ==0){
       
        
            PTC_SetHigh();
         
 
-	  //}
+	  }
     }
     else{
    
@@ -176,73 +175,6 @@ void ActionEvent_Handler(void)
 
 
 
-void updateMainboard_fun(void)
-{
-
- static uint8_t ptc_on,ptc_off,ptc_on_default=0xff,ptc_off_default=0xff;
- static uint8_t mouse_on,mouse_off,mouse_on_default=0xff,mouse_off_default=0xff;
-   if(dry_open_flag==1){//if(gctl_t.gDry ==1 || g_dry_open_flag ==1){
-
-      if(gctl_t.ptc_warning ==0){
-
-       if(ptc_on_default != ptc_on){
-           ptc_on_default = ptc_on;
-           ptc_off++;
-           PTC_SetHigh();
-
-        }
-
-	  }
-    }
-    else {
-       if(ptc_off_default != ptc_off){
-         ptc_off_default = ptc_off;
-         ptc_on++;
-         PTC_SetLow();
-
-      }
-		  
- 
-
-    }
-
-  
-	if(plasma_open_flag==1){//if(gctl_t.gPlasma == 1){
-		
-	     PLASMA_SetHigh();
-	}
-	else{
-
-		PLASMA_SetLow();
-	}
-	//driver bug
-	if(ultrasonic_open_flag==1){//if(gctl_t.gUlransonic ==1){
-	
-	    if(mouse_on_default != mouse_on){
-
-           mouse_on_default = mouse_on;
-           mouse_off++;
-		    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
-
-        }
-	}
-	else{
-
-     if(mouse_off_default != mouse_off){
-
-           mouse_off_default = mouse_off;
-           mouse_on++;
-	      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
-
-        }
-
-	}
-
-	Fan_RunSpeed_Fun();
-		
- }
-
-
 void every_power_on_run(void)
 {
 
@@ -253,8 +185,8 @@ void every_power_on_run(void)
       gctl_t.gFan = 1;
       dry_open_flag=1;//gctl_t.gDry = 1;
       //g_dry_open_flag =1;
-      plasma_open_flag=1;//gctl_t.gPlasma =1;       //"杀菌"
-      ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "驱虫"
+      plasma_open_flag=1;//gctl_t.gPlasma =1;       //"鏉?鑿?"
+      ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "椹辫櫕"
       gctl_t.gTimer_fan_run_one_minute=0;
 
  

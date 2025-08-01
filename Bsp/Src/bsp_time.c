@@ -72,14 +72,16 @@ void works_run_two_hours_state(void)
 {
    static uint8_t timer_fan_flag,times_flag;
 
-   if(stopHours_flag ==1){
+   if(stopHours_flag ==1){ //two works two hours stop flag is "1"
 
     stopHours_flag++;
    
-  
+    check_time=0;
     PLASMA_SetLow(); //
-    HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+    FAN_Stop();//WT.2025.07.31 HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+    
 	PTC_SetLow();
+	 gpro_t.fan_run_initial_times =0;
      gctl_t.gTimer_fan_run_one_minute=0;
      gpro_t.stopTwoHours_flag = 1;
      timer_fan_flag=1;
@@ -91,7 +93,8 @@ void works_run_two_hours_state(void)
     switch(gpro_t.stopTwoHours_flag){
 
     case 1: //don't run main board any action.
-     #if TEST_UNIT 
+    
+     #if TEST_TWO_HOURS_UNIT 
 	 if(check_time  > 2){ //10
            
              check_time=0;
@@ -103,15 +106,17 @@ void works_run_two_hours_state(void)
       }
      #else 
 
-//      if(check_time  > 10){ //10
-//               
-//         check_time=0;
-//         gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
-//         stopHours_flag=0;
-//         gpro_t.stopTwoHours_flag=0;
-//         ActionEvent_Handler();
-//                
-//      }
+      if(check_time  > 10){ //10
+               
+         check_time=0;
+         gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
+         stopHours_flag=0;
+         gpro_t.stopTwoHours_flag=0;
+         ActionEvent_Handler();
+		 
+		
+                
+      }
 
 
       #endif 
@@ -120,16 +125,17 @@ void works_run_two_hours_state(void)
 
 	      if(gctl_t.gTimer_fan_run_one_minute < 60){
 	  
-	              Fan_One_Power_Off_Speed();//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
-	          }       
+	           fan_run_fun();//SetLevel_Fan_PWMA(10);//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
+	      }       
 
 	       if(gctl_t.gTimer_fan_run_one_minute > 59){
 	           
 			   gctl_t.gTimer_fan_run_one_minute=0;
 			
 			  timer_fan_flag=0;
-              gctl_t.fan_stop_flag = 1;
+               gctl_t.fan_stop_flag = 1;
 			   FAN_Stop();
+			   gpro_t.fan_run_initial_times =0;
 	       }
 
 	  }
@@ -139,7 +145,7 @@ void works_run_two_hours_state(void)
           times_flag ++;
            if(times_flag > 2){
                times_flag =0;
-                  Update_DHT11_Value();
+                  updateDht11_sensorData_toDisp();
            }
 	 
       }
@@ -148,13 +154,10 @@ void works_run_two_hours_state(void)
     case 0:
         if(gctl_t.gTimer_senddata_panel >5 ){ //300ms
              gctl_t.gTimer_senddata_panel=0;
-             times_flag ++;
+             //times_flag ++;
               ActionEvent_Handler();
 
-              if(times_flag > 2){
-                  times_flag =0;
-                  Update_DHT11_Value();
-              }
+              
          }
       break;
    }
@@ -456,7 +459,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 	        wifi_t.soft_ap_config_flag =1;
              auto_link_net_flag =2;
    
-	        HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//开始连接
+	        HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//寮?濮嬭繛鎺?
             HAL_Delay(1000);
          
            
