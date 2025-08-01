@@ -15,40 +15,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "bsp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-//LED��˸����1
-void LED_Thread1(void const * argument)
-{
 
-  /* USER CODE BEGIN 5 */
-  (void) argument;
-  /* Infinite loop */
-  for (;;)
-  {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);//PB4�����
-  osDelay(100);//�ȴ�100ms
- 
-  }
-  /* USER CODE END 5 */ 
-}
-
-//LED��˸����2
-void LED_Thread2(void const * argument)
-{
-  /* USER CODE BEGIN LED_Thread2 */
-  (void) argument;
-  /* Infinite loop */
-  for (;;)
-  {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);//PB4�����
-  osDelay(250);//�ȴ�250ms
-  }
-  /* USER CODE END LED_Thread2 */
-}
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -116,12 +88,20 @@ int main(void)
 
   /* Start scheduler */
  // osKernelStart();
+   /* USER CODE BEGIN 2 */
+ 
+   //HAL_TIM_Base_Start_IT(&htim14);
+
+
+   freeRTOS_Handler();
+
+  /* USER CODE END 2 */
 
   /* We should never get here as control is now taken by the scheduler */
-
+#if 0
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	 osThreadDef(THREAD1, LED_Thread1, osPriorityNormal, 0, 128);//��������1
+osThreadDef(THREAD1, LED_Thread1, osPriorityNormal, 0, 128);//��������1
   osThreadCreate(osThread(THREAD1), NULL);//����LED��˸����1
 
   /* definition and creation of THREAD2 */
@@ -129,6 +109,7 @@ int main(void)
   osThreadCreate(osThread(THREAD2), NULL);//����LED��˸����2
   /* Start scheduler */
   osKernelStart();//ϵͳ����
+  #endif 
   while (1)
   {
     /* USER CODE END WHILE */
