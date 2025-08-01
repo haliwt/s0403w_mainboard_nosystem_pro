@@ -153,7 +153,7 @@ static void vTaskStart(void *pvParameters)
 
         };
 
-         switch(gpro_t.gpower_on){ 
+          switch(gpro_t.gpower_on){ 
 
             case power_on:
             power_on_handler();

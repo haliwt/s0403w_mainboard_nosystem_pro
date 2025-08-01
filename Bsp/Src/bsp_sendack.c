@@ -20,58 +20,51 @@ void receive_data_fromm_display(uint8_t *pdata)
 
      break;
 
-     case 0x01: //表示�?机指�?
+     case 0x01: //??????????
 
         if(pdata[3] == 0x01){ //open
           
            
-		   buzzer_sound();
-		   SendWifiData_Answer_Cmd(0x01,0x01);
-    
+          do{
            
            gpro_t.gpower_on = power_on;
             gctl_t.gModel=1;
     	    gctl_t.gFan = 1;
-    	
+    		dry_open_flag=1;//gctl_t.gDry = 1;
          
-    		gctl_t.gPlasma =1;       //"�?�?"
-    	
-    	
+    		//gctl_t.gPlasma =1;       //"????"
+    		plasma_open_flag =1;
+    		ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "???"
     	    gctl_t.gTimer_fan_run_one_minute=0;
             gpro_t.process_run_step=0;     //WT.EDIT 2025.01.11
             fan_run_fun();//SetLevel_Fan_PWMA(10); //WT.EDIT 2024.12.24
             PTC_SetHigh(); // the moment open ptc  //WT.EDIT 2025.01.11
-           
-		  
-		  
-           
+            SendWifiData_Answer_Cmd(0x01,0x01);
+            buzzer_sound();//buzzer_sound_fun();
+
             
-         
+            }while(0);
+            
 
         }
         else if(pdata[3] == 0x0){ //close 
-              buzzer_sound();
-
-		      power_off_action_fun();
+           
+           do{
+              power_off_action_fun();
               powerOffTunrOff_flag=1;
               gpro_t.gpower_on = power_off;
               SendWifiData_Answer_Cmd(0x01,0x02); //power off .
-          
+              buzzer_sound();
               
 
-         
+           }while(0);
 
 
         }
 
      break;
-	}
-}
-}
-		
-	#if 0
 
-     case 0x02: //PTC打开关闭指令
+     case 0x02: //PTC?????????
 
      if(pdata[3] == 0x01){
           buzzer_sound();
@@ -88,7 +81,7 @@ void receive_data_fromm_display(uint8_t *pdata)
        }
        }
        else if(pdata[3] == 0x0){
-          buzzer_sound();
+        buzzer_sound();
           dry_open_flag=0;//gctl_t.gDry =0;
         
          PTC_SetLow();
@@ -101,7 +94,7 @@ void receive_data_fromm_display(uint8_t *pdata)
 
      break;
 
-     case 0x03: //PLASMA 打开关闭指令
+     case 0x03: //PLASMA ?????????
 
         if(pdata[3] == 0x01){
            
@@ -126,7 +119,7 @@ void receive_data_fromm_display(uint8_t *pdata)
      break;
 
 
-      case 0x04: //ultrasonic  打开关闭指令
+      case 0x04: //ultrasonic  ?????????
 
         if(pdata[3] == 0x01){  //open 
           
@@ -145,7 +138,7 @@ void receive_data_fromm_display(uint8_t *pdata)
       case 0x05: // link wifi command
 
        if(pdata[3] == 0x01){  // link wifi 
-         //  buzzer_sound();
+        
          
           gpro_t.link_net_step =0;
 	      net_t.wifi_link_net_success=0;
@@ -166,20 +159,16 @@ void receive_data_fromm_display(uint8_t *pdata)
 
      case 0x06: //buzzer sound command 
 
-        if(pdata[3] == 0x01){  //buzzer sound 
+       
 
-         do{
+           
             buzzer_sound();
-             pdata[2] =0xff;
-          }while(0);
+			//gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.30
+           // pdata[2] =0xff;
+          
            
 
-        }
-        else if(pdata[3] == 0x0){ // don't buzzer sound .
-
-
-
-        }
+       
 
 
      break;
@@ -187,31 +176,26 @@ void receive_data_fromm_display(uint8_t *pdata)
      case 0x16 : //buzzer sound command with answer .
 
       
-       if(pdata[3] == 0x01){  //buzzer sound 
+      
+		   buzzer_sound();
+        
+		  
+           gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
+          // pdata[2] =0xff;
 
-           do{
-            SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.01.07
-            buzzer_sound();
             
-            pdata[2] =0xff;
-
-            }while(0);
            
  
-        }
-        else if(pdata[3] == 0x0){ // don't buzzer sound .
- 
- 
- 
-        }
+        
+      
 
 
      break;
 
 
-      case 0x1A: //温度数据
+      case 0x1A: //??????
 
-        if(pdata[3] == 0x0F){ //数据
+        if(pdata[3] == 0x0F){ //???
 
            gctl_t.set_temperature_value = pdata[5] ;
            if(wifi_link_net_state()==1){
@@ -222,17 +206,17 @@ void receive_data_fromm_display(uint8_t *pdata)
         }
       break;
 
-      case 0x1B: //湿度数据
+      case 0x1B: //??????
 
-        if(pdata[3] == 0x0F){ //数据
+        if(pdata[3] == 0x0F){ //???
             
 
         }
       break;
 
-      case 0x1C: //表示时间：小时，分，�?
+      case 0x1C: //?????????????????
 
-        if(pdata[3] == 0x0F){ //数据
+        if(pdata[3] == 0x0F){ //???
 
           
 
@@ -240,9 +224,9 @@ void receive_data_fromm_display(uint8_t *pdata)
         }
       break;
 
-        case 0x1D: //表示日期�? 年，月，�?
+        case 0x1D: //???????? ????????
 
-        if(pdata[3] == 0x0F){ //数据
+        if(pdata[3] == 0x0F){ //???
 
              
             
@@ -250,14 +234,14 @@ void receive_data_fromm_display(uint8_t *pdata)
         }
       break;
 
-     case 0x22: //PTC打开关闭指令,没有蜂鸣器声音�??
+     case 0x22: //PTC?????????,????????0????
 
       if(pdata[3] == 0x01){
         
 
          dry_open_flag=1;//gctl_t.gDry = 1;
    
-        if(gpro_t.stopTwoHours_flag ==0){
+        if(gpro_t.stopTwoHours_flag ==1){
               PTC_SetHigh();
              if(wifi_link_net_state()==1){
                   MqttData_Publish_SetPtc(0x01);
@@ -351,10 +335,9 @@ void receive_data_fromm_display(uint8_t *pdata)
      }
 
    }
-  
 
 }
- #endif 
+
 
 /**********************************************************************
 *
