@@ -103,7 +103,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_4);
+ // HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_4);
    HAL_TIM_Base_Start_IT(&htim17);
    UART_Start_Receive_IT(&huart1,inputBuf,1);
    UART_Start_Receive_IT(&huart2,wifi_rx_inputBuf,1);
