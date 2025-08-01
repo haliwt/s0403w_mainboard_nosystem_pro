@@ -137,13 +137,13 @@ void ActionEvent_Handler(void)
 
  
 
-      if(fan_warning_flag ==0){
+    //  if(fan_warning_flag ==0){
       
        
            PTC_SetHigh();
         
 
-	  }
+	  //}
     }
     else{
    

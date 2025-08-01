@@ -76,7 +76,7 @@ void works_run_two_hours_state(void)
 
     stopHours_flag++;
    
-    check_time=0;
+  
     PLASMA_SetLow(); //
     HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
 	PTC_SetLow();
@@ -103,15 +103,15 @@ void works_run_two_hours_state(void)
       }
      #else 
 
-      if(check_time  > 10){ //10
-               
-         check_time=0;
-         gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
-         stopHours_flag=0;
-         gpro_t.stopTwoHours_flag=0;
-         ActionEvent_Handler();
-                
-      }
+//      if(check_time  > 10){ //10
+//               
+//         check_time=0;
+//         gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
+//         stopHours_flag=0;
+//         gpro_t.stopTwoHours_flag=0;
+//         ActionEvent_Handler();
+//                
+//      }
 
 
       #endif 

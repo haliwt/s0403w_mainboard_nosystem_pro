@@ -142,6 +142,7 @@ typedef struct _RUN_T{
 
 	 // uint8_t  gUlransonic;
 	  uint8_t  gModel;
+	  uint8_t gPlasma;
     
 
 	  

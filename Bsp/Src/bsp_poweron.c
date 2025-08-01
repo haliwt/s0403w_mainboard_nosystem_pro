@@ -29,7 +29,7 @@ void power_on_handler(void)
 		 //error detected times 
 		 gctl_t.ptc_warning =0;
 		// gctl_t.fan_warning =0;
-         fan_warning_flag =0;
+      //   fan_warning_flag =0;
 		 gctl_t.gTimer_ptc_adc_times=0;
 		 gctl_t.gTimer_fan_adc_times=0;
 		
@@ -40,7 +40,7 @@ void power_on_handler(void)
         powerOffFanRun_flag =1;
         //
         gctl_t.first_link_tencent_cloud_flag=1;
-        check_time=0;
+        //check_time=0;
         gpro_t.stopTwoHours_flag =0;
         stopHours_flag =0;
         gpro_t.gTimer_detect_fan_error=0;

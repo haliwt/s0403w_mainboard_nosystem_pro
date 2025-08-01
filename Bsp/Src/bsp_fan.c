@@ -184,6 +184,27 @@ void Fan_Two_Speed(void)
 
 
 
+void Fan_RunSpeed_Fun(void)
+{
+
+    if(gctl_t.set_wind_speed_value < 34 ){
+        Fan_One_Speed();
+    }
+    else if(gctl_t.set_wind_speed_value > 33  && gctl_t.set_wind_speed_value < 67 ){
+
+        Fan_Two_Speed();
+
+    }
+    else if(gctl_t.set_wind_speed_value > 66){
+
+         Fan_Full_Speed();
+
+    }
+
+      
+
+}
+
 
 /********************************************************
 *

@@ -34,7 +34,7 @@
 
 
 #define PLASMA_SetHigh()          HAL_GPIO_WritePin(PLASMA_GPIO_Port,PLASMA_Pin,GPIO_PIN_SET)// do{PLASMA_GPIO_Port-> BSRR |= PLASMA_Pin;}while(0) //HAL_GPIO_WritePin(PLASMA_GPIO,PLASMA_PIN,GPIO_PIN_SET)    // output high level
-#define PLASMA_SetLow()            HAL_GPIO_WritePin(PLASMA_GPIO_Port,PLASMA_Pin,GPIO_PIN_RESET)    // //  do{PLASMA_GPIO_Port-> BRR = PLASMA_Pin;}while(0)// HAL_GPIO_WritePin(PLASMA_GPIO,PLASMA_PIN,GPIO_PIN_RESET)    // output low level
+#define PLASMA_SetLow()           HAL_GPIO_WritePin(PLASMA_GPIO_Port,PLASMA_Pin,GPIO_PIN_RESET)    // //  do{PLASMA_GPIO_Port-> BRR = PLASMA_Pin;}while(0)// HAL_GPIO_WritePin(PLASMA_GPIO,PLASMA_PIN,GPIO_PIN_RESET)    // output low level
 
 #define NEWPCB_FAN       1
 

@@ -25,36 +25,38 @@ void receive_data_fromm_display(uint8_t *pdata)
         if(pdata[3] == 0x01){ //open
           
            
+		   buzzer_sound();
+		   SendWifiData_Answer_Cmd(0x01,0x01);
     
            
            gpro_t.gpower_on = power_on;
-          //  gctl_t.gModel=1;
-    	  //  gctl_t.gFan = 1;
-    	//	dry_open_flag=1;//gctl_t.gDry = 1;
+            gctl_t.gModel=1;
+    	    gctl_t.gFan = 1;
+    	
          
-    		//gctl_t.gPlasma =1;       //"Êù?Ëè?"
-    		//plasma_open_flag =1;
-    		//ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "È©±Ëô´"
-    	   // gctl_t.gTimer_fan_run_one_minute=0;
-           // gpro_t.process_run_step=0;     //WT.EDIT 2025.01.11
-            //fan_run_fun();//SetLevel_Fan_PWMA(10); //WT.EDIT 2024.12.24
-           // PTC_SetHigh(); // the moment open ptc  //WT.EDIT 2025.01.11
-            SendWifiData_Answer_Cmd(0x01,0x01);
+    		gctl_t.gPlasma =1;       //"Êù?Ëè?"
+    	
+    	
+    	    gctl_t.gTimer_fan_run_one_minute=0;
+            gpro_t.process_run_step=0;     //WT.EDIT 2025.01.11
+            fan_run_fun();//SetLevel_Fan_PWMA(10); //WT.EDIT 2024.12.24
+            PTC_SetHigh(); // the moment open ptc  //WT.EDIT 2025.01.11
+           
 		  
 		  
-           buzzer_sound();//buzzer_sound_fun();
-
+           
             
          
 
         }
         else if(pdata[3] == 0x0){ //close 
-       
-             // power_off_action_fun();
-            //  powerOffTunrOff_flag=1;
-             // gpro_t.gpower_on = power_off;
+              buzzer_sound();
+
+		      power_off_action_fun();
+              powerOffTunrOff_flag=1;
+              gpro_t.gpower_on = power_off;
               SendWifiData_Answer_Cmd(0x01,0x02); //power off .
-             buzzer_sound();
+          
               
 
          

@@ -32,13 +32,13 @@ void power_off_handler(void)
 		gctl_t.app_timer_power_on_flag =0;
 		
 		stopHours_flag =0;
-	    check_time =0;
+	  
         
 	    gpro_t.stopTwoHours_flag=0;
 
 		  gctl_t.ptc_warning =0;
 		 //gctl_t.fan_warning =0;
-         fan_warning_flag =0;
+       
 		 gctl_t.gTimer_ptc_adc_times=0;
 		 gctl_t.gTimer_fan_adc_times=0;
          gpro_t.process_run_step=0;//gpro_t.process_run_step
@@ -54,12 +54,12 @@ void power_off_handler(void)
         
        if(wifi_link_net_state() == 1){
 
-          MqttData_Publish_PowerOff_Ref(); 
+         // MqttData_Publish_PowerOff_Ref(); 
           osDelay(200);//HAL_Delay(200);
 
           if( gctl_t.ptc_remove_warning_send_data ==0){
 		 	gctl_t.ptc_remove_warning_send_data++;
-		  	Publish_Data_Warning(ptc_temp_warning,0);
+		  //	Publish_Data_Warning(ptc_temp_warning,0);
 		  	osDelay(200);
 			Publish_Data_Warning(fan_warning,0);
 			osDelay(200);
@@ -101,7 +101,7 @@ void power_off_handler(void)
 
         }
         gpro_t.stopTwoHours_flag =0;
-        check_time=0;
+       
         power_off_stop_fun();
 
      break;

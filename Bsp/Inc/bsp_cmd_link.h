@@ -1,27 +1,7 @@
 #ifndef __BSP_CMD_LINK_H_
 #define __BSP_CMD_LINK_H_
 #include "main.h"
-typedef enum ack_sig{
 
-  ack_null,
-  ack_power_on ,
-  ack_power_off,
-  ack_wifi_on,
-  ack_ptc_on,
-  ack_ptc_off,
-  ack_plasma_on,
-  ack_plasma_off,
-  ack_ultra_on,
-  ack_ultra_off,
-  //wifi cmd
-
-  ack_app_power_on,
-  ack_app_power_off,
-  ack_app_timer_power_on,
-  
-  
-
-}ack_e;
 
 extern uint8_t rx_wifi_data[7];
 

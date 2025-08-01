@@ -6,7 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "bsp_freertos.h"
+#include "cmsis_os.h"
+#include "adc.h"
+#include "tim.h"
+#include "usart.h"
+#include "gpio.h"
 
 
 
@@ -14,17 +18,49 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "main.h"
-#include "cmsis_os.h"
 
 
-#include "adc.h"
-#include "tim.h"
-#include "usart.h"
-#include "gpio.h"
+#include "bsp_freertos.h"
+#include "bsp_fan.h"
+
+#include "bsp_ctl.h"
+#include "bsp_delay.h"
 
 #include "bsp_cmd_link.h"
+#include "bsp_sendack.h"
+#include "bsp_poweroff.h"
+#include "bsp_poweron.h"
+#include "bsp_time.h"
+#include "bsp_netparse.h"
+
+#include "interrupt_manager.h"
+
+
+#include "bsp_wifi.h"
 #include "bsp_buzzer.h"
+#include "bsp_adc.h"
+#include "bsp_freertos.h"
+
+
+#include "bsp_wifi_fun.h"
+#include "bsp_dht11.h"
 #include "bsp_fan.h"
+#include "bsp_ultrasonic.h"
+
+#include "bsp_special_power.h"
+
+//wifi files
+#include "bsp_esp8266.h"
+#include "bsp_mqtt_iot.h"
+#include "bsp_publish.h"
+#include "bsp_wifi_fun.h"
+#include "bsp_wifi.h"
+#include "bsp_subscription.h"
+
+
+
+
+
 #define WIFI_RX_NUMBERS         1
 
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
@@ -54,6 +90,7 @@ typedef struct PROCESS_T{
    uint8_t receive_copy_cmd ;
    uint8_t send_ack_cmd;
    uint8_t gFan_pwm_duty_level;
+	
   
    
 
