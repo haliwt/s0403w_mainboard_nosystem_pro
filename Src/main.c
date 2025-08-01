@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -20,7 +21,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+uint8_t counter_flag;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -79,6 +80,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -86,21 +88,15 @@ int main(void)
   /* Call init function for freertos objects (in cmsis_os2.c) */
   MX_FREERTOS_Init();
 
-  /* Start scheduler */
- // osKernelStart();
-   /* USER CODE BEGIN 2 */
- 
-   //HAL_TIM_Base_Start_IT(&htim14);
 
-
-   freeRTOS_Handler();
-
-  /* USER CODE END 2 */
 
   /* We should never get here as control is now taken by the scheduler */
-#if 0
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+   HAL_TIM_Base_Start_IT(&htim17);
+   freeRTOS_Handler();
+ #if 0
 osThreadDef(THREAD1, LED_Thread1, osPriorityNormal, 0, 128);//��������1
   osThreadCreate(osThread(THREAD1), NULL);//����LED��˸����1
 
@@ -179,13 +175,21 @@ void SystemClock_Config(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
-
+  static uint16_t tim17_counter;
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM14)
   {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
+  else if (htim->Instance == TIM17)
+  {
+    tim17_counter++;
+	if(tim17_counter>999){
+		tim17_counter=0;
+		counter_flag++;
+	}
+  }
 
   /* USER CODE END Callback 1 */
 }
