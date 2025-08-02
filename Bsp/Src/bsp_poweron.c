@@ -90,8 +90,8 @@ void power_on_handler(void)
              SendWifiData_To_Data(0x1F,0x01);
              osDelay(20);
 
-             updateDht11_sensorData_toDisp();
-              osDelay(20);
+            // updateDht11_sensorData_toDisp();
+            //  osDelay(20);
 	
 	  }
       else if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==0){
@@ -105,9 +105,18 @@ void power_on_handler(void)
      }
 
 
-    // works_times_handler(); //WT.EDIT 2025.01.07
+     gpro_t.process_run_step= 2;
 
      break;
+	 
+	case 2:
+		gpro_t.process_run_step= 1;
+
+	break;
+	
+	default:
+		//gpro_t.process_run_step= 1;
+		break;
   }
 }
 

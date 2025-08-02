@@ -113,7 +113,7 @@ static void vTaskMsgPro(void *pvParameters)
          xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
 						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
-						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
+						          portMAX_DELAY);  /* ????????,????-block portMAX_DELAY */
         if(xResult == pdPASS){
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
@@ -173,8 +173,15 @@ static void vTaskStart(void *pvParameters)
 
 
             }
+
+       
+		   if(gpro_t.buzzer_sounding_flag==1){
 			
-			if(gpro_t.gTimer_update_todisplay > 6){
+				gpro_t. buzzer_sounding_flag ++;
+		         gpro_t.gTimer_update_todisplay=0;
+
+		   }     
+			 else if(gpro_t.gTimer_update_todisplay > 6){
 			 	gpro_t.gTimer_update_todisplay=0;
                 updateDht11_sensorData_toDisp();
               
@@ -190,15 +197,21 @@ static void vTaskStart(void *pvParameters)
               power_off_handler();
              break;
           }
-         
-          if(gpro_t.wifi_led_fast_blink_flag==0 ){
+		  
+		  
+          if(gpro_t.stop_run_wifi_pro ==1){
+             
+		        gpro_t.stop_run_wifi_pro++;
+
+		      }
+          else if(gpro_t.wifi_led_fast_blink_flag==0 ){
              wifi_communication_tnecent_handler();//
              getBeijingTime_cofirmLinkNetState_handler();
              wifi_auto_detected_link_state();
           }
          
           send_cmd_ack_hanlder();
-		  vTaskDelay(20);//�ȴ�100ms
+		  vTaskDelay(200);//�ȴ�100ms
 
 
         }
@@ -318,15 +331,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
                 state = 0;
             
-                uid = rx_data_counter;
-                rx_end_flag=0;
+                //uid = rx_data_counter;
+                //rx_end_flag=0;
 
                 rx_data_counter =0;
 
              
-                state=0;
+               // state=0;
 
-                bcc_check_code=inputBuf[0];
+                //bcc_check_code=inputBuf[0];
 
            
 

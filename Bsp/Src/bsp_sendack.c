@@ -160,9 +160,10 @@ void receive_data_fromm_display(uint8_t *pdata)
      case 0x06: //buzzer sound command 
 
        
-
+           gpro_t.stop_run_wifi_pro =1; //stop wifi process
            
             buzzer_sound();
+             gpro_t.stop_run_wifi_pro =1; //stop wifi process
 			//gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.30
            // pdata[2] =0xff;
           
@@ -175,10 +176,10 @@ void receive_data_fromm_display(uint8_t *pdata)
 
      case 0x16 : //buzzer sound command with answer .
 
-      
+        gpro_t.stop_run_wifi_pro =1; //stop wifi process
       
 		   buzzer_sound();
-        
+         gpro_t.stop_run_wifi_pro =1; //stop wifi process
 		  
            gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
           // pdata[2] =0xff;
