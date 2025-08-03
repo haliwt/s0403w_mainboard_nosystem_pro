@@ -48,6 +48,7 @@ void power_on_handler(void)
         stopHours_flag =0;
         gpro_t.gTimer_detect_fan_error=0;
         gpro_t.fan_run_initial_times = 0; //WT.EDIT 2025.07.31
+        gctl_t.set_temperature_value=40; //power on default set temperature value is 40 degree,don't compare 
 		 gpro_t.process_run_step= 1;
 	break; 
 
@@ -55,6 +56,7 @@ void power_on_handler(void)
   case 1:
         
          updateDht11_sensorData_toDisp();
+		 osDelay(10);
 	 gpro_t.process_run_step= 2;
 	   
   break;
@@ -74,7 +76,7 @@ void power_on_handler(void)
         if(wifi_link_net_state() ==1){
 
           Update_Dht11_Totencent_Value();
-          osDelay(20);//HAL_Delay(200) //WT.EDIT 2024.08.10
+          osDelay(100);//HAL_Delay(200) //WT.EDIT 2024.08.10
         }
 
         fan_run_fun();//SetLevel_Fan_PWMA(10); //WT.EDIT 2024.12.24
@@ -88,11 +90,11 @@ void power_on_handler(void)
 
   case 4: //5
 
-//     if(send_dht11 ==0){
-//       send_dht11 ++;
-//       updateDht11_sensorData_toDisp();
-
-//     }
+     if(wifi_link_net_state() ==1){
+    
+		     MqttData_Publish_SetOpen(1);  
+			 osDelay(100);
+     	}
 	  gpro_t.process_run_step= 5;
 	 
 	 break;
@@ -102,15 +104,10 @@ void power_on_handler(void)
 		
 	
 		if(wifi_link_net_state() ==1){
-    
-		     MqttData_Publish_SetOpen(1);  
-			 HAL_Delay(200);
-		     updateDht11_sensorData_toDisp();
-			 HAL_Delay(200);
-	         gctl_t.set_wind_speed_value =100;
+           gctl_t.set_wind_speed_value =100;
 		
-			 MqttData_Publish_Update_Data();
-			 HAL_Delay(200);
+			 MqttData_Publish_Init();
+			 osDelay(200);
 
          }
 	     gpro_t.process_run_step=6 ;
@@ -119,22 +116,25 @@ void power_on_handler(void)
   case 6: 
 
    if(gpro_t.wifi_led_fast_blink_flag==0){
-    if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==1 && gctl_t.app_timer_power_on_flag==0){
+      if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==1 && gctl_t.app_timer_power_on_flag==0){
 	
 		  gctl_t.first_link_tencent_cloud_flag++;
 
-            Publish_Data_ToTencent_Initial_Data();
-			osDelay(100);//HAL_Delay(200);
+            Publish_Data_ToTencent_Update_Data();
+			osDelay(200);//HAL_Delay(200);
 
-            MqttData_Publish_SetOpen(0x01);
-			osDelay(100);//HAL_Delay(100);
+           // MqttData_Publish_SetOpen(0x01);
+			//osDelay(100);//HAL_Delay(100);
+    	}
+	    else if(gctl_t.first_link_tencent_cloud_flag < 4){
+			 gctl_t.first_link_tencent_cloud_flag++;
 
             Subscriber_Data_FromCloud_Handler();
     		osDelay(100);//HAL_Delay(100);//HAL_Delay(350);
-
+	    }
 	
 	  }
-     }
+    
       
 	 gpro_t.process_run_step=7 ;
  break; 

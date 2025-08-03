@@ -80,8 +80,9 @@ void link_wifi_net_handler(void)
             case 1:
                // WIFI_IC_ENABLE();
                 HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
-
+                osDelay(1000);
                 gctl_t.randomName[0]=HAL_GetUIDw0();
+			    osDelay(200);
                 gpro_t.gTimer_link_net_timer_time = 0;
 
                 gpro_t.link_net_step = 2;
@@ -202,8 +203,8 @@ void link_wifi_net_handler(void)
 
 			 case 8: 
 			 	
-			    Publish_Data_ToTencent_Initial_Data();
-                osDelay(300);
+			    MqttData_Publish_Update_Data();//Publish_Data_ToTencent_Initial_Data();
+                osDelay(200);
 
 			   gpro_t.link_net_step = 9;
 
