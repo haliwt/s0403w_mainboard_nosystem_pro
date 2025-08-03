@@ -169,19 +169,14 @@ static void vTaskStart(void *pvParameters)
             if(gpro_t.answer_buzzer_flag == 1){//WT.EDIT 2025.07.28
                 gpro_t.answer_buzzer_flag ++;
 			    SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-			    osDelay(5);
+			    osDelay(10);
 
 
             }
 
        
-		   if(gpro_t.buzzer_sounding_flag==1){
-			
-				gpro_t. buzzer_sounding_flag ++;
-		         gpro_t.gTimer_update_todisplay=0;
-
-		   }     
-			 else if(gpro_t.gTimer_update_todisplay > 6){
+		    
+			if(gpro_t.gTimer_update_todisplay > 1){
 			 	gpro_t.gTimer_update_todisplay=0;
                 updateDht11_sensorData_toDisp();
               
@@ -211,7 +206,7 @@ static void vTaskStart(void *pvParameters)
           }
          
           send_cmd_ack_hanlder();
-		  vTaskDelay(200);//�ȴ�100ms
+		  vTaskDelay(20);//�ȴ�100ms
 
 
         }

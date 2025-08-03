@@ -16,10 +16,13 @@ void power_on_handler(void)
     switch(gpro_t.process_run_step){
 
 	case 0: //1
-	     
 
+
+    
          smartphone_timer_power_on_and_normal_handler();
 
+	      
+         
          
          gctl_t.gTImer_send_data_to_disp=0; //temp and humidity data of times
          
@@ -45,35 +48,77 @@ void power_on_handler(void)
         stopHours_flag =0;
         gpro_t.gTimer_detect_fan_error=0;
         gpro_t.fan_run_initial_times = 0; //WT.EDIT 2025.07.31
+		 gpro_t.process_run_step= 1;
+	break; 
+
+
+  case 1:
         
          updateDht11_sensorData_toDisp();
+	 gpro_t.process_run_step= 2;
 	   
-
+  break;
+	
+	
+	case 2:
+		
         every_power_on_run();
+	
+	 gpro_t.process_run_step= 3;
+	break;
+	
+	
+	case 3:
+	
+	
         if(wifi_link_net_state() ==1){
 
           Update_Dht11_Totencent_Value();
           osDelay(20);//HAL_Delay(200) //WT.EDIT 2024.08.10
         }
 
+        fan_run_fun();//SetLevel_Fan_PWMA(10); //WT.EDIT 2024.12.24
+        PTC_SetHigh(); // the moment open ptc  //WT.EDIT 2025.01.11
         
-        fan_run_fun(); //WT.EDIT .2025.02.14
-
-		 //read_ntc_value_init();
+      
+	
        
-        gpro_t.process_run_step= 1;
+        gpro_t.process_run_step= 4;
+	break;
+
+  case 4: //5
+
+//     if(send_dht11 ==0){
+//       send_dht11 ++;
+//       updateDht11_sensorData_toDisp();
+
+//     }
+	  gpro_t.process_run_step= 5;
+	 
+	 break;
+	     
+
+    case 5:
+		
+	
+		if(wifi_link_net_state() ==1){
+    
+		     MqttData_Publish_SetOpen(1);  
+			 HAL_Delay(200);
+		     updateDht11_sensorData_toDisp();
+			 HAL_Delay(200);
+	         gctl_t.set_wind_speed_value =100;
+		
+			 MqttData_Publish_Update_Data();
+			 HAL_Delay(200);
+
+         }
+	     gpro_t.process_run_step=6 ;
 	break;
         
-    case 1: //5
+  case 6: 
 
-     if(send_dht11 <2){
-       send_dht11 ++;
-       updateDht11_sensorData_toDisp();
-
-     }
-
-  
-	if(gpro_t.wifi_led_fast_blink_flag==0){
+   if(gpro_t.wifi_led_fast_blink_flag==0){
     if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==1 && gctl_t.app_timer_power_on_flag==0){
 	
 		  gctl_t.first_link_tencent_cloud_flag++;
@@ -87,32 +132,30 @@ void power_on_handler(void)
             Subscriber_Data_FromCloud_Handler();
     		osDelay(100);//HAL_Delay(100);//HAL_Delay(350);
 
-             SendWifiData_To_Data(0x1F,0x01);
-             osDelay(20);
-
-            // updateDht11_sensorData_toDisp();
-            //  osDelay(20);
 	
 	  }
-      else if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==0){
+     }
+      
+	 gpro_t.process_run_step=7 ;
+ break; 
+	  
+  case 7:
+      if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==0){
 
-           gctl_t.first_link_tencent_cloud_flag++;
+           
+		  gctl_t.first_link_tencent_cloud_flag++;
            //updateDht11_sensorData_toDisp();
            Update_Dht11_Totencent_Value();
-           osDelay(20);
+           osDelay(200);
+		   SendWifiData_To_Data(0x1F,0x01);
+            osDelay(15);
       }
 
-     }
-
-
-     gpro_t.process_run_step= 2;
+      gpro_t.process_run_step= 6;
 
      break;
 	 
-	case 2:
-		gpro_t.process_run_step= 1;
 
-	break;
 	
 	default:
 		//gpro_t.process_run_step= 1;

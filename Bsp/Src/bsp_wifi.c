@@ -112,7 +112,7 @@ void link_wifi_net_handler(void)
                    gpro_t.link_net_step = 4;
            // WIFI_IC_ENABLE();
 			
-            HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //动态注册 
+            HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //动�?�注�? 
 	  		osDelay(1000);//HAL_Delay(1000);
         
           
@@ -145,7 +145,7 @@ void link_wifi_net_handler(void)
             if(net_t.soft_ap_config_success==1){
 
             net_t.soft_ap_config_success=0;
-            HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//开始连接
+            HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//�?始连�?
             //HAL_Delay(1000);
             // HAL_Delay(1000);
             ///HAL_Delay(1000);
@@ -159,7 +159,7 @@ void link_wifi_net_handler(void)
 
             case 6:
 
-            if( gpro_t.gTimer_link_net_timer_time  > 6){
+            if( gpro_t.gTimer_link_net_timer_time  > 7){
 
              if(net_t.wifi_link_net_success==1){
 			
@@ -168,6 +168,7 @@ void link_wifi_net_handler(void)
 				wifi_t.get_rx_beijing_time_enable=0;
                 
                SendWifiData_To_Data(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+               osDelay(5);
 			    gpro_t.link_net_step = 7;
               
 				
@@ -175,9 +176,9 @@ void link_wifi_net_handler(void)
 		     else{
                 
                   gpro_t.wifi_led_fast_blink_flag=0;
-                  gpro_t.link_net_step = 8;
+                  gpro_t.link_net_step = 10;
                   SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
-                
+                  osDelay(5);
            
                 }
                 
@@ -190,16 +191,30 @@ void link_wifi_net_handler(void)
               gpro_t.wifi_led_fast_blink_flag=0;
               gpro_t.gTimer_get_data_from_tencent_data=0;
 			 
-				 MqttData_Publish_SetOpen(0x01);
-		         HAL_Delay(20);
-		        // osDelay(100);
-		         Publish_Data_ToTencent_Initial_Data();
-				 HAL_Delay(20);
-                  //osDelay(100);
+				MqttData_Publish_SetOpen(0x01);
+		      
+		        osDelay(200);
+		        
+				 
+			gpro_t.link_net_step = 8;
+		    break;
+				 
+
+			 case 8: 
+			 	
+			    Publish_Data_ToTencent_Initial_Data();
+                osDelay(300);
+
+			   gpro_t.link_net_step = 9;
+
+
+			break;
+
+			case 9:
 
 				Subscriber_Data_FromCloud_Handler();
-				HAL_Delay(20);
-	             //osDelay(100);
+		
+	             osDelay(200);
 
 			 gpro_t.link_net_step = 0xfe;
 
@@ -207,7 +222,7 @@ void link_wifi_net_handler(void)
             break;
 
 
-            case 8:
+            case 10:
 
 
               gpro_t.get_beijing_flag= 10;

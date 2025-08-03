@@ -55,50 +55,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
     HAL_IncTick();
   }
-   #if 0
-    if(htim->Instance==TIM14){ //timer number14 is 100ms.
-         tm1++;
-      if(tm1 > 99){//10ms *100 = 1000ms =1s
-        tm1 =0;
-      gTimer_powerOffRunFan++;
-      stopHoursCounter++;
-
-
-      if(stopHoursCounter> 59){ //one minute
-          stopHoursCounter =0;
-       
-          
-          check_time ++;
-         #if TEST_UNIT
-          if(check_time >3  && stopHours_flag ==0){ //119
-             check_time=0;
-          
-             stopHours_flag =1;
-              
-          }
-         #else 
-           if(check_time >119  && stopHours_flag ==0){ //119
-                   check_time=0;
-                
-                   stopHours_flag =1;
-                    
-           }
-
-
-         #endif 
-       }
-
-
-      }
-  
-    }
-	#endif 
-    else if(htim->Instance==TIM17){
+   else if(htim->Instance==TIM17){
 		
 	   tm0 ++ ;
        
      
-	 if(tm0 > 99){//10ms *100 = 1000ms =1s
+	 if(tm0 > 999){//10ms *100 = 1000ms =1s
         tm0 =0;
         
         gpro_t.gTimer_link_net_timer_time++;
