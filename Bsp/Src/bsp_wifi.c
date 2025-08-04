@@ -108,15 +108,15 @@ void link_wifi_net_handler(void)
 
             case 3:
                 
-            if(gpro_t.gTimer_link_net_timer_time  > 7){
+            if(gpro_t.gTimer_link_net_timer_time  > 4){
                       gpro_t.gTimer_link_net_timer_time = 0;
-                   gpro_t.link_net_step = 4;
+                  
            // WIFI_IC_ENABLE();
 			
-            HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //åŠ¨æ?æ³¨å†? 
-	  		osDelay(1000);//HAL_Delay(1000);
+                 HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //åŠ¨æ?æ³¨å†? 
+	  		         osDelay(1000);//HAL_Delay(1000);
         
-          
+                  gpro_t.link_net_step = 4;
             }
 
             break;
@@ -128,37 +128,45 @@ void link_wifi_net_handler(void)
 
                    net_t.linking_tencent_cloud_doing =1;
                   wifi_t.soft_ap_config_flag =1; //WE.EIDT 
+                  gpro_t.link_net_step = 5;
+                 }
+
+            break;
+
+            case 5:
+
 	            sprintf((char *)device_massage, "AT+TCSAP=\"UYIJIA01-%d\"\r\n",gctl_t.randomName[0]);
-                 at_send_data(device_massage, strlen((const char *)device_massage));
+              at_send_data(device_massage, strlen((const char *)device_massage));
+	             osDelay(1000);//HAL_Delay(1000);
+               osDelay(1000);//HAL_Delay(1000);
+
+              gpro_t.link_net_step = 6;
 
 
-                   gpro_t.link_net_step = 5;
-
-
-                    }
+                    
 
             break;
 
 
-            case 5:
+            case 6:
                 
 
             if(net_t.soft_ap_config_success==1){
 
             net_t.soft_ap_config_success=0;
             HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//å¼?å§‹è¿žæŽ?
-            //HAL_Delay(1000);
-            // HAL_Delay(1000);
+            osDelay(1000);//HAL_Delay(1000);
+            osDelay(1000);// HAL_Delay(1000);
             ///HAL_Delay(1000);
 
-            gpro_t.link_net_step = 6;
+            gpro_t.link_net_step = 7;
             gpro_t.gTimer_link_net_timer_time = 0;
             }
 
                    
             break;
 
-            case 6:
+            case 7:
 
             if( gpro_t.gTimer_link_net_timer_time  > 7){
 
@@ -170,7 +178,7 @@ void link_wifi_net_handler(void)
                 
                SendWifiData_To_Data(0x1F,0x01); //link wifi order 1 --link wifi net is success.
                osDelay(5);
-			    gpro_t.link_net_step = 7;
+			    gpro_t.link_net_step = 8;
               
 				
 		     }
@@ -187,7 +195,7 @@ void link_wifi_net_handler(void)
 
             break;
 
-            case 7:
+            case 8:
 
               gpro_t.wifi_led_fast_blink_flag=0;
               gpro_t.gTimer_get_data_from_tencent_data=0;
@@ -197,21 +205,21 @@ void link_wifi_net_handler(void)
 		        osDelay(200);
 		        
 				 
-			gpro_t.link_net_step = 8;
+			gpro_t.link_net_step = 9; // this is flag: link wifi times 119s is over.
 		    break;
 				 
 
-			 case 8: 
+			 case 9: 
 			 	
-			    MqttData_Publish_Update_Data();//Publish_Data_ToTencent_Initial_Data();
-                osDelay(200);
+			    //MqttData_Publish_Update_Data();//Publish_Data_ToTencent_Initial_Data();
+                //osDelay(200);
 
-			   gpro_t.link_net_step = 9;
+			   gpro_t.link_net_step = 10;
 
 
 			break;
 
-			case 9:
+			case 10:
 
 				Subscriber_Data_FromCloud_Handler();
 		
@@ -223,7 +231,7 @@ void link_wifi_net_handler(void)
             break;
 
 
-            case 10:
+            case 11:
 
 
               gpro_t.get_beijing_flag= 10;

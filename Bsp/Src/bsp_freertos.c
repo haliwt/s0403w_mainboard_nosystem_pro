@@ -5,7 +5,7 @@
 /***********************************************************************************************************
 											函数声明
 ***********************************************************************************************************/
-//static void vTaskRunPro(void *pvParameters);
+//static void vTaskWifiPro(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
 static void vTaskStart(void *pvParameters);
 static void AppTaskCreate (void);
@@ -18,7 +18,7 @@ static void AppTaskCreate (void);
 /***********************************************************************************************************
 											变量声明
 ***********************************************************************************************************/
-//static TaskHandle_t xHandleTaskRunPro = NULL;
+//static TaskHandle_t xHandleTaskWifiPro = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
 static TaskHandle_t xHandleTaskStart = NULL;
 
@@ -54,6 +54,9 @@ void LED_Thread2(void const * argument)
   /* USER CODE END LED_Thread2 */
 }
 #endif
+
+#define LOWEST_PRIORITY   1  // ???????
+#define HIGHEST_PRIORITY  2
 typedef struct Msg
 {
 	uint8_t  ucMessageID;
@@ -65,11 +68,11 @@ MSG_T   gl_tMsg; /* ?????????????? */
 
 uint8_t rx_data_counter,rx_end_flag;
 
-uint8_t  rx_end_counter,uid;
+uint8_t test_counter;
 
-uint8_t check_code;
 
-uint8_t bcc_check_code;
+
+uint8_t wifi_counter;
 
 /**********************************************************************************************************
 *
@@ -91,6 +94,31 @@ void freeRTOS_Handler(void)
 
 
 }
+
+/**********************************************************************************************************
+*	�?1�?7 �?1�?7 �?1�?7: vTaskStart
+*	功能说明: 启动任务，也就是朢�高优先级任务，这里用作按键扫描��?1�?7
+*	�?1�?7    �?1�?7: pvParameters 是在创建该任务时传��的形参
+*	�?1�?7 �?1�?7 �?1�?7: �?1�?7
+*   �?1�?7 �?1�?7 �?1�?7: 4  (数��越小优先级越低，这个跟uCOS相反)
+************************************ifi**********************************************************************/
+// static void vTaskWifiPro(void *pvParameters)
+// {
+  
+//      while(1)
+//      {
+
+//        if(gpro_t.wifi_led_fast_blink_flag==0 ){
+// 		  	     wifi_counter++;
+//              wifi_communication_tnecent_handler();//
+//              getBeijingTime_cofirmLinkNetState_handler();
+//              wifi_auto_detected_link_state();
+//        }
+//        vTaskDelay(1000);
+//     }
+
+
+// }
 /**********************************************************************************************************
 *	�?1�?7 �?1�?7 �?1�?7: vTaskStart
 *	功能说明: 启动任务，也就是朢�高优先级任务，这里用作按键扫描��?1�?7
@@ -102,7 +130,7 @@ static void vTaskMsgPro(void *pvParameters)
 {
   
 	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
+	//const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
     uint32_t ulValue;
   
 	
@@ -124,7 +152,14 @@ static void vTaskMsgPro(void *pvParameters)
               // if(check_code == bcc_check_code ){
                
                   receive_data_fromm_display(gl_tMsg.usData);
-                 
+                  //taskYIELD();
+				    /* ????? 1ms,?????????? */
+                   // vTaskDelay(pdMS_TO_TICKS(5));  // 1ms ??
+				  /* ????:??????,?????????? */
+         
+			      vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
+			      taskYIELD();  // ??????
+			      vTaskPrioritySet(xHandleTaskStart, HIGHEST_PRIORITY);  // ???????
                   
                 }
                 
@@ -162,14 +197,14 @@ static void vTaskStart(void *pvParameters)
             if(wifi_link_net_state() ==1 && gl_tMsg.link_wifi_net_flag ==0){
               gl_tMsg.link_wifi_net_flag ++;
               Update_Dht11_Totencent_Value();
-              osDelay(20);//HAL_Delay(200) //WT.EDIT 2024.08.10
+             vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(200) //WT.EDIT 2024.08.10
              }
 		
           
             if(gpro_t.answer_buzzer_flag == 1){//WT.EDIT 2025.07.28
                 gpro_t.answer_buzzer_flag ++;
 			    SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-			    osDelay(10);
+			    vTaskDelay(pdMS_TO_TICKS(10));
 
 
             }
@@ -181,7 +216,7 @@ static void vTaskStart(void *pvParameters)
                 updateDht11_sensorData_toDisp();
               
 			 }
-			
+			test_counter++;
 			
            break;
 
@@ -192,21 +227,24 @@ static void vTaskStart(void *pvParameters)
               power_off_handler();
              break;
           }
-		  
-		  
-          if(gpro_t.stop_run_wifi_pro ==1){
-             
-		        gpro_t.stop_run_wifi_pro++;
 
-		      }
-          else if(gpro_t.wifi_led_fast_blink_flag==0 ){
+
+           if(gpro_t.wifi_led_fast_blink_flag==0 ){
+		  	     wifi_counter++;
              wifi_communication_tnecent_handler();//
              getBeijingTime_cofirmLinkNetState_handler();
              wifi_auto_detected_link_state();
-          }
-         
+            }
+		  
+		  
+          if(gpro_t.gTimer_update_todisplay > 1){
+			 	    gpro_t.gTimer_update_todisplay=0;
+                updateDht11_sensorData_toDisp();
+              
+		       }
+			
           send_cmd_ack_hanlder();
-		  vTaskDelay(20);//�ȴ�100ms
+		     vTaskDelay(20);//�ȴ�100ms
 
 
         }
@@ -227,7 +265,9 @@ static void vTaskStart(void *pvParameters)
 */
 void AppTaskCreate (void)
 {
-    xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
+    
+ 
+  xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7    */
                  128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
@@ -290,9 +330,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	  __HAL_UART_CLEAR_OREFLAG(&huart2);
       HAL_UART_Receive_IT(&huart2,wifi_rx_inputBuf,1);
 	}
-
-	
-   if(huart->Instance==USART1)//if(huart==&huart1) // Motor Board receive data (filter)
+    else if(huart->Instance==USART1)//if(huart==&huart1) // Motor Board receive data (filter)
 	{
       // DISABLE_INT();
 		switch(state)

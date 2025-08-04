@@ -43,7 +43,12 @@
 
 
 #include "bsp_wifi_fun.h"
+
+#ifndef DHT22_ENABL
 #include "bsp_dht11.h"
+#else
+#include "bsp_dht22.h"
+#endif
 #include "bsp_fan.h"
 #include "bsp_ultrasonic.h"
 
@@ -62,6 +67,22 @@
 
 
 #define WIFI_RX_NUMBERS         1
+
+
+#define  USE_FreeRTOS      1
+
+
+#if USE_FreeRTOS == 1
+	#include "FreeRTOS.h"
+    #include "task.h"
+    #include "cmsis_os.h"
+	#define DISABLE_INT()    taskENTER_CRITICAL()
+	#define ENABLE_INT()     taskEXIT_CRITICAL()
+#else
+	/* ??????????l? */
+	#define ENABLE_INT()	__set_PRIMASK(0)	/* '???????? */
+	#define DISABLE_INT()	__set_PRIMASK(1)	/* ????????? */
+#endif
 
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 extern uint8_t inputBuf[1];

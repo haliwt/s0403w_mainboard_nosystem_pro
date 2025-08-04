@@ -8,8 +8,10 @@ uint8_t read_flag;
 static void DHT11_Mode_IPU(void);
 static void DHT11_Mode_Out_PP(void);
 static uint8_t DHT11_ReadByte(void);
-DHT11_Data_TypeDef DHT11;
-void static Dht11_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth11);
+DHT22_Data_TypeDef DHT22;
+//void static Dht22_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth22);
+
+void static Dht22_Read_TempHumidity_Handler(DHT22_Data_TypeDef * pdth22);
 
 
 //??us??
@@ -112,86 +114,79 @@ static uint8_t DHT11_ReadByte ( void )
   *           SUCCESS:????
   * ?    ?:8bit ???? + 8bit ???? + 8bit ???? + 8bit ???? + 8bit ??? 
   */
-uint8_t DHT11_Read_TempAndHumidity(DHT11_Data_TypeDef *DHT11_Data)
+uint8_t DHT22_Read_TempAndHumidity(DHT22_Data_TypeDef *DHT22_Data)
 {  
   uint8_t temp;
-  uint16_t humi_temp;
-  
-	/*????*/
-	DHT11_Mode_Out_PP();
-	/*????*/
-	DHT11_Dout_LOW();
-	/*??18ms*/
-	HAL_Delay(20);
+  int16_t raw_temp;
+  uint16_t raw_humi;
 
-	/*???? ????30us*/
-	DHT11_Dout_HIGH(); 
+  DHT11_Mode_Out_PP();       // 设置为推挽输出
+  DHT11_Dout_LOW();          // 拉低开始信号
+  HAL_Delay(1);              // DHT22只需 >1ms，推荐1~2ms
 
-	delay_us(30);   //??30us
+  DHT11_Dout_HIGH();         // 拉高
+  delay_us(30);              // 等待响应
 
-	/*?????? ????????*/ 
-	DHT11_Mode_IPU();
-  delay_us(40);   //??30us
-	/*?????????????? ???????,???????*/   
-	if(DHT11_Data_IN()==Bit_RESET)     
-	{
-    /*???????? ?80us ??? ??????*/  
-    while(DHT11_Data_IN()==Bit_RESET);
+  DHT11_Mode_IPU();          // 设置为上拉输入
+  delay_us(40);              // 等待DHT22响应
 
-    /*????????? 80us ??? ??????*/
-    while(DHT11_Data_IN()==Bit_SET);
+  if(DHT11_Data_IN() == Bit_RESET)     
+  {
+    while(DHT11_Data_IN() == Bit_RESET); // 等待DHT22拉高
+    while(DHT11_Data_IN() == Bit_SET);   // 等待DHT22拉低
 
-    /*??????*/   
-    DHT11_Data->humi_high8bit= DHT11_ReadByte();
-    DHT11_Data->humi_low8bit = DHT11_ReadByte();
-    DHT11_Data->temp_high8bit= DHT11_ReadByte();
-    DHT11_Data->temp_low8bit = DHT11_ReadByte();
-    DHT11_Data->check_sum    = DHT11_ReadByte();
+    // 读取5字节数据
+    DHT22_Data->humi_high8bit = DHT11_ReadByte();
+    DHT22_Data->humi_low8bit  = DHT11_ReadByte();
+    DHT22_Data->temp_high8bit = DHT11_ReadByte();
+    DHT22_Data->temp_low8bit  = DHT11_ReadByte();
+    DHT22_Data->check_sum     = DHT11_ReadByte();
 
-    /*????,????????*/
     DHT11_Mode_Out_PP();
-    /*????*/
     DHT11_Dout_HIGH();
-    
-    /* ??????? */
-    humi_temp=DHT11_Data->humi_high8bit*100+DHT11_Data->humi_low8bit;
-    DHT11_Data->humidity =(float)humi_temp/100;
-    
-    humi_temp=DHT11_Data->temp_high8bit*100+DHT11_Data->temp_low8bit;
-    DHT11_Data->temperature=(float)humi_temp/100;    
-    
-    /*???????????*/
-    temp = DHT11_Data->humi_high8bit + DHT11_Data->humi_low8bit + 
-           DHT11_Data->temp_high8bit+ DHT11_Data->temp_low8bit;
-    if(DHT11_Data->check_sum==temp)
+
+    // 湿度处理（无符号）
+    raw_humi = ((uint16_t)DHT22_Data->humi_high8bit << 8) | DHT22_Data->humi_low8bit;
+    DHT22_Data->humidity = raw_humi / 10.0f;
+
+    // 温度处理（高位符号位）
+    raw_temp = ((uint16_t)(DHT22_Data->temp_high8bit & 0x7F) << 8) | DHT22_Data->temp_low8bit;
+    if (DHT22_Data->temp_high8bit & 0x80) {
+      raw_temp = -raw_temp;
+    }
+    DHT22_Data->temperature = raw_temp / 10.0f;
+
+    // 校验和验证
+    temp = DHT22_Data->humi_high8bit + DHT22_Data->humi_low8bit + 
+           DHT22_Data->temp_high8bit + DHT22_Data->temp_low8bit;
+    if(DHT22_Data->check_sum == temp)
     { 
       return SUCCESS;
     }
     else 
       return ERROR;
-	}	
-	else
-		return ERROR;
+  } 
+  else
+    return ERROR;
 }
 
 
-void static Dht11_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth11)
+
+void static Dht22_Read_TempHumidity_Handler(DHT22_Data_TypeDef * pdth22)
 {
-	read_flag =DHT11_Read_TempAndHumidity(pdth11);
-    if(read_flag == 0){
-		   
-		   gctl_t.gDht11_humidity = (pdth11->humi_high8bit);
-		   
-		   gctl_t.gDht11_temperature = (pdth11->temp_high8bit);
-	   
-	 }
+	read_flag = DHT22_Read_TempAndHumidity(pdth22);  // 调用 DHT22 读取函数
+
+    if (read_flag == 0) {
+        gctl_t.gDht11_humidity = pdth22->humidity;         // 直接使用 float 湿度
+        gctl_t.gDht11_temperature = pdth22->temperature;   // 直接使用 float 温度
+    }
 
 }
 
 void updateDht11_sensorData_toDisp(void)
 {
 	
-	    Dht11_Read_TempHumidity_Handler(&DHT11);
+	    Dht22_Read_TempHumidity_Handler(&DHT22);
 	    sendData_Real_TimeHum(gctl_t.gDht11_humidity ,gctl_t.gDht11_temperature);
 		osDelay(20);
 	
@@ -208,7 +203,7 @@ void Update_Dht11_Totencent_Value(void)
 {
 
   
-	Dht11_Read_TempHumidity_Handler(&DHT11);
+	Dht22_Read_TempHumidity_Handler(&DHT22);
 	
 	// dht11_read_data(&gctl_t.gDht11_temperature, &gctl_t.gDht11_humidity);
 
