@@ -154,10 +154,10 @@ static void vTaskMsgPro(void *pvParameters)
                   receive_data_fromm_display(gl_tMsg.usData);
                
          
-			     // vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
-			     // taskYIELD();  // ??????
-			     // vTaskPrioritySet(xHandleTaskStart, HIGHEST_PRIORITY);  // ???????
-			     vTaskDelay(pdMS_TO_TICKS(5));
+			      vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
+			      taskYIELD();  // ??????
+			      vTaskPrioritySet(xHandleTaskStart, HIGHEST_PRIORITY);  // ???????
+			     vTaskDelay(pdMS_TO_TICKS(10));
                 
                 }
                 
@@ -226,11 +226,12 @@ static void vTaskStart(void *pvParameters)
              break;
           }
 
-           if( gpro_t.stop_run_wifi_pro ==1){
-			  gpro_t.stop_run_wifi_pro++;
-
-           	}
-		   else if(gpro_t.wifi_led_fast_blink_flag==0 ){
+//           if( gpro_t.stop_run_wifi_pro ==1){
+//			  gpro_t.stop_run_wifi_pro++;
+//
+//           	}
+//		   else 
+		   	if(gpro_t.wifi_led_fast_blink_flag==0 ){
 		  	     wifi_counter++;
              wifi_communication_tnecent_handler();//
              getBeijingTime_cofirmLinkNetState_handler();
