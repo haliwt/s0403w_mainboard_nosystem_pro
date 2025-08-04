@@ -136,9 +136,7 @@ static void vTaskMsgPro(void *pvParameters)
 	
     while(1)
     {
-      
-      
-         xResult = xTaskNotifyWait(0x00000000,      
+       xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
 						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
 						          portMAX_DELAY);  /* ????????,????-block portMAX_DELAY */
@@ -151,7 +149,7 @@ static void vTaskMsgPro(void *pvParameters)
 
               // if(check_code == bcc_check_code ){
                
-                  receive_data_fromm_display(gl_tMsg.usData);
+                  receive_data_from_display(gl_tMsg.usData);
                
          
 			      vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
