@@ -62,27 +62,21 @@ void link_wifi_net_handler(void)
 
             case 0: //one step
 
-               // WIFI_IC_DISABLE();
-        		//HAL_Delay(1000);
-        		//HAL_Delay(1000);
-        		//HAL_Delay(1000);
-        		//net_t.linking_tencent_cloud_doing =1;
-        		//WIFI_IC_ENABLE();
-        		//at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
+          
         		at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
-        		//HAL_Delay(1000);
-        		osDelay(1000);
+        
+        		vTaskDelay(pdMS_TO_TICKS(1000));//osDelay(1000);
 
-                 gpro_t.link_net_step = 1;
+              gpro_t.link_net_step = 1;
 
             break;
 
             case 1:
                // WIFI_IC_ENABLE();
                 HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
-                osDelay(1000);
+                vTaskDelay(pdMS_TO_TICKS(1000));
                 gctl_t.randomName[0]=HAL_GetUIDw0();
-			    osDelay(200);
+			          vTaskDelay(pdMS_TO_TICKS(1000));
                 gpro_t.gTimer_link_net_timer_time = 0;
 
                 gpro_t.link_net_step = 2;
@@ -97,7 +91,7 @@ void link_wifi_net_handler(void)
             			
                         sprintf((char *)device_massage, "AT+TCPRDINFOSET=1,\"%s\",\"%s\",\"UYIJIA01-%d\"\r\n", PRODUCT_ID, DEVICE_SECRET,gctl_t.randomName[0]);
             			at_send_data(device_massage, strlen((const char *)device_massage));
-            	  		osDelay(1000);//HAL_Delay(1000);
+            	  		vTaskDelay(pdMS_TO_TICKS(1000));
                     
                        gpro_t.link_net_step = 3;
 
@@ -114,7 +108,7 @@ void link_wifi_net_handler(void)
            // WIFI_IC_ENABLE();
 			
                  HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //Âä®Ê?ÅÊ≥®ÂÜ? 
-	  		         osDelay(1000);//HAL_Delay(1000);
+	  		         vTaskDelay(pdMS_TO_TICKS(1000));
         
                   gpro_t.link_net_step = 4;
             }
@@ -137,8 +131,8 @@ void link_wifi_net_handler(void)
 
 	            sprintf((char *)device_massage, "AT+TCSAP=\"UYIJIA01-%d\"\r\n",gctl_t.randomName[0]);
               at_send_data(device_massage, strlen((const char *)device_massage));
-	             osDelay(1000);//HAL_Delay(1000);
-               osDelay(1000);//HAL_Delay(1000);
+	            vTaskDelay(pdMS_TO_TICKS(1000));
+               vTaskDelay(pdMS_TO_TICKS(1000));
 
               gpro_t.link_net_step = 6;
 
@@ -155,10 +149,9 @@ void link_wifi_net_handler(void)
 
             net_t.soft_ap_config_success=0;
             HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//Âº?ÂßãËøûÊé?
-            osDelay(1000);//HAL_Delay(1000);
-            osDelay(1000);// HAL_Delay(1000);
-            ///HAL_Delay(1000);
+            vTaskDelay(pdMS_TO_TICKS(1000));
 
+            vTaskDelay(pdMS_TO_TICKS(1000));
             gpro_t.link_net_step = 7;
             gpro_t.gTimer_link_net_timer_time = 0;
             }
@@ -177,7 +170,7 @@ void link_wifi_net_handler(void)
 				wifi_t.get_rx_beijing_time_enable=0;
                 
                SendWifiData_To_Data(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-               osDelay(5);
+               vTaskDelay(pdMS_TO_TICKS(5));
 			    gpro_t.link_net_step = 8;
               
 				
@@ -185,9 +178,9 @@ void link_wifi_net_handler(void)
 		     else{
                 
                   gpro_t.wifi_led_fast_blink_flag=0;
-                  gpro_t.link_net_step = 10;
+                  gpro_t.link_net_step = 11;
                   SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
-                  osDelay(5);
+                  vTaskDelay(pdMS_TO_TICKS(5));
            
                 }
                 
@@ -202,10 +195,10 @@ void link_wifi_net_handler(void)
 			 
 				MqttData_Publish_SetOpen(0x01);
 		      
-		        osDelay(200);
+		       vTaskDelay(pdMS_TO_TICKS(200));
 		        
 				 
-			gpro_t.link_net_step = 9; // this is flag: link wifi times 119s is over.
+			  gpro_t.link_net_step = 9; // this is flag: link wifi times 119s is over.
 		    break;
 				 
 
@@ -223,7 +216,7 @@ void link_wifi_net_handler(void)
 
 				Subscriber_Data_FromCloud_Handler();
 		
-	             osDelay(200);
+	             vTaskDelay(pdMS_TO_TICKS(200));
 
 			 gpro_t.link_net_step = 0xfe;
 

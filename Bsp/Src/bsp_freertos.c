@@ -152,10 +152,7 @@ static void vTaskMsgPro(void *pvParameters)
               // if(check_code == bcc_check_code ){
                
                   receive_data_fromm_display(gl_tMsg.usData);
-                  //taskYIELD();
-				    /* ????? 1ms,?????????? */
-                   // vTaskDelay(pdMS_TO_TICKS(5));  // 1ms ??
-				  /* ????:??????,?????????? */
+               
          
 			      vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
 			      taskYIELD();  // ??????
