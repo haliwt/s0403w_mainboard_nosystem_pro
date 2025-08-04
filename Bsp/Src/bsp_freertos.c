@@ -154,10 +154,11 @@ static void vTaskMsgPro(void *pvParameters)
                   receive_data_fromm_display(gl_tMsg.usData);
                
          
-			      vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
-			      taskYIELD();  // ??????
-			      vTaskPrioritySet(xHandleTaskStart, HIGHEST_PRIORITY);  // ???????
-                  
+			     // vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
+			     // taskYIELD();  // ??????
+			     // vTaskPrioritySet(xHandleTaskStart, HIGHEST_PRIORITY);  // ???????
+			     vTaskDelay(pdMS_TO_TICKS(5));
+                
                 }
                 
             }
@@ -198,13 +199,13 @@ static void vTaskStart(void *pvParameters)
              }
 		
           
-            if(gpro_t.answer_buzzer_flag == 1){//WT.EDIT 2025.07.28
-                gpro_t.answer_buzzer_flag ++;
-			    SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-			    vTaskDelay(pdMS_TO_TICKS(10));
-
-
-            }
+//            if(gpro_t.answer_buzzer_flag == 1){//WT.EDIT 2025.07.28
+//                gpro_t.answer_buzzer_flag ++;
+//			    SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+//			    vTaskDelay(pdMS_TO_TICKS(10));
+//
+//
+//            }
 
        
 		    
@@ -225,8 +226,11 @@ static void vTaskStart(void *pvParameters)
              break;
           }
 
+           if( gpro_t.stop_run_wifi_pro ==1){
+			  gpro_t.stop_run_wifi_pro++;
 
-           if(gpro_t.wifi_led_fast_blink_flag==0 ){
+           	}
+		   else if(gpro_t.wifi_led_fast_blink_flag==0 ){
 		  	     wifi_counter++;
              wifi_communication_tnecent_handler();//
              getBeijingTime_cofirmLinkNetState_handler();
@@ -241,7 +245,7 @@ static void vTaskStart(void *pvParameters)
 		       }
 			
           send_cmd_ack_hanlder();
-		     vTaskDelay(20);//�ȴ�100ms
+		  vTaskDelay(pdMS_TO_TICKS(30));//�?0
 
 
         }

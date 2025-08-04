@@ -180,6 +180,8 @@ void receive_data_fromm_display(uint8_t *pdata)
       
 		   buzzer_sound();
          gpro_t.stop_run_wifi_pro =1; //stop wifi process
+          SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+		  vTaskDelay(pdMS_TO_TICKS(5));
 		  
            gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
           // pdata[2] =0xff;
