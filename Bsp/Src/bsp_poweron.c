@@ -21,7 +21,6 @@ void power_on_handler(void)
     
          smartphone_timer_power_on_and_normal_handler();
 
-	      
          
          
          gctl_t.gTImer_send_data_to_disp=0; //temp and humidity data of times
@@ -93,7 +92,7 @@ void power_on_handler(void)
      if(wifi_link_net_state() ==1){
     
 		     MqttData_Publish_SetOpen(1);  
-			 osDelay(100);
+			 vTaskDelay(pdMS_TO_TICKS(200));
      	}
 	  gpro_t.process_run_step= 5;
 	 
@@ -107,7 +106,7 @@ void power_on_handler(void)
            gctl_t.set_wind_speed_value =100;
 		
 			 MqttData_Publish_Init();
-			 osDelay(200);
+			 vTaskDelay(pdMS_TO_TICKS(200));
 
          }
 	     gpro_t.process_run_step=6 ;
@@ -121,16 +120,15 @@ void power_on_handler(void)
 		  gctl_t.first_link_tencent_cloud_flag++;
 
             Publish_Data_ToTencent_Update_Data();
-			osDelay(200);//HAL_Delay(200);
+			vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
 
-           // MqttData_Publish_SetOpen(0x01);
-			//osDelay(100);//HAL_Delay(100);
+          
     	}
 	    else if(gctl_t.first_link_tencent_cloud_flag < 4){
 			 gctl_t.first_link_tencent_cloud_flag++;
 
             Subscriber_Data_FromCloud_Handler();
-    		osDelay(100);//HAL_Delay(100);//HAL_Delay(350);
+    	   vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(100);//HAL_Delay(350);
 	    }
 	
 	  }

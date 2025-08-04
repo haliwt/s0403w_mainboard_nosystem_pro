@@ -159,7 +159,8 @@ static void vTaskMsgPro(void *pvParameters)
                 
                 }
                 
-            }
+         }
+		
     } 
 }
        
@@ -227,8 +228,7 @@ static void vTaskStart(void *pvParameters)
              wifi_auto_detected_link_state();
             }
 		  
-		  
-      
+		
 			
           send_cmd_ack_hanlder();
 		  vTaskDelay(pdMS_TO_TICKS(50));//�?0

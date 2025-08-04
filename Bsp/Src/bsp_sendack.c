@@ -1,16 +1,21 @@
 #include "bsp.h"
 
+
+uint8_t power_on_sound_flag;
+
+
 /**********************************************************************
     *
-    *Function Name:void receive_data_fromm_display(uint8_t *pdata,uint8_t len)
+    *Function Name:void receive_data_from_display(uint8_t *pdata,uint8_t len)
     *Function: receive usart touchkey of command 
     *Input Ref:NO
     *Return Ref:NO
     *
 **********************************************************************/
-void receive_data_fromm_display(uint8_t *pdata)
+void receive_data_from_display(uint8_t *pdata)
 {
 
+ 
    if(pdata[1] == 0x01){
 
     switch(pdata[2]){
@@ -25,9 +30,11 @@ void receive_data_fromm_display(uint8_t *pdata)
         if(pdata[3] == 0x01){ //open
           
            
-            buzzer_sound();//buzzer_sound_fun();
+
+		    buzzer_sound();//buzzer_sound_fun();
+          
            
-           gpro_t.gpower_on = power_on;
+           	gpro_t.gpower_on = power_on;
             gctl_t.gModel=1;
     	    gctl_t.gFan = 1;
     		dry_open_flag=1;//gctl_t.gDry = 1;
@@ -39,18 +46,30 @@ void receive_data_fromm_display(uint8_t *pdata)
             gpro_t.process_run_step=0;     //WT.EDIT 2025.01.11
             fan_run_fun();//SetLevel_Fan_PWMA(10); //WT.EDIT 2024.12.24
             PTC_SetHigh(); // the moment open ptc  //WT.EDIT 2025.01.11
-            SendWifiData_Answer_Cmd(0x01,0x01);
+             SendWifiData_Answer_Cmd(0x01,0x01);
             vTaskDelay(pdMS_TO_TICKS(5));
+		  
+            power_on_sound_flag=1;
+           
 
         }
         else if(pdata[3] == 0x0){ //close 
-           
-                buzzer_sound();
+
+
+		     if(power_on_sound_flag==1){
+			  	power_on_sound_flag++;
+			    vTaskDelay(pdMS_TO_TICKS(20));
+                 buzzer_sound();
+			  }
+              
+			  SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+              vTaskDelay(pdMS_TO_TICKS(5)); 
+             
               power_off_action_fun();
               powerOffTunrOff_flag=1;
               gpro_t.gpower_on = power_off;
-              SendWifiData_Answer_Cmd(0x01,0x02); //power off .
-             vTaskDelay(pdMS_TO_TICKS(5));
+			 
+			
         }
 
      break;
@@ -150,7 +169,7 @@ void receive_data_fromm_display(uint8_t *pdata)
 
      case 0x06: //buzzer sound command 
 
-       
+           power_on_sound_flag=3;
            gpro_t.stop_run_wifi_pro =1; //stop wifi process
            
             buzzer_sound();
