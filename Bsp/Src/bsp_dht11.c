@@ -185,6 +185,10 @@ void static Dht11_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth11)
 		   gctl_t.gDht11_temperature = (pdth11->temp_high8bit);
 	   
 	 }
+	 else{
+        vTaskDelay(pdMS_TO_TICKS(2000));//�?0
+
+	 }
 
 }
 

@@ -180,6 +180,10 @@ void static Dht22_Read_TempHumidity_Handler(DHT22_Data_TypeDef * pdth22)
         gctl_t.gDht11_humidity = pdth22->humidity;         // 直接使用 float 湿度
         gctl_t.gDht11_temperature = pdth22->temperature;   // 直接使用 float 温度
     }
+	else{
+        vTaskDelay(pd)
+
+	}
 
 }
 

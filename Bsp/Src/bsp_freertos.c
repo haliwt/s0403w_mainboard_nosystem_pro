@@ -136,7 +136,7 @@ static void vTaskMsgPro(void *pvParameters)
 	
     while(1)
     {
-
+      
       
          xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
@@ -157,12 +157,12 @@ static void vTaskMsgPro(void *pvParameters)
 			      vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
 			      taskYIELD();  // ??????
 			      vTaskPrioritySet(xHandleTaskStart, HIGHEST_PRIORITY);  // ???????
-			     vTaskDelay(pdMS_TO_TICKS(10));
+			     // vTaskDelay(pdMS_TO_TICKS(10));
                 
                 }
                 
             }
-        }
+    } 
 }
        
 
@@ -198,22 +198,18 @@ static void vTaskStart(void *pvParameters)
              vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(200) //WT.EDIT 2024.08.10
              }
 		
-          
-//            if(gpro_t.answer_buzzer_flag == 1){//WT.EDIT 2025.07.28
-//                gpro_t.answer_buzzer_flag ++;
-//			    SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-//			    vTaskDelay(pdMS_TO_TICKS(10));
-//
-//
-//            }
-
-       
-		    
-			if(gpro_t.gTimer_update_todisplay > 1){
+          if(gpro_t.gTimer_update_todisplay > 1){
 			 	gpro_t.gTimer_update_todisplay=0;
                 updateDht11_sensorData_toDisp();
               
 			 }
+
+		   if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
+
+		   SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+		  vTaskDelay(pdMS_TO_TICKS(5));
+		   	}
+         
 			test_counter++;
 			
            break;
@@ -226,11 +222,6 @@ static void vTaskStart(void *pvParameters)
              break;
           }
 
-//           if( gpro_t.stop_run_wifi_pro ==1){
-//			  gpro_t.stop_run_wifi_pro++;
-//
-//           	}
-//		   else 
 		   	if(gpro_t.wifi_led_fast_blink_flag==0 ){
 		  	     wifi_counter++;
              wifi_communication_tnecent_handler();//
@@ -239,14 +230,10 @@ static void vTaskStart(void *pvParameters)
             }
 		  
 		  
-          if(gpro_t.gTimer_update_todisplay > 1){
-			 	    gpro_t.gTimer_update_todisplay=0;
-                updateDht11_sensorData_toDisp();
-              
-		       }
+      
 			
           send_cmd_ack_hanlder();
-		  vTaskDelay(pdMS_TO_TICKS(30));//�?0
+		  vTaskDelay(pdMS_TO_TICKS(50));//�?0
 
 
         }

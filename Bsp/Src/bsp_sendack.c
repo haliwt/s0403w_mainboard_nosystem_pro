@@ -25,7 +25,7 @@ void receive_data_fromm_display(uint8_t *pdata)
         if(pdata[3] == 0x01){ //open
           
            
-          do{
+            buzzer_sound();//buzzer_sound_fun();
            
            gpro_t.gpower_on = power_on;
             gctl_t.gModel=1;
@@ -40,26 +40,17 @@ void receive_data_fromm_display(uint8_t *pdata)
             fan_run_fun();//SetLevel_Fan_PWMA(10); //WT.EDIT 2024.12.24
             PTC_SetHigh(); // the moment open ptc  //WT.EDIT 2025.01.11
             SendWifiData_Answer_Cmd(0x01,0x01);
-            buzzer_sound();//buzzer_sound_fun();
-
-            
-            }while(0);
-            
+            vTaskDelay(pdMS_TO_TICKS(5));
 
         }
         else if(pdata[3] == 0x0){ //close 
            
-           do{
+                buzzer_sound();
               power_off_action_fun();
               powerOffTunrOff_flag=1;
               gpro_t.gpower_on = power_off;
               SendWifiData_Answer_Cmd(0x01,0x02); //power off .
-              buzzer_sound();
-              
-
-           }while(0);
-
-
+             vTaskDelay(pdMS_TO_TICKS(5));
         }
 
      break;
@@ -180,10 +171,12 @@ void receive_data_fromm_display(uint8_t *pdata)
       
 		   buzzer_sound();
          gpro_t.stop_run_wifi_pro =1; //stop wifi process
+
+		  gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
           SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 		  vTaskDelay(pdMS_TO_TICKS(5));
 		  
-           gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
+         
           // pdata[2] =0xff;
 
             
