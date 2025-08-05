@@ -71,6 +71,8 @@ uint8_t rx_data_counter,rx_end_flag;
 uint8_t test_counter;
 
 uint8_t wifi_counter;
+uint8_t state;
+
 
 /**********************************************************************************************************
 *
@@ -142,7 +144,9 @@ static void vTaskMsgPro(void *pvParameters)
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
                 gpro_t.disp_rx_cmd_done_flag = 0;
-				gpro_t.gTimer_rx_cmd_done =0;
+				rx_data_counter=0;
+				state=0;
+				//gpro_t.gTimer_rx_cmd_done =0;
               
              //   check_code =  bcc_check(gl_tMsg.usData,uid);
 
@@ -161,15 +165,8 @@ static void vTaskMsgPro(void *pvParameters)
                 
          }
 
-		 if( gpro_t.disp_rx_cmd_done_flag ==1 && gpro_t.gTimer_rx_cmd_done > 2 ){
-		       gpro_t.disp_rx_cmd_done_flag=0;
 
-
-		    }
-	 
-		 
-		
-    } 
+	} 
 }
        
 
@@ -209,9 +206,7 @@ static void vTaskStart(void *pvParameters)
 			 	    gpro_t.gTimer_update_todisplay=0;
 				
                 updateDht11_sensorData_toDisp();
-		          vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
-			    taskYIELD();  // ??????
-			    vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+		      
               
 			 }
 
@@ -313,7 +308,7 @@ void AppTaskCreate (void)
 *******************************************************************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-     static uint8_t state;
+     
      BaseType_t xHigherPriorityTaskWoken = pdFALSE;
    //  MSG_T *ptMsg;
 
@@ -378,7 +373,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
                
               if(gl_tMsg.usData[rx_data_counter] ==0xFE && rx_end_flag == 0 &&  rx_data_counter > 4){
                      
-				     gpro_t.disp_rx_cmd_done_flag = 1 ;
+				     gpro_t.disp_rx_cmd_done_flag = 0 ;
          
 
                 state = 0;
@@ -393,7 +388,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
                 //bcc_check_code=inputBuf[0];
 
-                gpro_t.gTimer_rx_cmd_done =0;
+               // gpro_t.gTimer_rx_cmd_done =0;
 
                 #if 1
 
