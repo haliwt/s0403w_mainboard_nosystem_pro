@@ -115,6 +115,9 @@ typedef struct PROCESS_T{
    uint8_t answer_buzzer_flag ;
 	
 	 uint8_t power_on_prority_flag;
+     uint8_t ptc_switch_flag;
+	 uint8_t ultrasonic_switch_flag;
+	 uint8_t plasma_switch_flag;
 
   
    

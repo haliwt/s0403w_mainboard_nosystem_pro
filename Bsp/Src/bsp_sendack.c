@@ -68,24 +68,26 @@ void receive_data_from_display(uint8_t *pdata)
       if(gpro_t.stopTwoHours_flag==0){
          if(gpro_t.pct_warning ==0 && gpro_t.fan_warning_flag ==0){ //PTC warning flag
               PTC_SetHigh();
+              gpro_t.ptc_switch_flag =1;
           }
           
-          if(wifi_link_net_state()==1){
-              MqttData_Publish_SetPtc(0x01);
-	  	      vTaskDelay(pdMS_TO_TICKS(200));
-           }
+      //     if(wifi_link_net_state()==1){
+      //         MqttData_Publish_SetPtc(0x01);
+	  	//       vTaskDelay(pdMS_TO_TICKS(200));
+      //      }
        
-       }
+      //  }
        }
        else if(pdata[3] == 0x0){
         buzzer_sound();
           gctl_t.gDry =0;
         
          PTC_SetLow();
-         if(wifi_link_net_state()==1){
-              MqttData_Publish_SetPtc(0x0);
-	  	      vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-          }
+         gpro_t.ptc_switch_flag =2;
+        //  if(wifi_link_net_state()==1){
+        //       MqttData_Publish_SetPtc(0x0);
+	  	  //     vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+        //   }
 
        }
 
@@ -98,7 +100,7 @@ void receive_data_from_display(uint8_t *pdata)
             buzzer_sound();
            
            gctl_t.gPlasma = 1;
-         //  plasma_open_flag=1;
+           gpro_t.plasma_switch_flag =1;
           
            PLASMA_SetHigh();
         }
@@ -106,7 +108,7 @@ void receive_data_from_display(uint8_t *pdata)
            buzzer_sound();
            
            gctl_t.gPlasma = 0;
-          // plasma_open_flag=0;
+            gpro_t.plasma_switch_flag =2;
         
           PLASMA_SetLow();
 
@@ -121,11 +123,13 @@ void receive_data_from_display(uint8_t *pdata)
         if(pdata[3] == 0x01){  //open 
           
           gctl_t.gUlransonic =1;
+          gpro_t.ultrasonic_switch_flag =1;
 
         }
         else if(pdata[3] == 0x0){ //close 
 
           gctl_t.gUlransonic = 0;
+          gpro_t.ultrasonic_switch_flag =2;
 
         }
 
@@ -220,10 +224,10 @@ void receive_data_from_display(uint8_t *pdata)
 
         gctl_t.gDry = 1;
    
-        if(gpro_t.stopTwoHours_flag ==1){
+        if(gpro_t.stopTwoHours_flag ==0){
               PTC_SetHigh();
              if(wifi_link_net_state()==1){
-                  MqttData_Publish_SetPtc(0x01);
+                MqttData_Publish_SetPtc(0x01);
     	  	      osDelay(100);//HAL_Delay(350);
                }
           }
@@ -314,7 +318,7 @@ void receive_data_from_display(uint8_t *pdata)
      }
 
    }
-
+  }
 }
 
 
