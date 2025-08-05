@@ -110,7 +110,7 @@ void adc_detected_hundler(void)
 
     }
    #endif 
-    if(gctl_t.gTimer_fan_adc_times > 8 && gpro_t.stopTwoHours_flag ==0 && fan_warning_flag  == 0){ //detected 3 times is 60s 
+    if(gctl_t.gTimer_fan_adc_times > 8 && gpro_t.stopTwoHours_flag ==0 && gpro_t.fan_warning_flag  == 0){ //detected 3 times is 60s 
         gctl_t.gTimer_fan_adc_times =0;
         Get_Fan_ADC_Fun(ADC_CHANNEL_0,20);
         

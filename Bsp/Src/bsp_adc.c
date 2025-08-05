@@ -8,7 +8,7 @@
 
 //static uint16_t Get_Adc_Channel_0(void) ;
 //static uint16_t Get_Adc_Channel_1(void) ; 
-uint8_t fan_warning_flag ;
+
 
 
 
@@ -43,7 +43,7 @@ static uint16_t Get_Fan_Adc_Channel_0(uint32_t ch)
     ADC_ChannelConfTypeDef ADC1_ChanConf;
 
 	ADC1_ChanConf.Channel=ADC_CHANNEL_0;                                   //Í¨µÀ
-    ADC1_ChanConf.Rank= ADC_REGULAR_RANK_1;                                    //第一个序列
+    ADC1_ChanConf.Rank= ADC_REGULAR_RANK_1;                                    //第一个序�?
     ADC1_ChanConf.SamplingTime=ADC_SAMPLETIME_1CYCLE_5;//ADC_SAMPLETIME_239CYCLES_5;      //²ÉÑùÊ±¼ä               
 
 
@@ -74,7 +74,7 @@ static uint16_t Get_Ptc_Adc_Channel_1(uint32_t ch)
     ADC_ChannelConfTypeDef ADC1_ChanConf;
 
 	ADC1_ChanConf.Channel=ADC_CHANNEL_1;                                   //Í¨µÀ
-    ADC1_ChanConf.Rank= ADC_REGULAR_RANK_1 ;                               //第一个序列
+    ADC1_ChanConf.Rank= ADC_REGULAR_RANK_1 ;                               //第一个序�?
     ADC1_ChanConf.SamplingTime=ADC_SAMPLETIME_1CYCLE_5;//ADC_SAMPLETIME_239CYCLES_5;      //²ÉÑùÊ±¼ä               
 
 
@@ -166,7 +166,7 @@ void Get_Fan_ADC_Fun(uint8_t channel,uint8_t times)
 	   	
 		  detect_error_times= 0;
 		  //gctl_t.fan_warning = 1;
-		  fan_warning_flag = 1;
+		  gpro_t.fan_warning_flag = 1;
 		
 
            buzzer_sound();//Buzzer_KeySound();
@@ -193,7 +193,7 @@ void Get_Fan_ADC_Fun(uint8_t channel,uint8_t times)
 		}
         else{
 
-            fan_warning_flag=0;//gctl_t.fan_warning = 0;
+            gpro_t.fan_warning_flag=0;//gctl_t.fan_warning = 0;
          
             detect_error_times=0;
 
@@ -206,7 +206,7 @@ void Get_Fan_ADC_Fun(uint8_t channel,uint8_t times)
 
 void fan_warning_sound(void)
 {
-   if(fan_warning_flag == 1 && gpro_t.gTimer_detect_fan_error > 9){
+   if(gpro_t.fan_warning_flag == 1 && gpro_t.gTimer_detect_fan_error > 9){
         gpro_t.gTimer_detect_fan_error =0;
 
 
@@ -292,7 +292,7 @@ static void Judge_PTC_Temperature_Value(void)
 
     #endif 
 
-        dry_open_flag=0;//gctl_t.gDry = 0;
+        gctl_t.gDry = 0;
      
         PTC_SetLow(); //ptc turn off
 

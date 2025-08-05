@@ -77,7 +77,7 @@ static void Mqtt_Value_update_data(void)
     sg_info.open = 1;
 	if(gctl_t.gModel==0)gctl_t.gModel =1;
 	sg_info.state = gctl_t.gModel;
-	sg_info.ptc  = dry_open_flag;//gctl_t.gDry;
+	sg_info.ptc  = gctl_t.gDry;
     //sg_info.ptc = g_dry_open_flag;
 	sg_info.anion = plasma_open_flag;//gctl_t.gPlasma;
 	sg_info.sonic = ultrasonic_open_flag;//gctl_t.gUlransonic ;
@@ -380,14 +380,14 @@ void MqttData_Publish_SetPtc(uint8_t dptc)
 
 }
 
-void MqttData_Publish_SetPlasma(uint8_t pla) //杀菌
+void MqttData_Publish_SetPlasma(uint8_t pla) //�?�?
 {
    property_topic_publish();
    property_report_SetAnion(pla);
 
 }
 
-void MqttData_Publish_SetUltrasonic(uint8_t datsonic) //超声波
+void MqttData_Publish_SetUltrasonic(uint8_t datsonic) //超声�?
 {
    property_topic_publish();
    property_report_SetSonic(datsonic);

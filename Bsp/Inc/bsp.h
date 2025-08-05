@@ -124,6 +124,8 @@ typedef struct PROCESS_T{
    uint8_t wifi_led_fast_blink_flag;
    uint8_t get_beijing_time_success;
    uint8_t link_net_step;
+   uint8_t pct_warning ;
+   uint8_t fan_warning_flag;
 
    
    uint8_t disp_works_hours ;    

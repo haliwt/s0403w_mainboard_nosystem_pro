@@ -31,7 +31,7 @@ void power_on_handler(void)
 		 //error detected times 
 		 gctl_t.ptc_warning =0;
 		// gctl_t.fan_warning =0;
-         fan_warning_flag =0;
+         gpro_t.fan_warning_flag =0;
 		 gctl_t.gTimer_ptc_adc_times=0;
 		 gctl_t.gTimer_fan_adc_times=0;
 		
@@ -119,8 +119,8 @@ void power_on_handler(void)
 	
 		  gctl_t.first_link_tencent_cloud_flag++;
 
-            Publish_Data_ToTencent_Update_Data();
-			vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
+         Publish_Data_ToTencent_Update_Data();
+			   vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
 
           
     	}

@@ -2,7 +2,7 @@
 
 uint8_t plasma_open_flag ;
 uint8_t ultrasonic_open_flag;
-uint8_t dry_open_flag;
+
 
 
 
@@ -15,8 +15,8 @@ void smartphone_timer_power_on_and_normal_handler(void)
 		case 0:
         gctl_t.gModel=1;
 	    gctl_t.gFan = 1;
-		dry_open_flag = 1;//gctl_t.gDry = 1;
-        //g_dry_open_flag =1;
+		gctl_t.gDry = 1;
+     
 		plasma_open_flag=1;//gctl_t.gPlasma =1;       //"閺�?閼�?"
 		ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "妞硅精娅�"
 	    gctl_t.gTimer_fan_run_one_minute=0;
@@ -76,13 +76,13 @@ void smartphone_timer_power_on_and_normal_handler(void)
 
 
 
-			if(dry_open_flag==1){//if(gctl_t.gDry==1 ||g_dry_open_flag ==1){
+			if(gctl_t.gDry==1){
 
 				SendWifiData_To_Cmd(0x02,0x01);
 				 osDelay(100);
 			}
 			else{
-					dry_open_flag=0;//gctl_t.gDry=0;
+					gctl_t.gDry=0;
                   
 					SendWifiData_To_Cmd(0x02,0x0);
 					 osDelay(100);
@@ -106,7 +106,7 @@ void SetPowerOff_ForDoing(void)
      gctl_t.set_wind_speed_value =10;
  
     gctl_t.gFan = 0;
-    dry_open_flag=0;//gctl_t.gDry = 0;
+    gctl_t.gDry = 0;
   
 	plasma_open_flag=0;//gctl_t.gPlasma =0;       //"閺�?閼�?"
 	ultrasonic_open_flag=0;//gctl_t.gUlransonic = 0; // "妞硅精娅�"
@@ -132,11 +132,11 @@ void ActionEvent_Handler(void)
 {
 
 
-   if(dry_open_flag==1){//if(g_dry_open_flag == 1 || gctl_t.gDry==1){
+   if( gctl_t.gDry==1){
 
  
 
-    if(fan_warning_flag ==0){
+    if(gpro_t.fan_warning_flag ==0){
       
        
            PTC_SetHigh();
@@ -183,7 +183,7 @@ void every_power_on_run(void)
      
       gctl_t.gModel=1;
       gctl_t.gFan = 1;
-      dry_open_flag=1;//gctl_t.gDry = 1;
+      gctl_t.gDry = 1;
       //g_dry_open_flag =1;
       plasma_open_flag=1;//gctl_t.gPlasma =1;       //"閺�?閼�?"
       ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "妞硅精娅�"

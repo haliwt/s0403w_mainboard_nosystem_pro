@@ -439,7 +439,7 @@ void Tencent_Cloud_Rx_Handler(void)
 	
 	if(strstr((char *)gpro_t.wifi_rx_data_array,"ptc\":0")){
             if(gpro_t.gpower_on ==power_on){
-				  dry_open_flag=0;//gctl_t.gDry=0;
+				  gctl_t.gDry=0;
                 
 	           gctl_t.response_wifi_signal_label = PTC_OFF_ITEM;
 	         
@@ -448,7 +448,7 @@ void Tencent_Cloud_Rx_Handler(void)
     }
     else if(strstr((char *)gpro_t.wifi_rx_data_array,"ptc\":1")){
             if(gpro_t.gpower_on ==power_on){
-	          dry_open_flag=1;//gctl_t.gDry=1;
+	          gctl_t.gDry=1;
              
 			  gctl_t.response_wifi_signal_label = PTC_ON_ITEM;
 				
@@ -548,7 +548,7 @@ void Json_Parse_Command_Fun(void)
 
 			gctl_t.ptc_warning =0;
 			
-	        fan_warning_flag =0;
+	        gpro_t.fan_warning_flag =0;
 	        powerOffTunrOff_flag=1;
 	        powerOffFanRun_flag = 1;
 			gctl_t.ptc_remove_warning_send_data =0;
@@ -595,7 +595,7 @@ void Json_Parse_Command_Fun(void)
 	  	 osDelay(100);//HAL_Delay(350);
 
         // if(gpro_t.stopTwoHours_flag ==0){
-	      dry_open_flag=1;//gctl_t.gDry=1;
+	      gctl_t.gDry=1;
           gctl_t.gTimer_senddata_panel=8;   
     
 		 SendWifiData_To_Cmd(0x02,0x01);
@@ -614,7 +614,7 @@ void Json_Parse_Command_Fun(void)
 	
          MqttData_Publish_SetPtc(0);
 		 osDelay(100);//HAL_Delay(350);
-	     dry_open_flag=0;//gctl_t.gDry=0;
+	     gctl_t.gDry=0;
          gctl_t.gTimer_senddata_panel=8;
 		
 		 SendWifiData_To_Cmd(0x02,0x0);
@@ -626,7 +626,7 @@ void Json_Parse_Command_Fun(void)
 	  	
 	  	break;
 
-	  case ANION_OFF_ITEM: //"ÊùÄËèå" //5
+	  case ANION_OFF_ITEM: //"Êù?Ëè?" //5
 	  	if(gpro_t.gpower_on ==power_on){
 			
             MqttData_Publish_SetPlasma(0);
@@ -748,7 +748,7 @@ void Json_Parse_Command_Fun(void)
 	  case FAN_ITEM:
 	    if(gpro_t.gpower_on ==power_on){
 
-		     if(fan_warning_flag ==0){//if(gctl_t.fan_warning ==0){
+		     if(gpro_t.fan_warning_flag ==0){//if(gctl_t.fan_warning ==0){
 
            		 wind_hundred =gpro_t.wifi_rx_data_array[7]-0x30;
 	       		 wind_decade=gpro_t.wifi_rx_data_array[8]-0x30;
@@ -904,13 +904,13 @@ void Parse_Json_Statement(void)
     
      if(strstr((char *)TCMQTTRCVPUB,"ptc\":0")){
 				
-			dry_open_flag=0;//gctl_t.gDry=0;
+		gctl_t.gDry=0;
            
 				  
 		}
 		else if(strstr((char *)TCMQTTRCVPUB,"ptc\":1")){
 				
-				    dry_open_flag=1;//gctl_t.gDry=1;
+				    gctl_t.gDry=1;
                  
 				  
 					

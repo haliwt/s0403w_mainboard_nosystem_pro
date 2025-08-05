@@ -62,21 +62,24 @@ void receive_data_from_display(uint8_t *pdata)
 
      if(pdata[3] == 0x01){
           buzzer_sound();
-         dry_open_flag=1;//gctl_t.gDry = 1;
-       
+          gctl_t.gDry = 1;
 
+        
       if(gpro_t.stopTwoHours_flag==0){
-           PTC_SetHigh();
+         if(gpro_t.pct_warning ==0 && gpro_t.fan_warning_flag ==0){ //PTC warning flag
+              PTC_SetHigh();
+          }
+          
           if(wifi_link_net_state()==1){
               MqttData_Publish_SetPtc(0x01);
-	  	      osDelay(100);//HAL_Delay(350);
+	  	        osDelay(100);//HAL_Delay(350);
            }
        
        }
        }
        else if(pdata[3] == 0x0){
         buzzer_sound();
-          dry_open_flag=0;//gctl_t.gDry =0;
+          gctl_t.gDry =0;
         
          PTC_SetLow();
          if(wifi_link_net_state()==1){
@@ -153,7 +156,7 @@ void receive_data_from_display(uint8_t *pdata)
 
      case 0x06: //buzzer sound command 
 
- 
+          
            gpro_t.stop_run_wifi_pro =1; //stop wifi process
            
             buzzer_sound();
@@ -238,7 +241,7 @@ void receive_data_from_display(uint8_t *pdata)
       if(pdata[3] == 0x01){
         
 
-         dry_open_flag=1;//gctl_t.gDry = 1;
+        gctl_t.gDry = 1;
    
         if(gpro_t.stopTwoHours_flag ==1){
               PTC_SetHigh();
@@ -251,7 +254,7 @@ void receive_data_from_display(uint8_t *pdata)
       }
       else if(pdata[3] == 0x0){
         
-         dry_open_flag=0;//gctl_t.gDry =0;
+         gctl_t.gDry =0;
         
       if(gpro_t.stopTwoHours_flag ==0){
         PTC_SetLow();
