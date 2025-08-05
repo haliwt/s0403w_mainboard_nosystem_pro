@@ -201,13 +201,16 @@ static void vTaskStart(void *pvParameters)
           if(gpro_t.gTimer_update_todisplay > 1){
 			 	    gpro_t.gTimer_update_todisplay=0;
                 updateDht11_sensorData_toDisp();
+		          vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
+			    taskYIELD();  // ??????
+			    vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
               
 			 }
 
 		   if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
 
-		   SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-		  vTaskDelay(pdMS_TO_TICKS(5));
+				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+				vTaskDelay(pdMS_TO_TICKS(5));
 		   	}
          
 			test_counter++;
@@ -231,15 +234,21 @@ static void vTaskStart(void *pvParameters)
 
 
           if(gpro_t.wifi_led_fast_blink_flag > 1){
-			      gpro_t.wifi_led_fast_blink_flag=0;
+		  	 
+			  vTaskPrioritySet(xHandleTaskStart , LOWEST_PRIORITY);  // ???????
+			   taskYIELD();  // ??????
+			  vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+		  	   gpro_t.wifi_led_fast_blink_flag=0;
+			  vTaskDelay(pdMS_TO_TICKS(1000));//3000
+			  
 
           }
-			    else if(gpro_t.wifi_led_fast_blink_flag==0 ){
-		  	     wifi_counter++;
+		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
+		  	    wifi_counter++;
              wifi_communication_tnecent_handler();//
              getBeijingTime_cofirmLinkNetState_handler();
              wifi_auto_detected_link_state();
-            }
+           }
 		  
 		
 			
