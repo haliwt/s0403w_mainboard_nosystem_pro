@@ -189,7 +189,6 @@ void every_power_on_run(void)
       ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "妞硅精娅�"
       gctl_t.gTimer_fan_run_one_minute=0;
        gpro_t.process_run_step=0;
-      fan_run_fun();
       PLASMA_SetHigh();
       HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
       PTC_SetHigh();

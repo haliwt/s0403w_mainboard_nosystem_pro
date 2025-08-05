@@ -1,7 +1,7 @@
 #include "bsp.h"
 
 
-uint8_t power_on_sound_flag;
+
 
 
 /**********************************************************************
@@ -35,18 +35,14 @@ void receive_data_from_display(uint8_t *pdata)
             
            
            	gpro_t.gpower_on = power_on;
-             power_on_sound_flag=1;
+           
              gpro_t.power_on_prority_flag =1;
 
         }
         else if(pdata[3] == 0x0){ //close 
 
           
-		   //   if(power_on_sound_flag==1){
-			//   	power_on_sound_flag++;
-			//     vTaskDelay(pdMS_TO_TICKS(30));
-                 
-			//   }
+	
               
 			  SendWifiData_Answer_Cmd(0x01,0x02); //power off .
               vTaskDelay(pdMS_TO_TICKS(10)); 
