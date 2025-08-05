@@ -29,11 +29,10 @@ void receive_data_from_display(uint8_t *pdata)
 
         if(pdata[3] == 0x01){ //open
           
-           
-
-		    buzzer_sound();//buzzer_sound_fun();
+           buzzer_sound();//buzzer_sound_fun();
             SendWifiData_Answer_Cmd(0x01,0x01);
             vTaskDelay(pdMS_TO_TICKS(10));
+            
            
            	gpro_t.gpower_on = power_on;
              power_on_sound_flag=1;
@@ -42,15 +41,17 @@ void receive_data_from_display(uint8_t *pdata)
         }
         else if(pdata[3] == 0x0){ //close 
 
-
-		     if(power_on_sound_flag==1){
-			  	power_on_sound_flag++;
-			    vTaskDelay(pdMS_TO_TICKS(30));
-                 buzzer_sound();
-			  }
+          
+		   //   if(power_on_sound_flag==1){
+			//   	power_on_sound_flag++;
+			//     vTaskDelay(pdMS_TO_TICKS(30));
+                 
+			//   }
               
 			  SendWifiData_Answer_Cmd(0x01,0x02); //power off .
               vTaskDelay(pdMS_TO_TICKS(10)); 
+              buzzer_sound();
+              freertos_set_prority();
              
               
              powerOffTunrOff_flag=1;

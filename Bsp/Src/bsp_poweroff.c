@@ -20,15 +20,15 @@ void power_off_handler(void)
 
     case 1:
 
-     // if(powerOffTunrOff_flag==1){
+    
 
-          powerOffTunrOff_flag++;
+       
           gTimer_powerOffRunFan=0;
           gctl_t.gTimer_fan_run_one_minute=0;
        
       
-          gctl_t.set_wind_speed_value=10;
-		 gctl_t.gModel =1;
+        gctl_t.set_wind_speed_value=10;
+		gctl_t.gModel =1;
 		gctl_t.app_timer_power_on_flag =0;
 		
 		stopHours_flag =0;
@@ -47,7 +47,7 @@ void power_off_handler(void)
 
           SetPowerOff_ForDoing();
 		  powerOffTunrOff_flag = 2;
-       //  }
+       
       break;
 
       case 2:

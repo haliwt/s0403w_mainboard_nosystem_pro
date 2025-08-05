@@ -404,3 +404,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
  }
 
 
+void freertos_set_prority(void)
+{
+    if(xHandleTaskMsgPro != NULL){
+        vTaskPrioritySet(xHandleTaskMsgPro, HIGHEST_PRIORITY);
+    }
+   
+} 
