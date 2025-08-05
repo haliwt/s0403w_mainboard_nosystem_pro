@@ -153,7 +153,7 @@ void receive_data_from_display(uint8_t *pdata)
 
      case 0x06: //buzzer sound command 
 
-           power_on_sound_flag=3;
+ 
            gpro_t.stop_run_wifi_pro =1; //stop wifi process
            
             buzzer_sound();
