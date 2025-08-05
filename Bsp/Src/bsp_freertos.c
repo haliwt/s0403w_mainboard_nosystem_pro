@@ -208,7 +208,7 @@ static void vTaskStart(void *pvParameters)
                 updateDht11_sensorData_toDisp();
 		      
               
-			 }
+			    }
 
 		   if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
 

@@ -20,9 +20,6 @@ void power_off_handler(void)
 
     case 1:
 
-    
-
-       
           gTimer_powerOffRunFan=0;
           gctl_t.gTimer_fan_run_one_minute=0;
        
@@ -54,30 +51,34 @@ void power_off_handler(void)
         
        if(wifi_link_net_state() == 1){
 
-         // MqttData_Publish_PowerOff_Ref(); 
-          osDelay(200);//HAL_Delay(200);
+          MqttData_Publish_PowerOff_Ref(); 
+          vTaskDelay(pdMS_TO_TICKS(200)); //WT.EDTI 2024.11.19 
+       }
+         powerOffTunrOff_flag = 4;
+       break;
 
-          if( gctl_t.ptc_remove_warning_send_data ==0){
-		 	gctl_t.ptc_remove_warning_send_data++;
-		  //	Publish_Data_Warning(ptc_temp_warning,0);
-		  	osDelay(200);
+       case 4:
+
+          if(gctl_t.ptc_warning == 1){
+		 	
+		  	Publish_Data_Warning(ptc_temp_warning,0);
+		  	vTaskDelay(pdMS_TO_TICKS(100));
+            
+          }
+           powerOffTunrOff_flag = 5;
+        break;
+
+        case 5:
+            if(gctl_t.ptc_warning == 1){
 			Publish_Data_Warning(fan_warning,0);
-			osDelay(200);
+			vTaskDelay(pdMS_TO_TICKS(100));
 			
           }
-
-           Subscriber_Data_FromCloud_Handler();
-		   osDelay(200);
-		 
-        
-
-       }
-
-        powerOffTunrOff_flag = 3;
+        powerOffTunrOff_flag = 6;
       break;
 
 
-      case 3:
+      case 6:
 	   
 		if(gTimer_powerOffRunFan < 60 && powerOffFanRun_flag ==1){
           
