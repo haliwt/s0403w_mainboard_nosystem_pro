@@ -24,6 +24,14 @@ typedef enum ack_sig{
 
 }ack_e;
 
+typedef enum{
+
+  open =1,
+  close =2,
+  no_change =0  
+
+}atcion_state_e;
+
 
 
 void receive_data_from_display(uint8_t *pdata);

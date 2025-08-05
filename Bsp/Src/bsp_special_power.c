@@ -99,9 +99,9 @@ void Single_Usart_RxData(void(*rxHandler)(uint8_t dat))
 void ActionEvent_Handler(void)
 {
 
-   static uint8_t ptc_default =0xff,
-				  plasma_default =0xff,
-				  ultrasonic_default =0xff;
+   static uint8_t ptc_default =1,
+				  plasma_default =1,
+				  ultrasonic_default =1;
    if( gctl_t.gDry==1){
 	if(gpro_t.fan_warning_flag ==0 && gpro_t.pct_warning ==0){ //PTC warning flag
 		
@@ -199,6 +199,10 @@ void every_power_on_run(void)
       gctl_t.gUlransonic = 1; // "妞硅精娅�"
       gctl_t.gTimer_fan_run_one_minute=0;
        gpro_t.process_run_step=0;
+
+	  gpro_t.ptc_switch_flag =1;
+	  gpro_t.ultrasonic_switch_flag =1;
+	  gpro_t.plasma_switch_flag =1;
       PLASMA_SetHigh();
       HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
       PTC_SetHigh();

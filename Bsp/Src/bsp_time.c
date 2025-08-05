@@ -4,62 +4,7 @@ uint8_t  beijing_step;
 
 uint8_t real_hours,real_minutes,real_seconds;
 
-uint8_t auto_link_net_flag;
-#if 0
-/**********************************************************************
-    *
-    *Functin Name: void works_times_handler(void)
-    *Function :  
-    *Input Ref: NO
-    *Return Ref: NO
-    *
-************************************************************************/
-void works_times_handler(void)
-{
-
-  static uint8_t send_flag;
-
-   if(gpro_t.gTimer_works_time_seconds > 59){
-
-       gpro_t.gTimer_works_time_seconds =0;
-
-        gpro_t.disp_works_minutes++;
-        send_flag = 1;
-        if(gpro_t.disp_works_minutes > 59){
-               gpro_t.disp_works_hours ++;   
-                    
-               if(gpro_t.disp_works_hours >23){
-                    gpro_t.disp_works_hours =0;
-                    gpro_t.disp_works_minutes=0;
-                    gpro_t.gTimer_works_time_seconds =0;
-
-
-
-               }
-                    
-
-         }
-
-
-
-   }
-
-
-   if(send_flag ==1){
-       send_flag ++ ;
-
-       SendWifiData_To_PanelTime(gpro_t.disp_works_hours,gpro_t.disp_works_minutes,gpro_t.gTimer_works_time_seconds);
-
-   }
-    
-
-
-
-}
-
-#endif 
-
-
+uint8_t auto_link_net_flag, action_counter;
 /**********************************************************************
     *
     *Functin Name: void works_run_two_hours_state(void)
@@ -144,9 +89,9 @@ void works_run_two_hours_state(void)
     break;
 
     case 0:
-        if(gctl_t.gTimer_senddata_panel >1 ){ //300ms
+        if(gctl_t.gTimer_senddata_panel >6 ){ //300ms
              gctl_t.gTimer_senddata_panel=0;
-             
+              action_counter++;
               ActionEvent_Handler();
 
               

@@ -64,7 +64,7 @@ void power_on_handler(void)
 	
 	
 	case 2:
-		
+		if(gctl_t.app_timer_power_on_flag > 1)gctl_t.app_timer_power_on_flag=0;
         every_power_on_run();
 	
 	 gpro_t.process_run_step= 3;

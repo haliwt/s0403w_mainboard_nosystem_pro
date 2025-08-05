@@ -196,19 +196,17 @@ static void vTaskStart(void *pvParameters)
             power_on_handler();
             works_run_two_hours_state();
             link_wifi_to_tencent_handler(gpro_t.wifi_led_fast_blink_flag); //detected ADC of value 
-            if(wifi_link_net_state() ==1 && gl_tMsg.link_wifi_net_flag ==0){
-              gl_tMsg.link_wifi_net_flag ++;
-              Update_Dht11_Totencent_Value();
-             vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(200) //WT.EDIT 2024.08.10
-             }
+        
 		
-          if(gpro_t.gTimer_update_todisplay > 1){
-			 	    gpro_t.gTimer_update_todisplay=0;
-				
-                updateDht11_sensorData_toDisp();
-		      
-              
-			    }
+          if(gpro_t.gTimer_update_todisplay > 2){
+			gpro_t.gTimer_update_todisplay=0;
+
+			updateDht11_sensorData_toDisp();
+			vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
+			taskYIELD();  // ??????
+			vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+		           
+             }
 
 		   if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
 
@@ -226,9 +224,9 @@ static void vTaskStart(void *pvParameters)
 			  if(gpro_t.power_on_prority_flag ==1){
                   gpro_t.power_on_prority_flag ++;
 			   vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
-			    taskYIELD();  // ??????
+			   taskYIELD();  // ??????
 			    vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
-
+           
 			  }
       
               gpro_t.process_run_step=0;
