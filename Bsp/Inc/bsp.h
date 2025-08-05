@@ -114,6 +114,7 @@ typedef struct PROCESS_T{
    //uint8_t gFan_pwm_duty_level;
    uint8_t answer_buzzer_flag ;
 	 uint8_t stop_run_wifi_pro ;
+	 uint8_t power_on_prority_flag;
 
   
    

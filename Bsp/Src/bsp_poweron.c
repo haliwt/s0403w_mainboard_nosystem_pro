@@ -18,7 +18,7 @@ void power_on_handler(void)
 	case 0: //1
 
 
-    
+         gpro_t.power_on_prority_flag = 1;
          smartphone_timer_power_on_and_normal_handler();
 
          

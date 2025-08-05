@@ -44,7 +44,7 @@ void power_off_handler(void)
          gpro_t.process_run_step=0;//gpro_t.process_run_step
 
          
-		
+
           SetPowerOff_ForDoing();
 		  powerOffTunrOff_flag = 2;
        //  }

@@ -151,11 +151,12 @@ static void vTaskMsgPro(void *pvParameters)
                
                   receive_data_from_display(gl_tMsg.usData);
                
-         
+                  
 			      vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
 			      taskYIELD();  // ??????
 			      vTaskPrioritySet(xHandleTaskStart, HIGHEST_PRIORITY);  // ???????
 			     // vTaskDelay(pdMS_TO_TICKS(10));
+                  
                 
                 }
                 
@@ -214,6 +215,13 @@ static void vTaskStart(void *pvParameters)
            break;
 
             case power_off:
+			  if(gpro_t.power_on_prority_flag ==1){
+                  gpro_t.power_on_prority_flag ++;
+			   vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
+			    taskYIELD();  // ??????
+			    vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+
+			  }
       
               gpro_t.process_run_step=0;
               gl_tMsg.link_wifi_net_flag=0;

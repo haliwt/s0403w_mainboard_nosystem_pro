@@ -17,8 +17,8 @@ void smartphone_timer_power_on_and_normal_handler(void)
 	    gctl_t.gFan = 1;
 		dry_open_flag = 1;//gctl_t.gDry = 1;
         //g_dry_open_flag =1;
-		plasma_open_flag=1;//gctl_t.gPlasma =1;       //"鏉?鑿?"
-		ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "椹辫櫕"
+		plasma_open_flag=1;//gctl_t.gPlasma =1;       //"鏄1�7?鑄1�7?"
+		ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "椹辫櫄1�7"
 	    gctl_t.gTimer_fan_run_one_minute=0;
 
    
@@ -108,8 +108,8 @@ void SetPowerOff_ForDoing(void)
     gctl_t.gFan = 0;
     dry_open_flag=0;//gctl_t.gDry = 0;
   
-	plasma_open_flag=0;//gctl_t.gPlasma =0;       //"鏉?鑿?"
-	ultrasonic_open_flag=0;//gctl_t.gUlransonic = 0; // "椹辫櫕"
+	plasma_open_flag=0;//gctl_t.gPlasma =0;       //"鏄1�7?鑄1�7?"
+	ultrasonic_open_flag=0;//gctl_t.gUlransonic = 0; // "椹辫櫄1�7"
 	gctl_t.gModel =1;
 
 
@@ -185,11 +185,11 @@ void every_power_on_run(void)
       gctl_t.gFan = 1;
       dry_open_flag=1;//gctl_t.gDry = 1;
       //g_dry_open_flag =1;
-      plasma_open_flag=1;//gctl_t.gPlasma =1;       //"鏉?鑿?"
-      ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "椹辫櫕"
+      plasma_open_flag=1;//gctl_t.gPlasma =1;       //"鏄1�7?鑄1�7?"
+      ultrasonic_open_flag=1;//gctl_t.gUlransonic = 1; // "椹辫櫄1�7"
       gctl_t.gTimer_fan_run_one_minute=0;
-
- 
+       gpro_t.process_run_step=0;
+      fan_run_fun();
       PLASMA_SetHigh();
       HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
       PTC_SetHigh();
