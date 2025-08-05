@@ -60,6 +60,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 
 /* USER CODE BEGIN Private defines */
+#if 0
 #define WIFI_TX_Pin GPIO_PIN_2
 #define WIFI_TX_GPIO_Port GPIOA
 #define WIFI_RX_Pin GPIO_PIN_3
@@ -80,6 +81,7 @@ void Error_Handler(void);
 #define DISP_RX_GPIO_Port GPIOA
 #define WIFI_EN_Pin GPIO_PIN_12
 #define WIFI_EN_GPIO_Port GPIOA
+#endif 
 
 /* USER CODE END Private defines */
 
