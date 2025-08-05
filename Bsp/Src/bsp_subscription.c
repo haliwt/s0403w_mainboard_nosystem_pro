@@ -483,7 +483,7 @@ void Tencent_Cloud_Rx_Handler(void)
     }
     else if(strstr((char *)gpro_t.wifi_rx_data_array,"sonic\":1")){
             if(gpro_t.gpower_on ==power_on){
-            ultrasonic_open_flag=1;//gctl_t.gUlransonic=1;
+            gctl_t.gUlransonic=1;
 			gctl_t.response_wifi_signal_label = SONIC_ON_ITEM;
        
            }
@@ -631,7 +631,7 @@ void Json_Parse_Command_Fun(void)
 			
             MqttData_Publish_SetPlasma(0);
 			osDelay(100);//HAL_Delay(350);
-            plasma_open_flag=0;//gctl_t.gPlasma=0;
+             gctl_t.gPlasma=0;
 			gctl_t.gTimer_senddata_panel=8;
 			SendWifiData_To_Cmd(0x03,0x0);
 	  	   HAL_Delay(5);
@@ -646,7 +646,7 @@ void Json_Parse_Command_Fun(void)
             MqttData_Publish_SetPlasma(1);
 			osDelay(100);//HAL_Delay(350);
 		
-              plasma_open_flag=1;//gctl_t.gPlasma=1;
+              gctl_t.gPlasma=1;
               gctl_t.gTimer_senddata_panel=8;
 			
 			SendWifiData_To_Cmd(0x03,0x01);
@@ -663,7 +663,7 @@ void Json_Parse_Command_Fun(void)
             MqttData_Publish_SetUltrasonic(0);
 			osDelay(100);	//HAL_Delay(350);
 			
-             ultrasonic_open_flag=0;// gctl_t.gUlransonic=0;
+              gctl_t.gUlransonic=0;
              gctl_t.gTimer_senddata_panel=8; 
 	
 			SendWifiData_To_Cmd(0x04,0x0);
@@ -680,7 +680,7 @@ void Json_Parse_Command_Fun(void)
 			 osDelay(100);	//HAL_Delay(350);
 
          
-                ultrasonic_open_flag=1;//gctl_t.gUlransonic=1;
+                gctl_t.gUlransonic=1;
                 gctl_t.gTimer_senddata_panel=8;
         
 		
@@ -872,27 +872,27 @@ void Parse_Json_Statement(void)
     
     if(strstr((char *)TCMQTTRCVPUB,"sonic\":0")){
 			
-			     ultrasonic_open_flag=0;//gctl_t.gUlransonic=0;
+			  gctl_t.gUlransonic=0;
 				
 			
 		}
 		else if(strstr((char *)TCMQTTRCVPUB,"sonic\":1")){
 			
-				ultrasonic_open_flag=1;//gctl_t.gUlransonic=1;
+			gctl_t.gUlransonic=1;
 				
 		   }
         
            
       if(strstr((char *)TCMQTTRCVPUB,"Anion\":0")){
 			
-				   plasma_open_flag=0;//gctl_t.gPlasma=0;
+				   gctl_t.gPlasma=0;
 				
 				
 			 
 		}
 		else if(strstr((char *)TCMQTTRCVPUB,"Anion\":1")){
 			
-				plasma_open_flag=1;//gctl_t.gPlasma=1;
+				gctl_t.gPlasma=1;
 				
 			
 				

@@ -19,7 +19,7 @@ void power_on_handler(void)
 
 
          gpro_t.power_on_prority_flag = 1;
-         smartphone_timer_power_on_and_normal_handler();
+       
 
          
          
@@ -36,6 +36,7 @@ void power_on_handler(void)
 		 gctl_t.gTimer_fan_adc_times=0;
 		
 		 gctl_t.set_wind_speed_value= 100;
+		 gctl_t.set_temperature_value=40;
         //POWER OFF REF 
      
         powerOffTunrOff_flag = 1;
@@ -47,15 +48,16 @@ void power_on_handler(void)
         stopHours_flag =0;
         gpro_t.gTimer_detect_fan_error=0;
         gpro_t.fan_run_initial_times = 0; //WT.EDIT 2025.07.31
-        gctl_t.set_temperature_value=40; //power on default set temperature value is 40 degree,don't compare 
+        gctl_t.set_temperature_value=40; //power on default set temperature value is 40 degree,don't compare
+         updateDht11_sensorData_toDisp();
 		 gpro_t.process_run_step= 1;
 	break; 
 
 
   case 1:
         
-         updateDht11_sensorData_toDisp();
-		 osDelay(10);
+    smartphone_timer_power_on_and_normal_handler();
+		 
 	 gpro_t.process_run_step= 2;
 	   
   break;
@@ -71,28 +73,25 @@ void power_on_handler(void)
 	
 	case 3:
 	
-	
-        if(wifi_link_net_state() ==1){
+         if(wifi_link_net_state() ==1 ){
+    
+		    
+	         gctl_t.set_wind_speed_value =100;
 
-          Update_Dht11_Totencent_Value();
-          osDelay(100);//HAL_Delay(200) //WT.EDIT 2024.08.10
-        }
-
-        fan_run_fun();//SetLevel_Fan_PWMA(10); //WT.EDIT 2024.12.24
-        PTC_SetHigh(); // the moment open ptc  //WT.EDIT 2025.01.11
-        
-      
+		     MqttData_Publish_SetOpen(1);  
+			 vTaskDelay(pdMS_TO_TICKS(200));
+		
+		 }
 	
-       
-        gpro_t.process_run_step= 4;
+      gpro_t.process_run_step= 4;
 	break;
 
   case 4: //5
 
-     if(wifi_link_net_state() ==1){
+     if(wifi_link_net_state() ==1 &&  gctl_t.app_timer_power_on_flag==0){
     
-		     MqttData_Publish_SetOpen(1);  
-			 vTaskDelay(pdMS_TO_TICKS(200));
+		  MqttData_Publish_Init();
+		  vTaskDelay(pdMS_TO_TICKS(200));
      	}
 	  gpro_t.process_run_step= 5;
 	 
@@ -103,10 +102,9 @@ void power_on_handler(void)
 		
 	
 		if(wifi_link_net_state() ==1){
-           gctl_t.set_wind_speed_value =100;
-		
-			 MqttData_Publish_Init();
-			 vTaskDelay(pdMS_TO_TICKS(200));
+         
+		Update_Dht11_Totencent_Value();
+          
 
          }
 	     gpro_t.process_run_step=6 ;
@@ -119,7 +117,7 @@ void power_on_handler(void)
 	
 		  gctl_t.first_link_tencent_cloud_flag++;
 
-         Publish_Data_ToTencent_Update_Data();
+               MqttData_Publish_Update_Data();
 			   vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
 
           

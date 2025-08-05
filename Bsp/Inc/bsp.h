@@ -113,7 +113,7 @@ typedef struct PROCESS_T{
    uint8_t send_ack_cmd;
    //uint8_t gFan_pwm_duty_level;
    uint8_t answer_buzzer_flag ;
-	 uint8_t stop_run_wifi_pro ;
+	
 	 uint8_t power_on_prority_flag;
 
   
@@ -141,6 +141,7 @@ typedef struct PROCESS_T{
    uint8_t gTimer_again_send_power_on_off;
    uint8_t  gTimer_power_on_auto_link;
    uint8_t gTimer_update_todisplay;
+   uint8_t gTimer_rx_cmd_done;
 
 
 

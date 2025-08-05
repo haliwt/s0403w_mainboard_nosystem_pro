@@ -97,6 +97,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
        gpro_t.gTimer_again_send_power_on_off++;
 	   gpro_t.gTimer_power_on_auto_link++;
 	   gpro_t.gTimer_update_todisplay++;
+	   gpro_t.gTimer_rx_cmd_done++;
 	   
 	   gTimer_powerOffRunFan++;
       stopHoursCounter++;

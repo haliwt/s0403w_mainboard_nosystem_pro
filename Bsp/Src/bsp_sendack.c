@@ -72,7 +72,7 @@ void receive_data_from_display(uint8_t *pdata)
           
           if(wifi_link_net_state()==1){
               MqttData_Publish_SetPtc(0x01);
-	  	        osDelay(100);//HAL_Delay(350);
+	  	      vTaskDelay(pdMS_TO_TICKS(200));
            }
        
        }
@@ -84,7 +84,7 @@ void receive_data_from_display(uint8_t *pdata)
          PTC_SetLow();
          if(wifi_link_net_state()==1){
               MqttData_Publish_SetPtc(0x0);
-	  	      osDelay(100);//HAL_Delay(350);
+	  	      vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
           }
 
        }
@@ -97,16 +97,16 @@ void receive_data_from_display(uint8_t *pdata)
            
             buzzer_sound();
            
-           //gctl_t.gPlasma = 1;
-           plasma_open_flag=1;
+           gctl_t.gPlasma = 1;
+         //  plasma_open_flag=1;
           
            PLASMA_SetHigh();
         }
         else if(pdata[3] == 0x0){
            buzzer_sound();
            
-         // gctl_t.gPlasma = 0;
-           plasma_open_flag=0;
+           gctl_t.gPlasma = 0;
+          // plasma_open_flag=0;
         
           PLASMA_SetLow();
 
@@ -120,12 +120,12 @@ void receive_data_from_display(uint8_t *pdata)
 
         if(pdata[3] == 0x01){  //open 
           
-           ultrasonic_open_flag=1;//gctl_t.gUlransonic =1;
+          gctl_t.gUlransonic =1;
 
         }
         else if(pdata[3] == 0x0){ //close 
 
-          ultrasonic_open_flag=0; //gctl_t.gUlransonic = 0;
+          gctl_t.gUlransonic = 0;
 
         }
 
@@ -156,43 +156,20 @@ void receive_data_from_display(uint8_t *pdata)
 
      case 0x06: //buzzer sound command 
 
-          
-           gpro_t.stop_run_wifi_pro =1; //stop wifi process
-           
-            buzzer_sound();
-             gpro_t.stop_run_wifi_pro =1; //stop wifi process
-			//gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.30
-           // pdata[2] =0xff;
-          
-           
-
-       
-
-
+          buzzer_sound();
+		  vTaskDelay(pdMS_TO_TICKS(5));
      break;
 
      case 0x16 : //buzzer sound command with answer .
 
-        gpro_t.stop_run_wifi_pro =1; //stop wifi process
-      
-		   buzzer_sound();
-         gpro_t.stop_run_wifi_pro =1; //stop wifi process
+        buzzer_sound();
+        
 
 		  gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
           SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 		  vTaskDelay(pdMS_TO_TICKS(5));
 		  
-         
-          // pdata[2] =0xff;
-
-            
-           
- 
-        
-      
-
-
-     break;
+       break;
 
 
       case 0x1A: //??????

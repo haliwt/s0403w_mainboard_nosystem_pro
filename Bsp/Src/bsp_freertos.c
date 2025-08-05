@@ -70,8 +70,6 @@ uint8_t rx_data_counter,rx_end_flag;
 
 uint8_t test_counter;
 
-
-
 uint8_t wifi_counter;
 
 /**********************************************************************************************************
@@ -132,7 +130,7 @@ static void vTaskMsgPro(void *pvParameters)
 	BaseType_t xResult;
 	//const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
     uint32_t ulValue;
-  
+    
 	
     while(1)
     {
@@ -144,7 +142,8 @@ static void vTaskMsgPro(void *pvParameters)
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
                 gpro_t.disp_rx_cmd_done_flag = 0;
-
+				gpro_t.gTimer_rx_cmd_done =0;
+              
              //   check_code =  bcc_check(gl_tMsg.usData,uid);
 
               // if(check_code == bcc_check_code ){
@@ -161,6 +160,14 @@ static void vTaskMsgPro(void *pvParameters)
                 }
                 
          }
+
+		 if( gpro_t.disp_rx_cmd_done_flag ==1 && gpro_t.gTimer_rx_cmd_done > 2 ){
+		       gpro_t.disp_rx_cmd_done_flag=0;
+
+
+		    }
+	 
+		 
 		
     } 
 }
@@ -200,6 +207,7 @@ static void vTaskStart(void *pvParameters)
 		
           if(gpro_t.gTimer_update_todisplay > 1){
 			 	    gpro_t.gTimer_update_todisplay=0;
+				
                 updateDht11_sensorData_toDisp();
 		          vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
 			    taskYIELD();  // ??????
@@ -212,6 +220,8 @@ static void vTaskStart(void *pvParameters)
 				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 				vTaskDelay(pdMS_TO_TICKS(5));
 		   	}
+
+		  
          
 			test_counter++;
 			
@@ -383,7 +393,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
                 //bcc_check_code=inputBuf[0];
 
-           
+                gpro_t.gTimer_rx_cmd_done =0;
 
                 #if 1
 
