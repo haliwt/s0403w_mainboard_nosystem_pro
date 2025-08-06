@@ -94,8 +94,12 @@ void works_run_two_hours_state(void)
               action_counter++;
               ActionEvent_Handler();
 
-              
-         }
+			  	if(wifi_link_net_state() ==1){
+         
+		         Update_Dht11_Totencent_Value();
+                }
+
+		}
       break;
    }
 }
