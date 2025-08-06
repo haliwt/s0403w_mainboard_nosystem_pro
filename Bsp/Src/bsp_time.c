@@ -167,7 +167,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 
    case 1:
 
-        if(wifi_t.gTimer_get_beijing_time > 65 ){//WT.EDIT 2025.01.06 //100
+        if(wifi_t.gTimer_get_beijing_time > 65){//WT.EDIT 2025.01.06 //100
 
          wifi_t.gTimer_get_beijing_time=0;
         
@@ -239,7 +239,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 
     		
     		Get_BeiJing_Time_Cmd();
-    	    osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10//HAL_Delay(20);
+    	    vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10//HAL_Delay(20);
     	    beijing_step =1;
 
          break;
@@ -251,7 +251,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
         		gpro_t.wifi_rx_data_counter =0;
         		Get_Beijing_Time();
               
-        	    osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10
+        	    vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10
                 
         	
                 beijing_step =2;
@@ -280,7 +280,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
                     gpro_t.get_beijing_time_success = 1;
 
                     SendWifiData_To_PanelTime(gpro_t.disp_works_hours,gpro_t.disp_works_minutes,gpro_t.gTimer_works_time_seconds);
-                    osDelay(50);
+                    vTaskDelay(pdMS_TO_TICKS(10));//osDelay(50);
 
                    gpro_t.get_beijing_flag = 6; //WT.EDIT 2025.01.06
                     

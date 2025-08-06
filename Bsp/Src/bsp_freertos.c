@@ -204,10 +204,7 @@ static void vTaskStart(void *pvParameters)
 		   	}
 
 		  
-         
-			
-			
-           break;
+          break;
 
             case power_off:
 			  if(gpro_t.power_on_prority_flag ==1){
