@@ -185,6 +185,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
             else{
               
                SendWifiData_To_Data(0x1F,0x0); //0x1F: 0x1=wifi link net is succes ,0x0 = wifi link net is fail
+               vTaskDelay(pdMS_TO_TICKS(5));
                gpro_t.get_beijing_flag = 10;
                net_t.linking_tencent_cloud_doing  =1; //receive from tencent command state .
                gpro_t.send_ack_cmd = ack_wifi_on;

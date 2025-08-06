@@ -111,7 +111,7 @@ void power_on_handler(void)
 			gpro_t.gTimer_update_todisplay=0;
 
 			updateDht11_sensorData_toDisp();
-			freertos_set_prority();
+			//freertos_set_prority();
 		           
         }
 
