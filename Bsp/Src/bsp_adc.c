@@ -105,7 +105,7 @@ static uint16_t Get_Fan_Adc_Average(uint32_t ch,uint8_t times)
 	for(t=0;t<times;t++)
 	{
 		temp_val+=Get_Fan_Adc_Channel_0(ch);  
-        osDelay(5);//WT.EDIT 2024.11.11 modifiy //HAL_Delay(10);
+        vTaskDelay(pdMS_TO_TICKS(5));//WT.EDIT 2024.11.11 modifiy //HAL_Delay(10);
 		
 	}
 	return (uint16_t)temp_val/times;
@@ -119,7 +119,7 @@ static uint16_t Get_Ptc_Adc_Average(uint32_t ch,uint8_t times)
 	for(t=0;t<times;t++)
 	{
 		temp_val+=Get_Ptc_Adc_Channel_1(ch); 
-		osDelay(5);//WT.EDIT 2024.11.11 modifiy//HAL_Delay(10);
+		 vTaskDelay(pdMS_TO_TICKS(5));//WT.EDIT 2024.11.11 modifiy//HAL_Delay(10);
 	}
 	return (uint16_t)temp_val/times ;
 }
@@ -185,9 +185,9 @@ void Get_Fan_ADC_Fun(uint8_t channel,uint8_t times)
 	       if(wifi_link_net_state()==1){
 
                MqttData_Publis_SetFan(0);
-	           HAL_Delay(350);
+	            vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(350);
                Publish_Data_Warning(fan_warning,warning);
-    	       HAL_Delay(200);
+    	        vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
 
            }
 		}
@@ -226,10 +226,10 @@ void fan_warning_sound(void)
 	       if(wifi_link_net_state()==1){
 
                MqttData_Publis_SetFan(0);
-	            HAL_Delay(350);
+	             vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(350);
 
     		   Publish_Data_Warning(fan_warning,warning);
-    	       HAL_Delay(200);
+    	        vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
 
            }
 
@@ -310,7 +310,7 @@ static void Judge_PTC_Temperature_Value(void)
         if(wifi_link_net_state()==1){
 
         MqttData_Publish_SetPtc(0);
-        HAL_Delay(100);  
+         vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(100);  
 
         Publish_Data_Warning(ptc_temp_warning ,warning); //fan of default warning.
         osDelay(100);

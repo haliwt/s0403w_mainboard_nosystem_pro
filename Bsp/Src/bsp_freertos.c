@@ -242,7 +242,7 @@ static void vTaskStart(void *pvParameters)
 		
 			
           send_cmd_ack_hanlder();
-		  vTaskDelay(pdMS_TO_TICKS(50));//ï¿?1ï¿?7?0
+		  vTaskDelay(pdMS_TO_TICKS(100));//ï¿?1ï¿?7?0
 
 
         }

@@ -122,7 +122,7 @@ uint8_t DHT22_Read_TempAndHumidity(DHT22_Data_TypeDef *DHT22_Data)
 
   DHT11_Mode_Out_PP();       // 设置为推挽输出
   DHT11_Dout_LOW();          // 拉低开始信号
-  HAL_Delay(1);              // DHT22只需 >1ms，推荐1~2ms
+  delay_ms(1);//HAL_Delay(1);              // DHT22只需 >1ms，推荐1~2ms
 
   DHT11_Dout_HIGH();         // 拉高
   delay_us(30);              // 等待响应

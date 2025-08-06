@@ -122,7 +122,7 @@ uint8_t DHT11_Read_TempAndHumidity(DHT11_Data_TypeDef *DHT11_Data)
 	/*????*/
 	DHT11_Dout_LOW();
 	/*??18ms*/
-	HAL_Delay(20);
+	vTaskDelay(pdMS_TO_TICKS(20));//HAL_Delay(20);
 
 	/*???? ????30us*/
 	DHT11_Dout_HIGH(); 

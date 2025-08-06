@@ -177,22 +177,22 @@ void power_on_first_handler(void)
    if(wifi_link_net_state() ==1 && gctl_t.app_timer_power_on_flag==0){
 	
            MqttData_Publish_SetOpen(0x01);
-           osDelay(100);//HAL_Delay(100);
+           vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(100);
 
 
            Publish_Data_ToTencent_Initial_Data();
-			osDelay(100);//HAL_Delay(200);
+			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(200);
 
            
 
             Subscriber_Data_FromCloud_Handler();
-    		osDelay(30);//HAL_Delay(100);//HAL_Delay(350);
+    		vTaskDelay(pdMS_TO_TICKS(200));//osDelay(30);//HAL_Delay(100);//HAL_Delay(350);
 
              SendWifiData_To_Data(0x1F,0x01);
-             osDelay(20);
+             vTaskDelay(pdMS_TO_TICKS(5));//osDelay(20);
 
              updateDht11_sensorData_toDisp();
-              osDelay(20);
+              vTaskDelay(pdMS_TO_TICKS(5));//osDelay(20);
 	
 	  }
 
