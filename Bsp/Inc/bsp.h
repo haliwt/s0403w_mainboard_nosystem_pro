@@ -144,7 +144,8 @@ typedef struct PROCESS_T{
    uint8_t gTimer_again_send_power_on_off;
    uint8_t  gTimer_power_on_auto_link;
    uint8_t gTimer_update_todisplay;
-   uint8_t gTimer_rx_cmd_done;
+   uint8_t gTimer_update_tencet_dht11;
+
 
 
 

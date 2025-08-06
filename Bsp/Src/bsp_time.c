@@ -96,7 +96,7 @@ void works_run_two_hours_state(void)
 
 			  	if(wifi_link_net_state() ==1){
          
-		         Update_Dht11_Totencent_Value();
+		  
                 }
 
 		}
@@ -130,7 +130,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
              flag_switch=0;
             wifi_t.get_rx_beijing_time_enable=0;
             Subscriber_Data_FromCloud_Handler();
-            vTaskDelay(pdMS_TO_TICKS(100));;//HAL_Delay(200)
+            vTaskDelay(pdMS_TO_TICKS(100));//HAL_Delay(200)
             gpro_t.get_beijing_flag = 1;
 
             
@@ -139,9 +139,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
             flag_switch=0;
             wifi_t.get_rx_beijing_time_enable=0;
             Update_Dht11_Totencent_Value();
-            vTaskDelay(pdMS_TO_TICKS(100));//HAL_Delay(200) //WT.EDIT 2024.08.10
-            
-             gpro_t.get_beijing_flag = 1;
+            gpro_t.get_beijing_flag = 1;
 
          }
          else{ //WT.EDIT 2024.08.10 ADD ITEM
@@ -158,6 +156,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
     else{
 	 if(net_t.wifi_link_net_success ==0){
 	    SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
+	    vTaskDelay(pdMS_TO_TICKS(5));
 	 }
      gpro_t.get_beijing_flag = 1;
 
@@ -180,7 +179,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
       
                 net_t.linking_tencent_cloud_doing  =0; //receive from tencent command state .
                 SendWifiData_To_Data(0x1F,0x01);
-                //gpro_t.gTimer_pro_update_dht11_data =0; //disable publish to data to tencent .
+                vTaskDelay(pdMS_TO_TICKS(5));
 
             }
             else{
@@ -400,7 +399,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 	        wifi_t.soft_ap_config_flag =1;
              auto_link_net_flag =2;
    
-	        HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//瀵�?婵绻涢幒?
+	        HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//鐎碉拷1锟?7?濠殿喖顑堢换娑㈠箳?
             HAL_Delay(1000);
          
            

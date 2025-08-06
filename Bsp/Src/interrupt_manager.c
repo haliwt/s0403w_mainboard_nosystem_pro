@@ -65,39 +65,33 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         
         gpro_t.gTimer_link_net_timer_time++;
 	    gctl_t.gTimer_senddata_panel++;
-        wifi_t.gTimer_get_beijing_time++;
+       
 
-
-	 
-
-
-
-	   gctl_t.gTimer_usart_error++;
-	
-	   gctl_t.gTImer_send_data_to_disp++;
-	
-	  
-	   
 	   gctl_t.gTimer_fan_adc_times++;
 	   gctl_t.gTimer_ptc_adc_times++;
 
-	  gctl_t.gTimer_usart2_error++;
+	
 	  gctl_t.gTimer_linkTencentCounter++;
 	  gctl_t.gTimer_fan_run_one_minute++;
-        //gprocess 
+	  //wifi function 
+       wifi_t.gTimer_auto_detected_net_state_times ++;
+       wifi_t.gTimer_auto_link_net_time++ ;
+
+	   wifi_t.gTimer_get_beijing_time++;
+
+     //gprocess 
        gpro_t.gTimer_power_on_first_link_tencent++;
        gpro_t.gTimer_get_data_from_tencent_data++;
        gpro_t.gTimer_dc_power_on_auto_link_net++;
-       //wifi function 
-       wifi_t.gTimer_auto_detected_net_state_times ++;
-       wifi_t.gTimer_auto_link_net_time++ ;
+     
 
        gpro_t.gTimer_publis_dht11_data++ ;
        gpro_t.gTimer_detect_fan_error++;
        gpro_t.gTimer_again_send_power_on_off++;
 	   gpro_t.gTimer_power_on_auto_link++;
 	   gpro_t.gTimer_update_todisplay++;
-	   gpro_t.gTimer_rx_cmd_done++;
+	   gpro_t.gTimer_update_tencet_dht11++;
+
 	   
 	   gTimer_powerOffRunFan++;
       stopHoursCounter++;

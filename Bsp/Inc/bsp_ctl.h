@@ -105,7 +105,7 @@ typedef struct _RUN_T{
 
 	uint8_t iwdg_the_first_falg;
    
-	uint8_t gTimer_usart_error;
+	//uint8_t gTimer_usart_error;
     //app timer
 	//uint8_t app_timer_power_on_ref;
 	uint8_t app_timer_power_on_flag ;
@@ -160,7 +160,7 @@ typedef struct _RUN_T{
 	  uint8_t auto_link_cloud_flag;
 	  uint8_t reconnect_tencent_cloud_flag;
 	
-	  uint8_t  gTImer_send_data_to_disp;
+	
       
   
 	  uint8_t  wind_speed_decade;
@@ -187,7 +187,7 @@ typedef struct _RUN_T{
    
 	 uint8_t gTimer_linkTencentCounter;
 	
-	uint8_t gTimer_usart2_error;
+
 
     
 	uint32_t randomName[1];

@@ -19,13 +19,7 @@ void power_on_handler(void)
 
 
          gpro_t.power_on_prority_flag = 1;
-       
-
-         
-         
-         gctl_t.gTImer_send_data_to_disp=0; //temp and humidity data of times
-         
-	     gctl_t.gTimer_senddata_panel=0; //main board function run action.
+         gctl_t.gTimer_senddata_panel=0; //main board function run action.
 		
 
 		 //error detected times 
@@ -103,17 +97,33 @@ void power_on_handler(void)
 	
 		if(wifi_link_net_state() ==1){
          
-		Update_Dht11_Totencent_Value();
+			Update_Dht11_Totencent_Value();
           
-
          }
 	     gpro_t.process_run_step=6 ;
 	break;
-        
-  case 6: 
 
-   if(gpro_t.wifi_led_fast_blink_flag==0){
-      if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==1 && gctl_t.app_timer_power_on_flag==0){
+
+
+  case 6:
+
+       if(gpro_t.gTimer_update_todisplay > 1){
+			gpro_t.gTimer_update_todisplay=0;
+
+			updateDht11_sensorData_toDisp();
+			freertos_set_prority();
+		           
+        }
+
+       gpro_t.process_run_step=7 ;
+
+
+ break;
+        
+  case 7: 
+
+   if(gpro_t.wifi_led_fast_blink_flag==0 && gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==1){
+      if( gctl_t.app_timer_power_on_flag==0){
 	
 		  gctl_t.first_link_tencent_cloud_flag++;
 
@@ -132,28 +142,29 @@ void power_on_handler(void)
 	  }
     
       
-	 gpro_t.process_run_step=7 ;
+	 gpro_t.process_run_step=8 ;
  break; 
-	  
-  case 7:
-      if(gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==0){
 
-           
-		  gctl_t.first_link_tencent_cloud_flag++;
-           //updateDht11_sensorData_toDisp();
-           Update_Dht11_Totencent_Value();
-           osDelay(200);
-		   SendWifiData_To_Data(0x1F,0x01);
-            osDelay(15);
+
+	  
+  case 8:
+      if(wifi_link_net_state() ==1 && gpro_t.gTimer_update_tencet_dht11 >4){
+    	  gpro_t.gTimer_update_tencet_dht11=0;
+    	  Update_Dht11_Totencent_Value();
       }
 
-      gpro_t.process_run_step= 6;
+      gpro_t.process_run_step= 9;
 
      break;
-	 
 
-	
-	default:
+  case 9:
+
+     works_run_two_hours_state();
+
+     gpro_t.process_run_step= 6;
+  break;
+
+     default:
 		//gpro_t.process_run_step= 1;
 		break;
   }

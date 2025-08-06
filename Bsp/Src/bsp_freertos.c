@@ -3,7 +3,7 @@
 #define DECODER_BIT_0        (1<< 0)
 
 /***********************************************************************************************************
-											函数声明
+											鍑芥暟澹版槑
 ***********************************************************************************************************/
 //static void vTaskWifiPro(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
@@ -11,12 +11,12 @@ static void vTaskStart(void *pvParameters);
 static void AppTaskCreate (void);
 
 
-/* 创建任务通信机制 */
+/* 鍒涘缓浠诲姟閫氫俊鏈哄埗 */
 //static void AppObjCreate(void);
 
 
 /***********************************************************************************************************
-											变量声明
+											鍙橀噺澹版槑
 ***********************************************************************************************************/
 //static TaskHandle_t xHandleTaskWifiPro = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
@@ -24,7 +24,7 @@ static TaskHandle_t xHandleTaskStart = NULL;
 
 
 #if 0
-//LED��˸����1
+//LED锟?1锟?7锟?1锟?7锟?0锟?8锟?1锟?7锟?1锟?7锟?1锟?7锟?1锟?71
 void LED_Thread1(void const * argument)
 {
 
@@ -33,14 +33,14 @@ void LED_Thread1(void const * argument)
   /* Infinite loop */
   for (;;)
   {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);//PB4�����
-  osDelay(100);//�ȴ�100ms
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);//PB4锟?1锟?7锟?1锟?7锟?1锟?7锟?1锟?7锟?1锟?7
+  osDelay(100);//锟?1锟?7锟?0锟?9锟?1锟?7100ms
  
   }
   /* USER CODE END 5 */ 
 }
 
-//LED��˸����2
+//LED锟?1锟?7锟?1锟?7锟?0锟?8锟?1锟?7锟?1锟?7锟?1锟?7锟?1锟?72
 void LED_Thread2(void const * argument)
 {
   /* USER CODE BEGIN LED_Thread2 */
@@ -48,8 +48,8 @@ void LED_Thread2(void const * argument)
   /* Infinite loop */
   for (;;)
   {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);//PB4�����
-  osDelay(250);//�ȴ�250ms
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);//PB4锟?1锟?7锟?1锟?7锟?1锟?7锟?1锟?7锟?1锟?7
+  osDelay(250);//锟?1锟?7锟?0锟?9锟?1锟?7250ms
   }
   /* USER CODE END LED_Thread2 */
 }
@@ -68,7 +68,7 @@ MSG_T   gl_tMsg; /* ?????????????? */
 
 uint8_t rx_data_counter,rx_end_flag;
 
-uint8_t test_counter;
+//uint8_t test_counter;
 
 uint8_t wifi_counter;
 uint8_t state;
@@ -83,24 +83,24 @@ uint8_t state;
 **********************************************************************************************************/
 void freeRTOS_Handler(void)
 {
-     /* 创建任务 */
+     /* 鍒涘缓浠诲姟 */
 	  AppTaskCreate();
 	  
-	  /* 创建任务通信机制 */
+	  /* 鍒涘缓浠诲姟閫氫俊鏈哄埗 */
 //	   AppObjCreate();
 	  
-	  /* 启动调度，开始执行任�?1�?7 */
+	  /* 鍚姩璋冨害锛屽紑濮嬫墽琛屼换锟?1锟?7?1锟?1锟?7?7 */
 	   vTaskStartScheduler();
 
 
 }
 
 /**********************************************************************************************************
-*	�?1�?7 �?1�?7 �?1�?7: vTaskStart
-*	功能说明: 启动任务，也就是朢�高优先级任务，这里用作按键扫描��?1�?7
-*	�?1�?7    �?1�?7: pvParameters 是在创建该任务时传��的形参
-*	�?1�?7 �?1�?7 �?1�?7: �?1�?7
-*   �?1�?7 �?1�?7 �?1�?7: 4  (数��越小优先级越低，这个跟uCOS相反)
+*	Function Name: vTaskStart
+*	鍔熻兘璇存槑: 鍚姩浠诲姟锛屼篃灏辨槸鏈拷1锟?7楂樹紭鍏堢骇浠诲姟锛岃繖閲岀敤浣滄寜閿壂鎻忥拷1锟?7锟?1锟?7?1锟?1锟?7?7
+*	锟?1锟?7?1锟?1锟?7?7    锟?1锟?7?1锟?1锟?7?7: pvParameters 鏄湪鍒涘缓璇ヤ换鍔℃椂浼狅拷1锟?7锟?1锟?7鐨勫舰鍙?
+*	锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 锟?1锟?7?1锟?1锟?7?7
+*   锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 4  (鏁帮拷1锟?7锟?1锟?7瓒婂皬浼樺厛绾ц秺浣庯紝杩欎釜璺焨COS鐩稿弽)
 ************************************ifi**********************************************************************/
 // static void vTaskWifiPro(void *pvParameters)
 // {
@@ -120,11 +120,11 @@ void freeRTOS_Handler(void)
 
 // }
 /**********************************************************************************************************
-*	�?1�?7 �?1�?7 �?1�?7: vTaskStart
-*	功能说明: 启动任务，也就是朢�高优先级任务，这里用作按键扫描��?1�?7
-*	�?1�?7    �?1�?7: pvParameters 是在创建该任务时传��的形参
-*	�?1�?7 �?1�?7 �?1�?7: �?1�?7
-*   �?1�?7 �?1�?7 �?1�?7: 4  (数��越小优先级越低，这个跟uCOS相反)
+*	Function Name: vTaskStart
+*	鍔熻兘璇存槑: 鍚姩浠诲姟锛屼篃灏辨槸鏈拷1锟?7楂樹紭鍏堢骇浠诲姟锛岃繖閲岀敤浣滄寜閿壂鎻忥拷1锟?7锟?1锟?7?1锟?1锟?7?7
+*	锟?1锟?7?1锟?1锟?7?7    锟?1锟?7?1锟?1锟?7?7: pvParameters 鏄湪鍒涘缓璇ヤ换鍔℃椂浼狅拷1锟?7锟?1锟?7鐨勫舰鍙?
+*	锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 锟?1锟?7?1锟?1锟?7?7
+*   锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 4  (鏁帮拷1锟?7锟?1锟?7瓒婂皬浼樺厛绾ц秺浣庯紝杩欎釜璺焨COS鐩稿弽)
 **********************************************************************************************************/
 static void vTaskMsgPro(void *pvParameters)
 {
@@ -171,11 +171,11 @@ static void vTaskMsgPro(void *pvParameters)
        
 
 /**********************************************************************************************************
-*	�?1�?7 �?1�?7 �?1�?7: vTaskStart
-*	功能说明: 启动任务，也就是朢�高优先级任务，这里用作按键扫描��?1�?7
-*	�?1�?7    �?1�?7: pvParameters 是在创建该任务时传��的形参
-*	�?1�?7 �?1�?7 �?1�?7: �?1�?7
-*   �?1�?7 �?1�?7 �?1�?7: 4  (数��越小优先级越低，这个跟uCOS相反)
+*	锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: vTaskStart
+*	鍔熻兘璇存槑: 鍚姩浠诲姟锛屼篃灏辨槸鏈拷1锟?7楂樹紭鍏堢骇浠诲姟锛岃繖閲岀敤浣滄寜閿壂鎻忥拷1锟?7锟?1锟?7?1锟?1锟?7?7
+*	锟?1锟?7?1锟?1锟?7?7    锟?1锟?7?1锟?1锟?7?7: pvParameters 鏄湪鍒涘缓璇ヤ换鍔℃椂浼狅拷1锟?7锟?1锟?7鐨勫舰鍙?
+*	锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 锟?1锟?7?1锟?1锟?7?7
+*   锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 4  (鏁帮拷1锟?7锟?1锟?7瓒婂皬浼樺厛绾ц秺浣庯紝杩欎釜璺焨COS鐩稿弽)
 **********************************************************************************************************/
 static void vTaskStart(void *pvParameters)
 {
@@ -194,21 +194,10 @@ static void vTaskStart(void *pvParameters)
 
             case power_on:
             power_on_handler();
-            works_run_two_hours_state();
+           
             link_wifi_to_tencent_handler(gpro_t.wifi_led_fast_blink_flag); //detected ADC of value 
         
-		
-          if(gpro_t.gTimer_update_todisplay > 2){
-			gpro_t.gTimer_update_todisplay=0;
-
-			updateDht11_sensorData_toDisp();
-			vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
-			taskYIELD();  // ??????
-			vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
-		           
-             }
-
-		   if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
+		    if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
 
 				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 				vTaskDelay(pdMS_TO_TICKS(5));
@@ -216,7 +205,7 @@ static void vTaskStart(void *pvParameters)
 
 		  
          
-			test_counter++;
+			
 			
            break;
 
@@ -256,7 +245,7 @@ static void vTaskStart(void *pvParameters)
 		
 			
           send_cmd_ack_hanlder();
-		  vTaskDelay(pdMS_TO_TICKS(50));//�?0
+		  vTaskDelay(pdMS_TO_TICKS(50));//锟?1锟?7?0
 
 
         }
@@ -269,30 +258,30 @@ static void vTaskStart(void *pvParameters)
   
  /*
 *********************************************************************************************************
-*	�?1�?7 �?1�?7 �?1�?7: AppTaskCreate
-*	功能说明: 创建应用任务
-*	�?1�?7    参：�?1�?7
-*	�?1�?7 �?1�?7 �?1�?7: �?1�?7
+*	锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: AppTaskCreate
+*	鍔熻兘璇存槑: 鍒涘缓搴旂敤浠诲姟
+*	锟?1锟?7?1锟?1锟?7?7    鍙傦細锟?1锟?7?1锟?1锟?7?7
+*	锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 锟?1锟?7?1锟?1锟?7?7
 *********************************************************************************************************
 */
 void AppTaskCreate (void)
 {
     
  
-  xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
-                 "vTaskMsgPro",   		/* 任务�?1�?7    */
-                 128,            		/* 任务栈大小，单位word，也就是4字节 */
-                 NULL,           		/* 任务参数  */
-                 2,              		/* 任务优先�?1�?7 数��越小优先级越低，这个跟uCOS相反 */
-                 &xHandleTaskMsgPro);   /* 任务句柄  */
+  xTaskCreate( vTaskMsgPro,     		/* 浠诲姟鍑芥暟  */
+                 "vTaskMsgPro",   		/* 浠诲姟锟?1锟?7?1锟?1锟?7?7    */
+                 128,            		/* 浠诲姟鏍堝ぇ灏忥紝鍗曚綅word锛屼篃灏辨槸4瀛楄妭 */
+                 NULL,           		/* 浠诲姟鍙傛暟  */
+                 2,              		/* 浠诲姟浼樺厛锟?1锟?7?1锟?1锟?7?7 鏁帮拷1锟?7锟?1锟?7瓒婂皬浼樺厛绾ц秺浣庯紝杩欎釜璺焨COS鐩稿弽 */
+                 &xHandleTaskMsgPro);   /* 浠诲姟鍙ユ焺  */
 
 
-   xTaskCreate( vTaskStart,     		/* 任务函数  */
-                 "vTaskStart",   		/* 任务�?1�?7    */
-                 128,            		/* 任务栈大小，单位word，也就是4字节 */
-                 NULL,           		/* 任务参数  */
-                 1,              		/* 任务优先�?1�?7 数��越小优先级越低，这个跟uCOS相反 */
-                 &xHandleTaskStart );   /* 任务句柄  */
+   xTaskCreate( vTaskStart,     		/* 浠诲姟鍑芥暟  */
+                 "vTaskStart",   		/* 浠诲姟锟?1锟?7?1锟?1锟?7?7    */
+                 128,            		/* 浠诲姟鏍堝ぇ灏忥紝鍗曚綅word锛屼篃灏辨槸4瀛楄妭 */
+                 NULL,           		/* 浠诲姟鍙傛暟  */
+                 1,              		/* 浠诲姟浼樺厛锟?1锟?7?1锟?1锟?7?7 鏁帮拷1锟?7锟?1锟?7瓒婂皬浼樺厛绾ц秺浣庯紝杩欎釜璺焨COS鐩稿弽 */
+                 &xHandleTaskStart );   /* 浠诲姟鍙ユ焺  */
 }
 
 
@@ -423,9 +412,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void freertos_set_prority(void)
 {
-    if(xHandleTaskMsgPro != NULL){
-        vTaskPrioritySet(xHandleTaskMsgPro, HIGHEST_PRIORITY);
-    }
+	
+	vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
+	taskYIELD();  // ??????
+	vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+
    
 } 
 
