@@ -4,7 +4,7 @@ uint8_t  beijing_step;
 
 uint8_t real_hours,real_minutes,real_seconds;
 
-uint8_t auto_link_net_flag, action_counter;
+uint8_t auto_link_net_flag;
 /**********************************************************************
     *
     *Functin Name: void works_run_two_hours_state(void)
@@ -91,13 +91,9 @@ void works_run_two_hours_state(void)
     case 0:
         if(gctl_t.gTimer_senddata_panel >6 ){ //300ms
              gctl_t.gTimer_senddata_panel=0;
-              action_counter++;
+            
               ActionEvent_Handler();
 
-			  	if(wifi_link_net_state() ==1){
-         
-		  
-                }
 
 		}
       break;
@@ -188,7 +184,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
                vTaskDelay(pdMS_TO_TICKS(5));
                gpro_t.get_beijing_flag = 10;
                net_t.linking_tencent_cloud_doing  =1; //receive from tencent command state .
-               gpro_t.send_ack_cmd = ack_wifi_on;
+               //gpro_t.send_ack_cmd = ack_wifi_on;
                gpro_t.gTimer_again_send_power_on_off=0;
              }
 	

@@ -4,7 +4,7 @@
 _run_t gctl_t; 
 uint8_t powerOffFanRun_flag ;
 uint8_t powerOffTunrOff_flag;
-uint8_t gTimer_powerOffRunFan;
+
 uint8_t stopHours_flag;
 
 

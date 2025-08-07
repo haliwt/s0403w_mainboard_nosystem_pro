@@ -206,7 +206,7 @@ extern uint8_t powerOffFanRun_flag ;
 
 extern uint8_t powerOffTunrOff_flag;
 
-extern uint8_t gTimer_powerOffRunFan;
+
 
 extern uint8_t stopHours_flag;
 

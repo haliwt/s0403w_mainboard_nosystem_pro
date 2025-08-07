@@ -92,8 +92,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	   gpro_t.gTimer_update_todisplay++;
 	   gpro_t.gTimer_update_tencet_dht11++;
 
-	   
-	   gTimer_powerOffRunFan++;
+	    gpro_t.gTimer_poweroff_fan++;
+		
       stopHoursCounter++;
 
 

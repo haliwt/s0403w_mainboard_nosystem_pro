@@ -18,7 +18,7 @@ void power_on_handler(void)
 	case 0: //1
 
 
-         gpro_t.power_on_prority_flag = 1;
+      
          gctl_t.gTimer_senddata_panel=0; //main board function run action.
 		
 
@@ -107,11 +107,12 @@ void power_on_handler(void)
 
   case 6:
 
-       if(gpro_t.gTimer_update_todisplay > 1){
+       if(gpro_t.gTimer_update_todisplay > 2){
 			gpro_t.gTimer_update_todisplay=0;
 
 			updateDht11_sensorData_toDisp();
 			//freertos_set_prority();
+			vTaskDelay(pdMS_TO_TICKS(50));//WT.EDIT 2025.08.07
 		           
         }
 
@@ -122,8 +123,8 @@ void power_on_handler(void)
         
   case 7: 
 
-   if(gpro_t.wifi_led_fast_blink_flag==0 && gctl_t.first_link_tencent_cloud_flag ==1 && wifi_link_net_state() ==1){
-      if( gctl_t.app_timer_power_on_flag==0){
+   if(gpro_t.wifi_led_fast_blink_flag==0 && wifi_link_net_state() ==1){
+      if( gctl_t.app_timer_power_on_flag==0 && gctl_t.first_link_tencent_cloud_flag ==1){
 	
 		  gctl_t.first_link_tencent_cloud_flag++;
 

@@ -20,7 +20,7 @@ void power_off_handler(void)
 
     case 1:
 
-          gTimer_powerOffRunFan=0;
+          gpro_t.gTimer_poweroff_fan=0;
           gctl_t.gTimer_fan_run_one_minute=0;
        
       
@@ -80,20 +80,20 @@ void power_off_handler(void)
 
       case 6:
 	   
-		if(gTimer_powerOffRunFan < 60 && powerOffFanRun_flag ==1){
+		if(gpro_t.gTimer_poweroff_fan < 60 && powerOffFanRun_flag ==1){
           
                    
 			Fan_One_Power_Off_Speed();
                   
         }       
-        else if(gTimer_powerOffRunFan > 59   ){ //WT.EDTI 2024.11.19
+        else if(gpro_t.gTimer_poweroff_fan > 59   ){ //WT.EDTI 2024.11.19
 		   
 			       powerOffFanRun_flag=2;
 				   FAN_Stop();
          }
 
-        if(gTimer_powerOffRunFan > 61){
-              gTimer_powerOffRunFan =0;
+        if(gpro_t.gTimer_poweroff_fan > 61){
+              gpro_t.gTimer_poweroff_fan =0;
 
               powerOffFanRun_flag=2;
               gctl_t.fan_stop_flag =1;

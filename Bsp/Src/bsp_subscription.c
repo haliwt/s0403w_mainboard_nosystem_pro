@@ -553,7 +553,7 @@ void Json_Parse_Command_Fun(void)
 	        powerOffFanRun_flag = 1;
 			gctl_t.ptc_remove_warning_send_data =0;
 			gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
-			gpro_t.send_ack_cmd = ack_app_power_on;
+			//gpro_t.send_ack_cmd = ack_app_power_on;
 	        gpro_t.gTimer_again_send_power_on_off=0;
 		    SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
 			osDelay(5);//HAL_Delay(5);
@@ -574,7 +574,7 @@ void Json_Parse_Command_Fun(void)
             gpro_t.gpower_on = power_off;
             powerOffTunrOff_flag=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
-            gpro_t.send_ack_cmd = ack_app_power_off;
+           // gpro_t.send_ack_cmd = ack_app_power_off;
             gpro_t.gTimer_again_send_power_on_off=0;
 	
             SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
@@ -803,7 +803,7 @@ void Json_Parse_Command_Fun(void)
             
 			   buzzer_temp_on=0;
    
-               gpro_t.send_ack_cmd = ack_app_timer_power_on;
+              // gpro_t.send_ack_cmd = ack_app_timer_power_on;
                gpro_t.gTimer_again_send_power_on_off=0;
 		         
 
@@ -821,7 +821,7 @@ void Json_Parse_Command_Fun(void)
 	            gpro_t.gpower_on = power_off;
                 powerOffTunrOff_flag = 1; //WT.EDIT.2025.01.04
                 powerOffFanRun_flag = 1;
-                gpro_t.send_ack_cmd = ack_app_power_off; //WT.EDIT 2024.12.31
+               // gpro_t.send_ack_cmd = ack_app_power_off; //WT.EDIT 2024.12.31
                 gpro_t.gTimer_again_send_power_on_off=0;
 
 			SendWifiData_To_Cmd(0x21,0x0); //turn off power off

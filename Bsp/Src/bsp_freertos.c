@@ -1,5 +1,8 @@
 #include "bsp.h"
 
+
+#define BIT_1                (1<<1)
+
 #define DECODER_BIT_0        (1<< 0)
 
 /***********************************************************************************************************
@@ -68,7 +71,7 @@ MSG_T   gl_tMsg; /* ?????????????? */
 
 uint8_t rx_data_counter,rx_end_flag;
 
-//uint8_t test_counter;
+uint8_t notify_counter;
 
 uint8_t wifi_counter;
 uint8_t state;
@@ -119,18 +122,18 @@ void freeRTOS_Handler(void)
 
 
 // }
-/**********************************************************************************************************
-*	Function Name: vTaskStart
-*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨ä»»åŠ¡ï¼Œä¹Ÿå°±æ˜¯æœ¢ï¿½1ï¿?7é«˜ä¼˜å…ˆçº§ä»»åŠ¡ï¼Œè¿™é‡Œç”¨ä½œæŒ‰é”®æ‰«æï¿½1ï¿?7ï¿?1ï¿?7?1ï¿?1ï¿?7?7
-*	ï¿?1ï¿?7?1ï¿?1ï¿?7?7    ï¿?1ï¿?7?1ï¿?1ï¿?7?7: pvParameters æ˜¯åœ¨åˆ›å»ºè¯¥ä»»åŠ¡æ—¶ä¼ ï¿½1ï¿?7ï¿?1ï¿?7çš„å½¢å?
-*	ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7: ï¿?1ï¿?7?1ï¿?1ï¿?7?7
-*   ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7: 4  (æ•°ï¿½1ï¿?7ï¿?1ï¿?7è¶Šå°ä¼˜å…ˆçº§è¶Šä½ï¼Œè¿™ä¸ªè·ŸuCOSç›¸å)
-**********************************************************************************************************/
+
+/**
+ * @brief  :  static void vTaskStart(void *pvParameters)´´½¨Êı¾İ´¦ÀíÈÎÎñ£¬ÓÅÏÈ¼¶ÎªÖĞµÈ
+ * @note    ÈÎÎñÄÚ²¿Ê¹ÓÃ¶ÓÁĞ½ÓÊÕÊı¾İ£¬ĞèÏÈ³õÊ¼»¯¶ÓÁĞ
+ * @param   None
+ * @retval  None
+ */
 static void vTaskMsgPro(void *pvParameters)
 {
   
 	BaseType_t xResult;
-	//const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(4000); /* 1.?????-?????????50ms */
     uint32_t ulValue;
     
 	
@@ -139,47 +142,52 @@ static void vTaskMsgPro(void *pvParameters)
        xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
 						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
-						          portMAX_DELAY);  /* ????????,????-block portMAX_DELAY */
+						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
         if(xResult == pdPASS){
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
                 gpro_t.disp_rx_cmd_done_flag = 0;
 				rx_data_counter=0;
 				state=0;
-				//gpro_t.gTimer_rx_cmd_done =0;
-              
-             //   check_code =  bcc_check(gl_tMsg.usData,uid);
 
-              // if(check_code == bcc_check_code ){
                
-                  receive_data_from_display(gl_tMsg.usData);
-               
+                 receive_data_from_display(gl_tMsg.usData);
+
                   
-			      vTaskPrioritySet(xHandleTaskMsgPro , LOWEST_PRIORITY);  // ???????
-			      taskYIELD();  // ??????
-			      vTaskPrioritySet(xHandleTaskStart, HIGHEST_PRIORITY);  // ???????
-			     // vTaskDelay(pdMS_TO_TICKS(10));
-                  
-                
-                }
+             	}
                 
          }
+		 else{
+		 	
+			if(gpro_t.gTimer_update_todisplay > 3 && gpro_t.gpower_on == power_on){
+			 gpro_t.gTimer_update_todisplay=0;
 
+			 updateDht11_sensorData_toDisp();
+			 
+			 vTaskDelay(pdMS_TO_TICKS(50));//WT.EDIT 2025.08.07
+		           
+            }            
+                  
+			 xTaskNotify(xHandleTaskStart, /* Ä¿±êÈÎÎñ */
+								BIT_1,             /* ÉèÖÃÄ¿±êÈÎÎñÊÂ¼ş±êÖ¾Î»bit0  */
+				 				eSetBits);         /* ½«Ä¿±êÈÎÎñµÄÊÂ¼ş±êÖ¾Î»ÓëBIT_0½øĞĞ»ò²Ù×÷£* */
+		}
+				                                   
+ 	}
+}	
 
-	} 
-}
-       
-
-/**********************************************************************************************************
-*	ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7: vTaskStart
-*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨ä»»åŠ¡ï¼Œä¹Ÿå°±æ˜¯æœ¢ï¿½1ï¿?7é«˜ä¼˜å…ˆçº§ä»»åŠ¡ï¼Œè¿™é‡Œç”¨ä½œæŒ‰é”®æ‰«æï¿½1ï¿?7ï¿?1ï¿?7?1ï¿?1ï¿?7?7
-*	ï¿?1ï¿?7?1ï¿?1ï¿?7?7    ï¿?1ï¿?7?1ï¿?1ï¿?7?7: pvParameters æ˜¯åœ¨åˆ›å»ºè¯¥ä»»åŠ¡æ—¶ä¼ ï¿½1ï¿?7ï¿?1ï¿?7çš„å½¢å?
-*	ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7: ï¿?1ï¿?7?1ï¿?1ï¿?7?7
-*   ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7: 4  (æ•°ï¿½1ï¿?7ï¿?1ï¿?7è¶Šå°ä¼˜å…ˆçº§è¶Šä½ï¼Œè¿™ä¸ªè·ŸuCOSç›¸å)
-**********************************************************************************************************/
+/**
+ * @brief  :  static void vTaskStart(void *pvParameters)´´½¨Êı¾İ´¦ÀíÈÎÎñ£¬ÓÅÏÈ¼¶ÎªÖĞµÈ
+ * @note    ÈÎÎñÄÚ²¿Ê¹ÓÃ¶ÓÁĞ½ÓÊÕÊı¾İ£¬ĞèÏÈ³õÊ¼»¯¶ÓÁĞ
+ * @param   None
+ * @retval  None
+ */
 static void vTaskStart(void *pvParameters)
 {
     static uint8_t power_on_sound_flag ;
+	BaseType_t xResult;
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(2000); /* ÉèÖÃ×î´óµÈ´ıÊ±¼äÎª500ms */
+	uint32_t ulValue;
 	while(1)
     {
   
@@ -188,7 +196,22 @@ static void vTaskStart(void *pvParameters)
             FAN_Stop();  //WT.EDIT.2025.01.03
             buzzer_sound();//buzzer_sound();
 
-        };
+        }
+
+
+		xResult = xTaskNotifyWait(0x00000000,      
+						          0xFFFFFFFF,      
+						          &ulValue,        /* ±£´æulNotifiedValueµ½±äÁ¿ulValueÖĞ */
+						          xMaxBlockTime);  /* ×î´óÔÊĞíÑÓ³ÙÊ±¼ä */
+		
+		if( xResult == pdPASS )
+		{
+			/* ½ÓÊÕµ½ÏûÏ¢£¬¼ì²âÄÇ¸öÎ»±»°´ÏÂ */
+			if((ulValue & BIT_1) != 0)
+			{
+              notify_counter++; 
+			}
+		}
 
           switch(gpro_t.gpower_on){ 
 
@@ -207,13 +230,7 @@ static void vTaskStart(void *pvParameters)
           break;
 
             case power_off:
-			  if(gpro_t.power_on_prority_flag ==1){
-                  gpro_t.power_on_prority_flag ++;
-			   vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
-			   taskYIELD();  // ??????
-			    vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
-           
-			  }
+
       
               gpro_t.process_run_step=0;
               gl_tMsg.link_wifi_net_flag=0;
@@ -224,9 +241,7 @@ static void vTaskStart(void *pvParameters)
 
           if(gpro_t.wifi_led_fast_blink_flag > 1){
 		  	 
-			  vTaskPrioritySet(xHandleTaskStart , LOWEST_PRIORITY);  // ???????
-			   taskYIELD();  // ??????
-			  vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+
 		  	   gpro_t.wifi_led_fast_blink_flag=0;
 			  vTaskDelay(pdMS_TO_TICKS(1000));//3000
 			  
@@ -241,8 +256,8 @@ static void vTaskStart(void *pvParameters)
 		  
 		
 			
-          send_cmd_ack_hanlder();
-		  vTaskDelay(pdMS_TO_TICKS(100));//ï¿?1ï¿?7?0
+          //send_cmd_ack_hanlder();
+		  vTaskDelay(pdMS_TO_TICKS(50));//ï¿?1ï¿?7?0
 
 
         }
@@ -253,14 +268,12 @@ static void vTaskStart(void *pvParameters)
        
 
   
- /*
-*********************************************************************************************************
-*	ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7: AppTaskCreate
-*	åŠŸèƒ½è¯´æ˜: åˆ›å»ºåº”ç”¨ä»»åŠ¡
-*	ï¿?1ï¿?7?1ï¿?1ï¿?7?7    å‚ï¼šï¿?1ï¿?7?1ï¿?1ï¿?7?7
-*	ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7 ï¿?1ï¿?7?1ï¿?1ï¿?7?7: ï¿?1ï¿?7?1ï¿?1ï¿?7?7
-*********************************************************************************************************
-*/
+/**
+ * @brief  :  void AppTaskCreate (void)½¨Êı¾İ´¦ÀíÈÎÎñ£¬ÓÅÏÈ¼¶ÎªÖĞµÈ
+ * @note    ÈÎÎñÄÚ²¿Ê¹ÓÃ¶ÓÁĞ½ÓÊÕÊı¾İ£¬ĞèÏÈ³õÊ¼»¯¶ÓÁĞ
+ * @param   None
+ * @retval  None
+ */
 void AppTaskCreate (void)
 {
     

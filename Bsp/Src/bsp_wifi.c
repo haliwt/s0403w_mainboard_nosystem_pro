@@ -66,7 +66,7 @@ void link_wifi_net_handler(void)
         		at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
         
         		vTaskDelay(pdMS_TO_TICKS(1000));//osDelay(1000);
-
+               
               gpro_t.link_net_step = 1;
 
             break;
@@ -78,6 +78,7 @@ void link_wifi_net_handler(void)
                 gctl_t.randomName[0]=HAL_GetUIDw0();
 			          vTaskDelay(pdMS_TO_TICKS(1000));
                 gpro_t.gTimer_link_net_timer_time = 0;
+		
 
                 gpro_t.link_net_step = 2;
 

@@ -110,11 +110,11 @@ typedef struct PROCESS_T{
    volatile uint8_t stopTwoHours_flag;
 
    uint8_t receive_copy_cmd ;
-   uint8_t send_ack_cmd;
+ //  uint8_t send_ack_cmd;
    //uint8_t gFan_pwm_duty_level;
    uint8_t answer_buzzer_flag ;
 	
-	 uint8_t power_on_prority_flag;
+	
      uint8_t ptc_switch_flag;
 	 uint8_t ultrasonic_switch_flag;
 	 uint8_t plasma_switch_flag;
@@ -145,6 +145,7 @@ typedef struct PROCESS_T{
    uint8_t  gTimer_power_on_auto_link;
    uint8_t gTimer_update_todisplay;
    uint8_t gTimer_update_tencet_dht11;
+   uint8_t gTimer_poweroff_fan;
 
 
 

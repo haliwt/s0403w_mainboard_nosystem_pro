@@ -36,7 +36,7 @@ void receive_data_from_display(uint8_t *pdata)
            
            	gpro_t.gpower_on = power_on;
            
-             gpro_t.power_on_prority_flag =1;
+  
 
         }
         else if(pdata[3] == 0x0){ //close 
@@ -141,6 +141,7 @@ void receive_data_from_display(uint8_t *pdata)
 		  
           gctl_t.gTimer_linkTencentCounter=0; //total times is 120s
           SendWifiData_Answer_Cmd(0x05,0x01); //WT.EDIT 2024.12.28
+          vTaskDelay(pdMS_TO_TICKS(10));
 
         }
         else if(pdata[3] == 0x0){ //don't link wifi 
@@ -317,7 +318,7 @@ void receive_data_from_display(uint8_t *pdata)
 void send_cmd_ack_hanlder(void)
 {
 
-    
+    #if 0
     switch(gpro_t.send_ack_cmd){
     
         case ack_null:
@@ -395,7 +396,7 @@ void send_cmd_ack_hanlder(void)
     
     
         }
-
+   #endif
 
 }
 
