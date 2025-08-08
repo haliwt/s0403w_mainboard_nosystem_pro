@@ -556,7 +556,7 @@ void Json_Parse_Command_Fun(void)
 			gpro_t.send_ack_cmd = ack_app_power_on;
 	        gpro_t.gTimer_again_send_power_on_off=0;
 		    SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
-			osDelay(5);//HAL_Delay(5);
+			vTaskDelay(pdMS_TO_TICKS(10));//osDelay(5);//HAL_Delay(5);
 	       
 			buzzer_temp_on=0;
 			
@@ -569,7 +569,7 @@ void Json_Parse_Command_Fun(void)
 
              if(wifi_link_net_state()==1){  //WT.EDIT 2025.03.27
 		 	MqttData_Publish_SetOpen(0);  
-			osDelay(100);
+			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
 
             gpro_t.gpower_on = power_off;
             powerOffTunrOff_flag=1; //WT.EDIT 2025.01.04
@@ -578,7 +578,7 @@ void Json_Parse_Command_Fun(void)
             gpro_t.gTimer_again_send_power_on_off=0;
 	
             SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
-			osDelay(5);//HAL_Delay(5);
+			osDelay(10);//HAL_Delay(5);
           
 			buzzer_temp_on=0;
 	
@@ -814,23 +814,26 @@ void Json_Parse_Command_Fun(void)
 		    if(strstr((char *)TCMQTTRCVPUB,"open\":0")){
 		   
 		   
-			    gctl_t.app_timer_power_on_flag = 0;
-               // __HAL_UART_CLEAR_OREFLAG(&huart2);
-		 			MqttData_Publish_SetOpen(0);  
-			       vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-	
-	            gpro_t.gpower_on = power_off;
-                powerOffTunrOff_flag = 1; //WT.EDIT.2025.01.04
-                powerOffFanRun_flag = 1;
-                gpro_t.send_ack_cmd = ack_app_power_off; //WT.EDIT 2024.12.31
-                gpro_t.gTimer_again_send_power_on_off=0;
+			  
+		 	MqttData_Publish_SetOpen(0);  
+			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
 
-			SendWifiData_To_Cmd(0x21,0x0); //turn off power off
-			osDelay(10);//HAL_Delay(10);
+            gpro_t.gpower_on = power_off;
+            powerOffTunrOff_flag=1; //WT.EDIT 2025.01.04
+            powerOffFanRun_flag = 1;
+            gpro_t.send_ack_cmd = ack_app_power_off;
+            gpro_t.gTimer_again_send_power_on_off=0;
+	
+            SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
+			osDelay(20);//HAL_Delay(5);
+          
+			buzzer_temp_on=0;
+	
+         
+            gctl_t.response_wifi_signal_label = 0xff;
+             
        
-		      buzzer_temp_on=0;
-				
-			}
+		    }
 
 	     gctl_t.response_wifi_signal_label=0xff;
 	       	}
