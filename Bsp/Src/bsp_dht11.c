@@ -231,7 +231,7 @@ void Update_Dht11_Totencent_Value(void)
 
 
 	MqttData_Publis_ReadTempHum(gctl_t.gDht11_temperature, gctl_t.gDht11_humidity);
-    vTaskDelay(pdMS_TO_TICKS(2000));//HAL_Delay(100);
+    vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(100);
 
 }
 

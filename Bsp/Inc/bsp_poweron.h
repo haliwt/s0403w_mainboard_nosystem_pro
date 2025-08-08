@@ -11,7 +11,6 @@ void power_on_handler(void);
 
 
 
-void power_on_first_handler(void);
 
 
 

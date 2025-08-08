@@ -103,7 +103,7 @@ void ActionEvent_Handler(void)
 				  plasma_default =1,
 				  ultrasonic_default =1;
    if( gctl_t.gDry==1){
-	if(gpro_t.fan_warning_flag ==0 && gpro_t.pct_warning ==0){ //PTC warning flag
+	if(gpro_t.fan_warning_flag ==0 && gpro_t.pct_warning ==0 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 		
 		
 			PTC_SetHigh();

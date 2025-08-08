@@ -18,11 +18,8 @@ void power_on_handler(void)
 	case 0: //1
 
 
-      
-         gctl_t.gTimer_senddata_panel=0; //main board function run action.
-		
-
-		 //error detected times 
+      gctl_t.gTimer_senddata_panel=0; //main board function run action.
+	  //error detected times 
 		 gctl_t.ptc_warning =0;
 		// gctl_t.fan_warning =0;
          gpro_t.fan_warning_flag =0;
@@ -164,32 +161,5 @@ void power_on_handler(void)
 }
 
 
-void power_on_first_handler(void)
-{
 
-   if(wifi_link_net_state() ==1 && gctl_t.app_timer_power_on_flag==0){
-	
-           MqttData_Publish_SetOpen(0x01);
-           vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(100);
-
-
-           Publish_Data_ToTencent_Initial_Data();
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(200);
-
-           
-
-            Subscriber_Data_FromCloud_Handler();
-    		vTaskDelay(pdMS_TO_TICKS(200));//osDelay(30);//HAL_Delay(100);//HAL_Delay(350);
-
-             SendWifiData_To_Data(0x1F,0x01);
-             vTaskDelay(pdMS_TO_TICKS(5));//osDelay(20);
-
-             updateDht11_sensorData_toDisp();
-              vTaskDelay(pdMS_TO_TICKS(5));//osDelay(20);
-	
-	  }
-
-
-
-}
 

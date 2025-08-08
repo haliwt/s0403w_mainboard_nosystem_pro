@@ -63,12 +63,13 @@ void receive_data_from_display(uint8_t *pdata)
      if(pdata[3] == 0x01){
           buzzer_sound();
           gctl_t.gDry = 1;
+	      gpro_t.ptc_switch_flag =open;
 
         
       if(gpro_t.stopTwoHours_flag==0){
          if(gpro_t.pct_warning ==0 && gpro_t.fan_warning_flag ==0){ //PTC warning flag
               PTC_SetHigh();
-              gpro_t.ptc_switch_flag =1;
+              gpro_t.ptc_switch_flag =open;
 		     gctl_t.gTimer_senddata_panel=7;
           }
       
@@ -78,14 +79,14 @@ void receive_data_from_display(uint8_t *pdata)
           gctl_t.gDry =0;
         
          PTC_SetLow();
-         gpro_t.ptc_switch_flag =2;
+         gpro_t.ptc_switch_flag =close;
          gctl_t.gTimer_senddata_panel=7;
 
        }
 
      break;
 
-     case 0x03: //PLASMA ?????????
+     case 0x03: //PLASMA ACTIVE OPEN OR CLOSE
 
         if(pdata[3] == 0x01){
            
@@ -93,14 +94,15 @@ void receive_data_from_display(uint8_t *pdata)
            
            gctl_t.gPlasma = 1;
            gpro_t.plasma_switch_flag =1;
-          
-           PLASMA_SetHigh();
+          if(gpro_t.stopTwoHours_flag==0){
+            PLASMA_SetHigh();
+          }
         }
         else if(pdata[3] == 0x0){
            buzzer_sound();
            
            gctl_t.gPlasma = 0;
-            gpro_t.plasma_switch_flag =2;
+           gpro_t.plasma_switch_flag =2;
         
           PLASMA_SetLow();
 
@@ -110,7 +112,7 @@ void receive_data_from_display(uint8_t *pdata)
      break;
 
 
-      case 0x04: //ultrasonic  ?????????
+      case 0x04: //ultrasonic  ACTIVE OPEN OR CLOSE
 
         if(pdata[3] == 0x01){  //open 
           
@@ -216,6 +218,7 @@ void receive_data_from_display(uint8_t *pdata)
         
 
         gctl_t.gDry = 1;
+		gpro_t.ptc_switch_flag = open;
    
         if(gpro_t.stopTwoHours_flag ==0){
               PTC_SetHigh();
@@ -242,7 +245,7 @@ void receive_data_from_display(uint8_t *pdata)
          //SendWifiData_Answer_Cmd(0x27,0x02); //don't AI mode,   WT.EDIT 2025.01.06
           if(wifi_link_net_state()==1){
             MqttData_Publish_SetState(2);
-	        osDelay(100);//HAL_Delay(350);
+	        vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
            }
         
           
@@ -253,7 +256,7 @@ void receive_data_from_display(uint8_t *pdata)
         // SendWifiData_Answer_Cmd(0x27,0x01); //AI mode,WT.EDIT 2025.01.06
          if(wifi_link_net_state()==1){
              MqttData_Publish_SetState(1);
-    	     osDelay(100);//HAL_Delay(350);
+    	     vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
          }
        }
 
@@ -318,7 +321,7 @@ void receive_data_from_display(uint8_t *pdata)
 void send_cmd_ack_hanlder(void)
 {
 
-    #if 0
+    
     switch(gpro_t.send_ack_cmd){
     
         case ack_null:
@@ -336,6 +339,7 @@ void send_cmd_ack_hanlder(void)
           else if(gpro_t.receive_copy_cmd != 0 && gpro_t.gTimer_again_send_power_on_off >1){
              gpro_t.gTimer_again_send_power_on_off =0;
               SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
+              vTaskDelay(pdMS_TO_TICKS(10));
           }
                     
          
@@ -351,6 +355,7 @@ void send_cmd_ack_hanlder(void)
           else if(gpro_t.receive_copy_cmd != 0 && gpro_t.gTimer_again_send_power_on_off >1){
               gpro_t.gTimer_again_send_power_on_off =0;
                SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
+               vTaskDelay(pdMS_TO_TICKS(10));
           }
     
     
@@ -366,6 +371,7 @@ void send_cmd_ack_hanlder(void)
           else if(gpro_t.receive_copy_cmd != 0 && gpro_t.gTimer_again_send_power_on_off >1){
              gpro_t.gTimer_again_send_power_on_off =0;
               SendWifiData_To_Cmd(0x21,0x01); //smart phone is power on
+              vTaskDelay(pdMS_TO_TICKS(10));
           }
 
         break;
@@ -380,6 +386,9 @@ void send_cmd_ack_hanlder(void)
           else if(gpro_t.receive_copy_cmd != 0 && gpro_t.gTimer_again_send_power_on_off >1){
              gpro_t.gTimer_again_send_power_on_off =0;
              SendWifiData_To_Data(0x1F,0x0);
+		     vTaskDelay(pdMS_TO_TICKS(10));
+
+			 
           }
     
     
@@ -396,7 +405,7 @@ void send_cmd_ack_hanlder(void)
     
     
         }
-   #endif
+ 
 
 }
 

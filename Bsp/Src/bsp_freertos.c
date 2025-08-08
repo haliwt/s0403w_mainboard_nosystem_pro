@@ -97,32 +97,6 @@ void freeRTOS_Handler(void)
 
 
 }
-
-/**********************************************************************************************************
-*	Function Name: vTaskStart
-*	鍔熻兘璇存槑: 鍚姩浠诲姟锛屼篃灏辨槸鏈拷1锟?7楂樹紭鍏堢骇浠诲姟锛岃繖閲岀敤浣滄寜閿壂鎻忥拷1锟?7锟?1锟?7?1锟?1锟?7?7
-*	锟?1锟?7?1锟?1锟?7?7    锟?1锟?7?1锟?1锟?7?7: pvParameters 鏄湪鍒涘缓璇ヤ换鍔℃椂浼狅拷1锟?7锟?1锟?7鐨勫舰鍙?
-*	锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 锟?1锟?7?1锟?1锟?7?7
-*   锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7 锟?1锟?7?1锟?1锟?7?7: 4  (鏁帮拷1锟?7锟?1锟?7瓒婂皬浼樺厛绾ц秺浣庯紝杩欎釜璺焨COS鐩稿弽)
-************************************ifi**********************************************************************/
-// static void vTaskWifiPro(void *pvParameters)
-// {
-  
-//      while(1)
-//      {
-
-//        if(gpro_t.wifi_led_fast_blink_flag==0 ){
-// 		  	     wifi_counter++;
-//              wifi_communication_tnecent_handler();//
-//              getBeijingTime_cofirmLinkNetState_handler();
-//              wifi_auto_detected_link_state();
-//        }
-//        vTaskDelay(1000);
-//     }
-
-
-// }
-
 /**
  * @brief  :  static void vTaskStart(void *pvParameters)创建数据处理任务，优先级为中等
  * @note    任务内部使用队列接收数据，需先初始化队列
@@ -154,21 +128,14 @@ static void vTaskMsgPro(void *pvParameters)
                  receive_data_from_display(gl_tMsg.usData);
 
 				 	vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
-	       taskYIELD();  // ??????
-	    vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
+	       			taskYIELD();  // ??????
+	    			vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
 
                   
              }
 			 
                 
          }
-//		 else{
-//		 	
-////		      xTaskNotify(xHandleTaskStart, /* 目标任务 */
-////								BIT_1,             /* 设置目标任务事件标志位bit0  */
-////				 				eSetBits);         /* 将目标任务的事件标志位与BIT_0进行或操作�* */
-//		
-//		}
 				                                   
  	}
 }	
@@ -182,9 +149,7 @@ static void vTaskMsgPro(void *pvParameters)
 static void vTaskStart(void *pvParameters)
 {
     static uint8_t power_on_sound_flag ;
-	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为500ms */
-	uint32_t ulValue;
+
 	while(1)
     {
   
@@ -196,21 +161,6 @@ static void vTaskStart(void *pvParameters)
         }
 
 
-//		xResult = xTaskNotifyWait(0x00000000,      
-//						          0xFFFFFFFF,      
-//						          &ulValue,        /* 保存ulNotifiedValue到变量ulValue中 */
-//						          xMaxBlockTime);  /* 最大允许延迟时间 */
-//		
-//		if( xResult == pdPASS )
-//		{
-//			/* 接收到消息，检测那个位被按下 */
-//			if((ulValue & BIT_1) != 0)
-//			{
-//              notify_counter++; 
-//			}
-//		}
-//    else{
-
           switch(gpro_t.gpower_on){ 
 
             case power_on:
@@ -221,7 +171,7 @@ static void vTaskStart(void *pvParameters)
 		    if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
 
 				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-				vTaskDelay(pdMS_TO_TICKS(5));
+				vTaskDelay(pdMS_TO_TICKS(10));
 		   	}
 
 		  
@@ -238,13 +188,9 @@ static void vTaskStart(void *pvParameters)
 
 
           if(gpro_t.wifi_led_fast_blink_flag > 1){
-		  	 
-
-		  	   gpro_t.wifi_led_fast_blink_flag=0;
-			  //vTaskDelay(pdMS_TO_TICKS(1000));//3000
-			  
-
-          }
+		  	 gpro_t.wifi_led_fast_blink_flag=0;
+			
+		  }
 		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
 		  	    wifi_counter++;
              wifi_communication_tnecent_handler();//
@@ -254,7 +200,7 @@ static void vTaskStart(void *pvParameters)
 		  
 		
 			
-          //send_cmd_ack_hanlder();
+          send_cmd_ack_hanlder();
 		  vTaskDelay(pdMS_TO_TICKS(100));//锟?1锟?7?0
 
 
