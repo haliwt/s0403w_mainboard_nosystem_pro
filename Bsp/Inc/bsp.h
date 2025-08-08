@@ -146,6 +146,7 @@ typedef struct PROCESS_T{
    uint8_t gTimer_update_todisplay;
    uint8_t gTimer_update_tencet_dht11;
    uint8_t gTimer_poweroff_fan;
+   uint8_t gTimer_read_dth11_sensor ;
 
 
 

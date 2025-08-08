@@ -10,7 +10,7 @@ static void DHT11_Mode_Out_PP(void);
 static uint8_t DHT11_ReadByte(void);
 DHT11_Data_TypeDef DHT11;
 void static Dht11_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth11);
-
+uint8_t dht11_read_flag;
 
 //??us??
 //void delay_us(unsigned long i)
@@ -122,7 +122,7 @@ uint8_t DHT11_Read_TempAndHumidity(DHT11_Data_TypeDef *DHT11_Data)
 	/*????*/
 	DHT11_Dout_LOW();
 	/*??18ms*/
-	vTaskDelay(pdMS_TO_TICKS(20));//HAL_Delay(20);
+	delay_ms(18);//HAL_Delay(20);//vTaskDelay(pdMS_TO_TICKS(20));//HAL_Delay(20);
 
 	/*???? ????30us*/
 	DHT11_Dout_HIGH(); 
@@ -131,7 +131,7 @@ uint8_t DHT11_Read_TempAndHumidity(DHT11_Data_TypeDef *DHT11_Data)
 
 	/*?????? ????????*/ 
 	DHT11_Mode_IPU();
-  delay_us(40);   //??30us
+      delay_us(30);   //??30us
 	/*?????????????? ???????,???????*/   
 	if(DHT11_Data_IN()==Bit_RESET)     
 	{
@@ -177,7 +177,11 @@ uint8_t DHT11_Read_TempAndHumidity(DHT11_Data_TypeDef *DHT11_Data)
 
 void static Dht11_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth11)
 {
-	read_flag =DHT11_Read_TempAndHumidity(pdth11);
+   
+
+	if(dht11_read_flag==0){
+
+	 read_flag =DHT11_Read_TempAndHumidity(pdth11);
     if(read_flag == 0){
 		   
 		   gctl_t.gDht11_humidity = (pdth11->humi_high8bit);
@@ -186,9 +190,18 @@ void static Dht11_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth11)
 	   
 	 }
 	 else{
-        vTaskDelay(pdMS_TO_TICKS(2000));//�?0
+
+	    dht11_read_flag=1;
+		gpro_t.gTimer_read_dth11_sensor =0;
 
 	 }
+	}
+
+	if(gpro_t.gTimer_read_dth11_sensor > 2 && dht11_read_flag==1){
+            dht11_read_flag=0;
+
+	}
+	
 
 }
 

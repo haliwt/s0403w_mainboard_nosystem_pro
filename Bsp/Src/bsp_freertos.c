@@ -133,7 +133,7 @@ static void vTaskMsgPro(void *pvParameters)
 {
   
 	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(4000); /* 1.?????-?????????50ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 1.?????-?????????50ms */
     uint32_t ulValue;
     
 	
@@ -153,25 +153,22 @@ static void vTaskMsgPro(void *pvParameters)
                
                  receive_data_from_display(gl_tMsg.usData);
 
+				 	vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
+	       taskYIELD();  // ??????
+	    vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
+
                   
-             	}
+             }
+			 
                 
          }
-		 else{
-		 	
-			if(gpro_t.gTimer_update_todisplay > 3 && gpro_t.gpower_on == power_on){
-			 gpro_t.gTimer_update_todisplay=0;
-
-			 updateDht11_sensorData_toDisp();
-			 
-			 vTaskDelay(pdMS_TO_TICKS(50));//WT.EDIT 2025.08.07
-		           
-            }            
-                  
-			 xTaskNotify(xHandleTaskStart, /* Ä¿±êÈÎÎñ */
-								BIT_1,             /* ÉèÖÃÄ¿±êÈÎÎñÊÂ¼ş±êÖ¾Î»bit0  */
-				 				eSetBits);         /* ½«Ä¿±êÈÎÎñµÄÊÂ¼ş±êÖ¾Î»ÓëBIT_0½øĞĞ»ò²Ù×÷£* */
-		}
+//		 else{
+//		 	
+////		      xTaskNotify(xHandleTaskStart, /* Ä¿±êÈÎÎñ */
+////								BIT_1,             /* ÉèÖÃÄ¿±êÈÎÎñÊÂ¼ş±êÖ¾Î»bit0  */
+////				 				eSetBits);         /* ½«Ä¿±êÈÎÎñµÄÊÂ¼ş±êÖ¾Î»ÓëBIT_0½øĞĞ»ò²Ù×÷„1¤7* */
+//		
+//		}
 				                                   
  	}
 }	
@@ -186,7 +183,7 @@ static void vTaskStart(void *pvParameters)
 {
     static uint8_t power_on_sound_flag ;
 	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(2000); /* ÉèÖÃ×î´óµÈ´ıÊ±¼äÎª500ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* ÉèÖÃ×î´óµÈ´ıÊ±¼äÎª500ms */
 	uint32_t ulValue;
 	while(1)
     {
@@ -199,19 +196,20 @@ static void vTaskStart(void *pvParameters)
         }
 
 
-		xResult = xTaskNotifyWait(0x00000000,      
-						          0xFFFFFFFF,      
-						          &ulValue,        /* ±£´æulNotifiedValueµ½±äÁ¿ulValueÖĞ */
-						          xMaxBlockTime);  /* ×î´óÔÊĞíÑÓ³ÙÊ±¼ä */
-		
-		if( xResult == pdPASS )
-		{
-			/* ½ÓÊÕµ½ÏûÏ¢£¬¼ì²âÄÇ¸öÎ»±»°´ÏÂ */
-			if((ulValue & BIT_1) != 0)
-			{
-              notify_counter++; 
-			}
-		}
+//		xResult = xTaskNotifyWait(0x00000000,      
+//						          0xFFFFFFFF,      
+//						          &ulValue,        /* ±£´æulNotifiedValueµ½±äÁ¿ulValueÖĞ */
+//						          xMaxBlockTime);  /* ×î´óÔÊĞíÑÓ³ÙÊ±¼ä */
+//		
+//		if( xResult == pdPASS )
+//		{
+//			/* ½ÓÊÕµ½ÏûÏ¢£¬¼ì²âÄÇ¸öÎ»±»°´ÏÂ */
+//			if((ulValue & BIT_1) != 0)
+//			{
+//              notify_counter++; 
+//			}
+//		}
+//    else{
 
           switch(gpro_t.gpower_on){ 
 
@@ -243,7 +241,7 @@ static void vTaskStart(void *pvParameters)
 		  	 
 
 		  	   gpro_t.wifi_led_fast_blink_flag=0;
-			  vTaskDelay(pdMS_TO_TICKS(1000));//3000
+			  //vTaskDelay(pdMS_TO_TICKS(1000));//3000
 			  
 
           }
@@ -257,14 +255,13 @@ static void vTaskStart(void *pvParameters)
 		
 			
           //send_cmd_ack_hanlder();
-		  vTaskDelay(pdMS_TO_TICKS(50));//ï¿?1ï¿?7?0
+		  vTaskDelay(pdMS_TO_TICKS(100));//ï¿?1ï¿?7?0
 
 
         }
        
-		
-	
- }
+    }
+ 
        
 
   
@@ -288,7 +285,7 @@ void AppTaskCreate (void)
 
    xTaskCreate( vTaskStart,     		/* ä»»åŠ¡å‡½æ•°  */
                  "vTaskStart",   		/* ä»»åŠ¡ï¿?1ï¿?7?1ï¿?1ï¿?7?7    */
-                 128,            		/* ä»»åŠ¡æ ˆå¤§å°ï¼Œå•ä½wordï¼Œä¹Ÿå°±æ˜¯4å­—èŠ‚ */
+                 256,            		/* ä»»åŠ¡æ ˆå¤§å°ï¼Œå•ä½wordï¼Œä¹Ÿå°±æ˜¯4å­—èŠ‚ */
                  NULL,           		/* ä»»åŠ¡å‚æ•°  */
                  1,              		/* ä»»åŠ¡ä¼˜å…ˆï¿?1ï¿?7?1ï¿?1ï¿?7?7 æ•°ï¿½1ï¿?7ï¿?1ï¿?7è¶Šå°ä¼˜å…ˆçº§è¶Šä½ï¼Œè¿™ä¸ªè·ŸuCOSç›¸å */
                  &xHandleTaskStart );   /* ä»»åŠ¡å¥æŸ„  */

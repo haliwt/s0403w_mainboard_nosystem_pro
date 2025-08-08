@@ -95,7 +95,7 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
-  MX_FREERTOS_Init();
+ // MX_FREERTOS_Init();
 
 
 
@@ -109,16 +109,7 @@ int main(void)
    UART_Start_Receive_IT(&huart1,inputBuf,1);
    UART_Start_Receive_IT(&huart2,wifi_rx_inputBuf,1);
    freeRTOS_Handler();
- #if 0
-osThreadDef(THREAD1, LED_Thread1, osPriorityNormal, 0, 128);//��������1
-  osThreadCreate(osThread(THREAD1), NULL);//����LED��˸����1
 
-  /* definition and creation of THREAD2 */
-  osThreadDef(THREAD2, LED_Thread2, osPriorityNormal, 0, 128);//��������2
-  osThreadCreate(osThread(THREAD2), NULL);//����LED��˸����2
-  /* Start scheduler */
-  osKernelStart();//ϵͳ����
-  #endif 
   while (1)
   {
     /* USER CODE END WHILE */

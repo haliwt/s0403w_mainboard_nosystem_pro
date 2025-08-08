@@ -107,14 +107,17 @@ void power_on_handler(void)
 
   case 6:
 
-       if(gpro_t.gTimer_update_todisplay > 2){
+      if(wifi_link_net_state() ==1 && gpro_t.gTimer_update_tencet_dht11 >5){
+				gpro_t.gTimer_update_tencet_dht11=0;
+				Update_Dht11_Totencent_Value();
+      }
+	  else if(gpro_t.gTimer_update_todisplay > 2){
 			gpro_t.gTimer_update_todisplay=0;
 
 			updateDht11_sensorData_toDisp();
-			//freertos_set_prority();
-			vTaskDelay(pdMS_TO_TICKS(50));//WT.EDIT 2025.08.07
+	
 		           
-        }
+       }
 
        gpro_t.process_run_step=7 ;
 
@@ -137,7 +140,7 @@ void power_on_handler(void)
 			 gctl_t.first_link_tencent_cloud_flag++;
 
             Subscriber_Data_FromCloud_Handler();
-    	   vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(100);//HAL_Delay(350);
+    	  
 	    }
 	
 	  }
@@ -147,18 +150,7 @@ void power_on_handler(void)
  break; 
 
 
-	  
-  case 8:
-      if(wifi_link_net_state() ==1 && gpro_t.gTimer_update_tencet_dht11 >4){
-    	  gpro_t.gTimer_update_tencet_dht11=0;
-    	  Update_Dht11_Totencent_Value();
-      }
-
-      gpro_t.process_run_step= 9;
-
-     break;
-
-  case 9:
+ case 8:
 
      works_run_two_hours_state();
 
