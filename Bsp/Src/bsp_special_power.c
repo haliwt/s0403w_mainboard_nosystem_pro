@@ -99,13 +99,12 @@ void Single_Usart_RxData(void(*rxHandler)(uint8_t dat))
 void ActionEvent_Handler(void)
 {
 
-   static uint8_t ptc_default =1,
-				  plasma_default =1,
-				  ultrasonic_default =1;
+   static uint8_t ptc_default =1,plasma_default =1,ultrasonic_default =1;
+   
    if( gctl_t.gDry==1){
 	if(gpro_t.fan_warning_flag ==0 && gpro_t.pct_warning ==0 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 		
-		
+		   
 			PTC_SetHigh();
 			if(ptc_default!=gpro_t.ptc_switch_flag){
 			ptc_default = gpro_t.ptc_switch_flag;
@@ -119,6 +118,7 @@ void ActionEvent_Handler(void)
 	}
 	else{
 		gctl_t.gDry =0;
+	
 		PTC_SetLow();
 		if(ptc_default!=gpro_t.ptc_switch_flag){
 			ptc_default = gpro_t.ptc_switch_flag;

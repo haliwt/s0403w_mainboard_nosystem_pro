@@ -24,6 +24,7 @@
 #include "bsp_fan.h"
 
 #include "bsp_ctl.h"
+#include "bsp_ptc.h"
 #include "bsp_delay.h"
 
 #include "bsp_cmd_link.h"

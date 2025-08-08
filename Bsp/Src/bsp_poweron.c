@@ -139,6 +139,7 @@ void power_on_handler(void)
             Subscriber_Data_FromCloud_Handler();
     	  
 	    }
+		
 	
 	  }
     
@@ -151,7 +152,23 @@ void power_on_handler(void)
 
      works_run_two_hours_state();
 
-     gpro_t.process_run_step= 6;
+     gpro_t.process_run_step= 9;
+  break;
+
+
+  case 9:
+  	 
+       adc_detected_hundler();
+       if(wifi_link_net_state() ==1 && gpro_t.gTimer_publis_dht11_data >8){
+        gpro_t.gTimer_publis_dht11_data=0;
+
+          ptc_update_wifi_data();
+       
+        }
+      
+       gpro_t.process_run_step= 6; 
+
+
   break;
 
      default:
