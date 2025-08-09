@@ -35,7 +35,7 @@ void power_on_handler(void)
         //
         gctl_t.first_link_tencent_cloud_flag=1;
       
-		gpro_t.gTimer_check_twohours=0;
+	     gTimer_check_twohours=0;
         gpro_t.stopTwoHours_flag =0;
  
         gpro_t.gTimer_detect_fan_error=0;
@@ -151,7 +151,7 @@ void power_on_handler(void)
 
  case 8:
 
-     works_run_two_hours_state();
+    // works_run_two_hours_state();
 
      gpro_t.process_run_step= 9;
   break;

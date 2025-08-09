@@ -88,6 +88,9 @@
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 extern uint8_t inputBuf[1];
 
+extern volatile  uint8_t  gTimer_check_twohours;
+
+
 typedef enum{
 
 
@@ -149,7 +152,7 @@ typedef struct PROCESS_T{
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
   
-   uint16_t gTimer_check_twohours; 
+
 
 
 

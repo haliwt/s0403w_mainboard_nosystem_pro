@@ -63,7 +63,9 @@ extern UART_HandleTypeDef huart2;
 extern TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN EV */
-static uint16_t timer17;
+volatile  uint16_t timer17;
+volatile  uint8_t timer18;
+volatile  uint8_t  gTimer_check_twohours;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -127,7 +129,12 @@ void TIM17_IRQHandler(void)
   timer17++;
   if(timer17 > 999){
 	  timer17 =0;
-	  gpro_t.gTimer_check_twohours ++ ;
+	  timer18++;
+      if(timer18 > 59){
+	  	timer18=0;
+	    gTimer_check_twohours ++ ; //119
+
+      }
    }
 
   /* USER CODE END TIM17_IRQn 0 */
