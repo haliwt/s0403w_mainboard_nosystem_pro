@@ -125,15 +125,16 @@ void TIM17_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM17_IRQn 0 */
   timer17++;
+  if(timer17 > 999){
+	  timer17 =0;
+	  gpro_t.gTimer_check_twohours ++ ;
+   }
 
   /* USER CODE END TIM17_IRQn 0 */
   HAL_TIM_IRQHandler(&htim17);
   /* USER CODE BEGIN TIM17_IRQn 1 */
  
-  if(timer17 > 999){
-  	 timer17 =0;
-     gpro_t.gTimer_check_twohours ++ ;
-  }
+ 
   /* USER CODE END TIM17_IRQn 1 */
 }
 

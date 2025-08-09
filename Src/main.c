@@ -116,7 +116,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
