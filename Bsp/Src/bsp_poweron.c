@@ -34,7 +34,8 @@ void power_on_handler(void)
         powerOffFanRun_flag =1;
         //
         gctl_t.first_link_tencent_cloud_flag=1;
-        gpro_t.gTimer_twoHours=0;
+      
+		gpro_t.gTimer_check_twohours=0;
         gpro_t.stopTwoHours_flag =0;
  
         gpro_t.gTimer_detect_fan_error=0;

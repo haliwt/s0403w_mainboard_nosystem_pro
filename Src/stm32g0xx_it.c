@@ -23,6 +23,7 @@
 #include "stm32g0xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "bsp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,7 +63,7 @@ extern UART_HandleTypeDef huart2;
 extern TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN EV */
-
+static uint16_t timer17;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -123,11 +124,16 @@ void TIM14_IRQHandler(void)
 void TIM17_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM17_IRQn 0 */
+  timer17++;
 
   /* USER CODE END TIM17_IRQn 0 */
   HAL_TIM_IRQHandler(&htim17);
   /* USER CODE BEGIN TIM17_IRQn 1 */
-
+ 
+  if(timer17 > 999){
+  	 timer17 =0;
+     gpro_t.gTimer_check_twohours ++ ;
+  }
   /* USER CODE END TIM17_IRQn 1 */
 }
 

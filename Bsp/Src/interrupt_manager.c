@@ -49,16 +49,12 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 *******************************************************************************/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-   static  uint16_t tm0, tm1,tm2;
+   static  uint16_t tm0, tm1;
 	
   if (htim->Instance == TIM14)
   {
     HAL_IncTick();
-	tm2++;
-	if(tm2 >999){
-		tm2=0;
-	 gpro_t.gTimer_twoHours ++;
-	}
+
   }
    else if(htim->Instance==TIM17){
 		
@@ -99,6 +95,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	    gpro_t.gTimer_poweroff_fan++;
 		gpro_t.gTimer_read_dth11_sensor ++;
+		
 		
        }
 
