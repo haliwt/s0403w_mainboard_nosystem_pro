@@ -186,8 +186,12 @@ static void vTaskStart(void *pvParameters)
              break;
           }
 
+          if(gpro_t.process_run_step > 9){
 
-          if(gpro_t.wifi_led_fast_blink_flag > 1){
+		      gpro_t.process_run_step=6;
+
+		  }
+          else if(gpro_t.wifi_led_fast_blink_flag > 1){
 		  	 gpro_t.wifi_led_fast_blink_flag=0;
 			
 		  }
