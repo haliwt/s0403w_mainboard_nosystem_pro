@@ -3,6 +3,7 @@
 #include "main.h"
 
 //void works_times_handler(void);
+#define  TEST_TWO_HOURS_UNIT     0
 
 
 void works_run_two_hours_state(void);

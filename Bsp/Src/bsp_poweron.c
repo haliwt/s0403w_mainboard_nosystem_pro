@@ -34,9 +34,9 @@ void power_on_handler(void)
         powerOffFanRun_flag =1;
         //
         gctl_t.first_link_tencent_cloud_flag=1;
-        check_time=0;
+        gpro_t.gTimer_twoHours=0;
         gpro_t.stopTwoHours_flag =0;
-        stopHours_flag =0;
+ 
         gpro_t.gTimer_detect_fan_error=0;
         gpro_t.fan_run_initial_times = 0; //WT.EDIT 2025.07.31
         gctl_t.set_temperature_value=40; //power on default set temperature value is 40 degree,don't compare

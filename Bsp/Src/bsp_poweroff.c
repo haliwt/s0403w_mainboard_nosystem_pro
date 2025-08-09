@@ -28,7 +28,7 @@ void power_off_handler(void)
 		gctl_t.gModel =1;
 		gctl_t.app_timer_power_on_flag =0;
 		
-		stopHours_flag =0;
+	
 	  
         
 	    gpro_t.stopTwoHours_flag=0;

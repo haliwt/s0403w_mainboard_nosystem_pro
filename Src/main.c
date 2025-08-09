@@ -29,6 +29,8 @@ uint8_t inputBuf[1];
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -104,6 +106,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
    bsp_init();
+   
 
    HAL_TIM_Base_Start_IT(&htim17);
    UART_Start_Receive_IT(&huart1,inputBuf,1);

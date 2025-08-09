@@ -208,7 +208,7 @@ extern uint8_t powerOffTunrOff_flag;
 
 
 
-extern uint8_t stopHours_flag;
+
 
 
 

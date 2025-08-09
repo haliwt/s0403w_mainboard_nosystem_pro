@@ -87,7 +87,7 @@ uint8_t state;
 void freeRTOS_Handler(void)
 {
      /* 创建任务 */
-	  AppTaskCreate();
+	   AppTaskCreate();
 	  
 	  /* 创建任务通信机制 */
 //	   AppObjCreate();
