@@ -258,12 +258,7 @@ void Get_Ptc_ADC_Fun(uint8_t channel,uint8_t times)
      ptc_detect_voltage  =(uint16_t)((adcx * 3300)/4096); //amplification 100 ,3.11V -> 311
    }
 
-   #if UNIT_TEST
-
-        ptc_detect_voltage =300;
-   #endif 
-	
-	 // run_t.ptc_temp_voltage= run_t.ptc_temp_voltage - MODIFICATION_VALUE ;
+     // run_t.ptc_temp_voltage= run_t.ptc_temp_voltage - MODIFICATION_VALUE ;
 	  Judge_PTC_Temperature_Value();
 
 	

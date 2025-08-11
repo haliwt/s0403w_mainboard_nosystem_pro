@@ -205,10 +205,7 @@ void link_wifi_net_handler(void)
 
 			 case 9: 
 			 	
-			    //MqttData_Publish_Update_Data();//Publish_Data_ToTencent_Initial_Data();
-                //osDelay(200);
-
-			   gpro_t.link_net_step = 10;
+			    gpro_t.link_net_step = 10;
 
 
 			break;

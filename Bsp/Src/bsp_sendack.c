@@ -67,7 +67,7 @@ void receive_data_from_display(uint8_t *pdata)
 
         
       if(gpro_t.stopTwoHours_flag==0){
-         if(gpro_t.pct_warning ==0 && gpro_t.fan_warning_flag ==0){ //PTC warning flag
+         if(gpro_t.ptc_warning ==0 && gpro_t.fan_warning_flag ==0){ //PTC warning flag
               PTC_SetHigh();
               gpro_t.ptc_switch_flag =open;
 		     gctl_t.gTimer_senddata_panel=7;

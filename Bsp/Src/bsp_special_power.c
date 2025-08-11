@@ -95,14 +95,21 @@ void Single_Usart_RxData(void(*rxHandler)(uint8_t dat))
       Single_Usart_ReceiveData=  rxHandler;
 
 }
-
+/************************************************************************************
+*
+*Function Name: void ActionEvent_Handler(void)
+*Fucntion :
+*Input Ref:NO
+*Return Ref:NO
+*
+************************************************************************************/
 void ActionEvent_Handler(void)
 {
 
    static uint8_t ptc_default =1,plasma_default =1,ultrasonic_default =1;
    
    if( gctl_t.gDry==1){
-	if(gpro_t.fan_warning_flag ==0 && gpro_t.pct_warning ==0 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
+	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 		
 		   
 			PTC_SetHigh();
@@ -182,7 +189,60 @@ void ActionEvent_Handler(void)
 		
  }
 
+/************************************************************************************
+************************************************************************************/
+void twoHours_afterWorks_Handler(void)
 
+{
+
+   static uint8_t ptc_default =1,plasma_default =1,ultrasonic_default =1;
+   
+   if( gctl_t.gDry==1){
+	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning != 1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
+		
+		   
+			PTC_SetHigh();
+		
+		
+		}
+	}
+	else{
+		gctl_t.gDry =0;
+	
+		PTC_SetLow();
+		
+   }
+   
+
+   //plasma
+    if(gctl_t.gPlasma == 1){
+		
+	     PLASMA_SetHigh();
+		
+	}
+	else{
+
+		PLASMA_SetLow();
+		
+	}
+
+	
+	//driver bug
+	if(gctl_t.gUlransonic ==1){
+	
+	 
+		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
+	
+	}
+	else{
+	  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
+		
+
+	}
+
+	Fan_RunSpeed_Fun();
+		
+ }
 
 void every_power_on_run(void)
 {

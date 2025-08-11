@@ -17,30 +17,39 @@ void power_on_handler(void)
 
 	case 0: //1
 
-
-      gctl_t.gTimer_senddata_panel=0; //main board function run action.
-	  //error detected times 
-		 gctl_t.ptc_warning =0;
-		// gctl_t.fan_warning =0;
-         gpro_t.fan_warning_flag =0;
-		 gctl_t.gTimer_ptc_adc_times=0;
+          /*power on initial reference---start */
+         gctl_t.gTimer_senddata_panel=0; //main board function run action.
+         gpro_t.fan_run_initial_times = 0; //WT.EDIT 2025.07.31
+         gctl_t.set_temperature_value=40; //power on default set temperature value is 40 degree,don't compare
+         gctl_t.gTimer_ptc_adc_times=0;
 		 gctl_t.gTimer_fan_adc_times=0;
 		
 		 gctl_t.set_wind_speed_value= 100;
 		 gctl_t.set_temperature_value=40;
-        //POWER OFF REF 
-     
+		 gctl_t.first_link_tencent_cloud_flag=1;
+		 /*end*/
+         
+	     /*clear error detected flag --start*/
+		 gctl_t.ptc_warning =0;
+	     gpro_t.fan_warning_flag =0;
+		 gpro_t.gTimer_detect_fan_error=0;
+		/*end*/
+       
+	
+        /*POWER OFF REF-start */
         powerOffTunrOff_flag = 1;
         powerOffFanRun_flag =1;
-        //
-        gctl_t.first_link_tencent_cloud_flag=1;
-      
-	     gTimer_check_twohours=0;
-        gpro_t.stopTwoHours_flag =0;
- 
-        gpro_t.gTimer_detect_fan_error=0;
-        gpro_t.fan_run_initial_times = 0; //WT.EDIT 2025.07.31
-        gctl_t.set_temperature_value=40; //power on default set temperature value is 40 degree,don't compare
+        /*end*/
+		
+       
+        /*this works two hours reference start -WT.EDIT 2025.08.11*/
+	    gTimer_check_twohours=0;
+         timer17=0;
+         timer18=0;
+		 gpro_t.stopTwoHours_flag =0;
+		/*end */
+       
+     
          updateDht11_sensorData_toDisp();
 		 gpro_t.process_run_step= 1;
 	break; 
@@ -150,8 +159,12 @@ void power_on_handler(void)
 
 
  case 8:
+     if(gpro_t.fan_warning_flag > 1 || gpro_t.ptc_warning  > 1){
+        if(gpro_t.fan_warning_flag > 1 ) gpro_t.fan_warning_flag = 0; //strictly forbid 
+	    if(gpro_t.ptc_warning  > 1)gpro_t.ptc_warning = 0;
 
-    // works_run_two_hours_state();
+     }
+	 works_run_two_hours_state();
 
      gpro_t.process_run_step= 9;
   break;

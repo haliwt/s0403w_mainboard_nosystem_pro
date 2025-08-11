@@ -174,7 +174,7 @@ static void vTaskStart(void *pvParameters)
 				vTaskDelay(pdMS_TO_TICKS(10));
 		   	}
 
-			works_run_two_hours_state();
+	
 
 		  
           break;

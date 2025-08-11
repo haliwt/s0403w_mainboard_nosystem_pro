@@ -89,6 +89,8 @@ extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 extern uint8_t inputBuf[1];
 
 extern volatile  uint8_t  gTimer_check_twohours;
+volatile extern  uint16_t timer17;
+volatile extern uint8_t timer18;
 
 
 typedef enum{
@@ -122,16 +124,12 @@ typedef struct PROCESS_T{
      uint8_t ptc_switch_flag;
 	 uint8_t ultrasonic_switch_flag;
 	 uint8_t plasma_switch_flag;
-
-  
-   
-
-   uint8_t process_run_step;
+     uint8_t process_run_step;
   
    uint8_t wifi_led_fast_blink_flag;
    uint8_t get_beijing_time_success;
    uint8_t link_net_step;
-   uint8_t pct_warning ;
+   uint8_t ptc_warning ;
    uint8_t fan_warning_flag;
 
    
@@ -152,10 +150,6 @@ typedef struct PROCESS_T{
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
   
-
-
-
-
 
 }process_t;
 

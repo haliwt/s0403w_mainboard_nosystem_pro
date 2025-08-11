@@ -37,18 +37,18 @@ void works_run_two_hours_state(void)
 
     case 1: //don't run main board any action.
     
-//     #if TEST_TWO_HOURS_UNIT 
-//	 if(gpro_t.gTimer_check_twohours > 2){ //10
-//           
-//           
-//			 gpro_t.gTimer_check_twohours=0;
-//             gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
-//	
-//             gpro_t.stopTwoHours_flag=0;
-//             ActionEvent_Handler();
-//            
-//      }
-//     #else 
+     #if TEST_TWO_HOURS_UNIT 
+	 if(gTimer_check_twohours > 2){ //10
+           
+           
+			gTimer_check_twohours =0;
+             gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
+	
+             gpro_t.stopTwoHours_flag=0;
+             ActionEvent_Handler();
+            
+      }
+     #else 
 
       if( gTimer_check_twohours > 10){ //10 minutes =600s
                
@@ -64,7 +64,7 @@ void works_run_two_hours_state(void)
       }
 
 
-     // #endif 
+      #endif 
 
 	 if(timer_fan_flag ==1){
 
