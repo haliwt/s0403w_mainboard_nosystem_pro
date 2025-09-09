@@ -7,6 +7,11 @@
 #define FAN_PWM_80      32
 
 uint8_t fan_switch_gears_flag;
+
+static void tim16_stop_fan_pmw_config(void);
+static void SetLevel_Fan_PWMA(uint8_t levelval);
+
+
 /******************************************************************************
 *
 *Fan adjut speed frequency is : 18KHz~25KHz 
@@ -22,6 +27,10 @@ void fan_run_fun(void)
 	FAN_RUN_SetHigh();
 	#if NEWPCB_FAN
 	  SetLevel_Fan_PWMA(FAN_PWM_100);
+	#else
+
+
+
 	#endif 
 	
 
@@ -30,6 +39,7 @@ void FAN_Stop(void)
 {
    FAN_COM_SetLow(); //brake
    FAN_RUN_SetLow();//SetLevel_Fan_PWMA(0);//SetLevel_Fan_PWMA(16);
+   tim16_stop_fan_pmw_config();
   
 }
 
@@ -88,99 +98,11 @@ void Fan_Two_Speed(void)
 
 }
 
-//void ShutDown_AllFunction(void)
-//{
-//	
-//	PLASMA_SetLow();
-//	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
-//	PTC_SetLow();
-//	FAN_Stop();
-//   
-
-
-//}
-////"Êù?ÊØ?" 
-//void ultrasonic_fun(uint8_t sel)
-//{
-//    if(sel==0){//open 
-//		
-//		
-//		 HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
-
-//	}
-//	else{ //close
-
-//			
-//		
-//		HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
-//	
-
-//	}
 
 
 
-//}
-
-//void Dry_Function(void)
-//{
-// 
-//  switch(dry_open_flag ){
-
-//   case 1:
-
-//      if(gctl_t.ptc_warning ==0){
-//  
-//          PTC_SetHigh();
-//           
-//        }
-//         
-//      break;
-//    
-//      case 0 :
-//       
-//            PTC_SetLow();
-//    
-//      }
-//             
-//      
-//}
 
 
-//void plasma_fun(uint8_t sel)
-//{
-//     if(sel ==0){
-//        PLASMA_SetHigh();
-
-//     }
-//     else{
-
-//        PLASMA_SetLow();
-//     }
-
-//}
-
-
-
-//void Fan_RunSpeed_Fun(void)
-//{
-
-//    if(gctl_t.set_wind_speed_value < 34 ){
-//        Fan_One_Speed();
-//    }
-//    else if(gctl_t.set_wind_speed_value > 33  && gctl_t.set_wind_speed_value < 67 ){
-
-//        Fan_Two_Speed();
-
-//    }
-//    else if(gctl_t.set_wind_speed_value > 66){
-
-//         Fan_Full_Speed();
-
-//    }
-
-//      
-
-//}
 
 
 
@@ -215,27 +137,26 @@ void Fan_RunSpeed_Fun(void)
 ********************************************************/
 static void SetLevel_Fan_PWMA(uint8_t levelval)
 {
-   gctl_t.gFan_pwm_duty_level = levelval;
-   MX_TIM16_Init();
+     gctl_t.gFan_pwm_duty_level = levelval;
+ //  MX_TIM16_Init();
  //  HAL_TIM_PWM_Start(&htim16,TIM_CHANNEL_1);
+    LL_TIM_DisableCounter(TIM16);
+	LL_TIM_SetAutoReload(TIM16,39);//PWM = 1/(39+1)MHZ = 0.025MHZ = 25KHZ.
+	LL_TIM_OC_SetCompareCH4(TIM16,levelval); //pwm duty = 20/40 =50%
+	LL_TIM_CC_EnableChannel(TIM1,LL_TIM_CHANNEL_CH1);
+	LL_TIM_EnableCounter(TIM16);
 	
 }
 
-
-#if 0
-void fan_start_fun(void)
+void tim16_stop_fan_pmw_config(void)
 {
-
-   SetLevel_Fan_PWMA(10);
-   osDelay(100);
-   FAN_Stop();
-   SetLevel_Fan_PWMA(10);
-   osDelay(100);
-   FAN_Stop();
-   SetLevel_Fan_PWMA(10);
-   osDelay(200);
+  LL_TIM_DisableCounter(TIM16);
+  LL_TIM_CC_DisableChannel(TIM16,LL_TIM_CHANNEL_CH1);
 
 
 }
-#endif 
+
+
+
+
 

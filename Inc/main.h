@@ -50,6 +50,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+#define NEWPCB_FAN       1
 
 /* USER CODE END ET */
 
@@ -73,28 +74,47 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 
 /* USER CODE BEGIN Private defines */
-#if 0
-#define WIFI_TX_Pin GPIO_PIN_2
-#define WIFI_TX_GPIO_Port GPIOA
-#define WIFI_RX_Pin GPIO_PIN_3
-#define WIFI_RX_GPIO_Port GPIOA
-#define PLASMA_Pin GPIO_PIN_5
-#define PLASMA_GPIO_Port GPIOA
-#define FAN_CCW_Pin GPIO_PIN_7
-#define FAN_CCW_GPIO_Port GPIOA
-#define RELAY_Pin GPIO_PIN_0
-#define RELAY_GPIO_Port GPIOB
-#define BEEP_Pin GPIO_PIN_1
-#define BEEP_GPIO_Port GPIOB
-#define TEMP_SENSOR_Pin GPIO_PIN_13
+
+#define WIFI_TX_Pin           LL_GPIO_PIN_2
+#define WIFI_TX_GPIO_Port      GPIOA
+
+#define WIFI_RX_Pin           LL_GPIO_PIN_3
+#define WIFI_RX_GPIO_Port     GPIOA
+
+//GPIO 
+#define PLASMA_Pin            LL_GPIO_PIN_4
+#define PLASMA_GPIO_Port        GPIOA
+
+#define FAN_CW_Pin            LL_GPIO_PIN_5
+#define FAN_CW_GPIO_Port        GPIOA
+
+
+
+#define FAN_CCW_Pin               LL_GPIO_PIN_7
+#define FAN_CCW_GPIO_Port           GPIOA
+
+#define RELAY_Pin           			LL_GPIO_PIN_0
+#define RELAY_GPIO_Port 				GPIOB
+
+
+
+#define TEMP_SENSOR_Pin         LL_GPIO_PIN_13
 #define TEMP_SENSOR_GPIO_Port GPIOB
-#define DISP_TX_Pin GPIO_PIN_9
+
+
+//USART2 
+#define DISP_TX_Pin         LL_GPIO_PIN_9
 #define DISP_TX_GPIO_Port GPIOA
-#define DISP_RX_Pin GPIO_PIN_10
+
+#define DISP_RX_Pin     LL_GPIO_PIN_10
 #define DISP_RX_GPIO_Port GPIOA
-#define WIFI_EN_Pin GPIO_PIN_12
+
+#define WIFI_EN_Pin        LL_GPIO_PIN_12
 #define WIFI_EN_GPIO_Port GPIOA
-#endif 
+//TIM
+#define BEEP_Pin              LL_GPIO_PIN_1
+#define BEEP_GPIO_Port        GPIOB
+
 
 /* USER CODE END Private defines */
 

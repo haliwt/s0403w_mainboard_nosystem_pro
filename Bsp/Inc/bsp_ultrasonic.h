@@ -6,6 +6,7 @@
 
 
 
+void ultrasonic_fun(uint8_t sel);
 
 
 

@@ -1,6 +1,32 @@
 #include "bsp.h"
 
 
+void Dry_Function(uint8_t id)
+{
+ 
+  switch(id){
+
+   case 1:
+
+      if(gctl_t.ptc_warning ==0){
+  
+          PTC_SetHigh();
+           
+        }
+         
+      break;
+    
+      case 0 :
+       
+            PTC_SetLow();
+    
+      }
+             
+      
+}
+
+
+
 
 
 void ptc_update_wifi_data(void)
