@@ -36,7 +36,7 @@ static uint8_t wifi_link_net_fun(void)
 void confirm_wifi_link_net_state(void)
 {
 
-   HAL_UART_Transmit(&huart2, "AT+TCMQTTSTATE?\r\n", strlen("AT+TCMQTTSTATE?\r\n"), 5000);
+//   HAL_UART_Transmit(&huart2, "AT+TCMQTTSTATE?\r\n", strlen("AT+TCMQTTSTATE?\r\n"), 5000);
 
 
 }
@@ -73,7 +73,7 @@ void link_wifi_net_handler(void)
 
             case 1:
                // WIFI_IC_ENABLE();
-                HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
+   //             HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
                 vTaskDelay(pdMS_TO_TICKS(1000));
                 gctl_t.randomName[0]=HAL_GetUIDw0();
 			          vTaskDelay(pdMS_TO_TICKS(1000));
@@ -108,7 +108,7 @@ void link_wifi_net_handler(void)
                   
            // WIFI_IC_ENABLE();
 			
-                 HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //Âä®Ê?ÅÊ≥®ÂÜ? 
+//                 HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //Âä®Ê?ÅÊ≥®ÂÜ? 
 	  		         vTaskDelay(pdMS_TO_TICKS(1000));
         
                   gpro_t.link_net_step = 4;
@@ -149,7 +149,7 @@ void link_wifi_net_handler(void)
             if(net_t.soft_ap_config_success==1){
 
             net_t.soft_ap_config_success=0;
-            HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//Âº?ÂßãËøûÊé?
+ //           HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//Âº?ÂßãËøûÊé?
             vTaskDelay(pdMS_TO_TICKS(1000));
 
             vTaskDelay(pdMS_TO_TICKS(1000));

@@ -217,7 +217,7 @@ static void SetLevel_Fan_PWMA(uint8_t levelval)
 {
    gctl_t.gFan_pwm_duty_level = levelval;
    MX_TIM16_Init();
-   HAL_TIM_PWM_Start(&htim16,TIM_CHANNEL_1);
+ //  HAL_TIM_PWM_Start(&htim16,TIM_CHANNEL_1);
 	
 }
 

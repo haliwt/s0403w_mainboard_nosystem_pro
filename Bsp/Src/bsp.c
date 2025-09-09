@@ -61,7 +61,12 @@ uint8_t bcc_check(const unsigned char *data, int len)
    delay_init(64);
    DHT11_Init();//dht11_init();//sensor_dht11_init();//updateDht11_sensorData_toDisp();//dht11_init();
    wifi_init();
-
+#if Enable_EventRecorder == 1  
+	/* 0…60‹10‡80†40†30…4EventRecorder0…50„40†70„90‡40‹0 */
+	EventRecorderInitialize(EventRecordAll, 1U);
+	EventRecorderStart();
+#endif
+	
   
   }
   
@@ -100,7 +105,7 @@ void adc_detected_hundler(void)
    #endif 
     if(gctl_t.gTimer_fan_adc_times > 8 && gpro_t.stopTwoHours_flag ==0 && gpro_t.fan_warning_flag  == 0){ //detected 3 times is 60s 
         gctl_t.gTimer_fan_adc_times =0;
-        Get_Fan_ADC_Fun(ADC_CHANNEL_0,20);
+       // Get_Fan_ADC_Fun(ADC_CHANNEL_0,20);
         
     }
 	
@@ -264,7 +269,7 @@ static void Auto_SmartPhone_TryToLink_TencentCloud(void)
 		
 	   gpro_t.gTimer_power_on_first_link_tencent=0;
        power_on_login_tencent_cloud_flag++;
-       HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//??
+      // HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//??
        vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
 	  
 	}

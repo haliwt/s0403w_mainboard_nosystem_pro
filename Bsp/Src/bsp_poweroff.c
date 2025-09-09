@@ -125,7 +125,7 @@ static void power_off_stop_fun(void)
 {
       
       PLASMA_SetLow(); //
-      HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+     // HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
       PTC_SetLow();
       
 
@@ -135,7 +135,7 @@ static void power_off_stop_fun(void)
 void power_off_action_fun(void)
 {
     PLASMA_SetLow(); //
-    HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+   // HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
     PTC_SetLow();
 
    

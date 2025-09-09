@@ -65,6 +65,7 @@
 
 
 
+#define Enable_EventRecorder 1  
 
 
 #define WIFI_RX_NUMBERS         1
@@ -84,6 +85,11 @@
 	#define ENABLE_INT()	__set_PRIMASK(0)	/* '???????? */
 	#define DISABLE_INT()	__set_PRIMASK(1)	/* ????????? */
 #endif
+
+#if Enable_EventRecorder == 1
+	#include "EventRecorder.h"
+#endif
+
 
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 extern uint8_t inputBuf[1];

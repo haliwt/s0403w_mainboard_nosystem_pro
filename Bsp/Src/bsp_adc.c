@@ -40,22 +40,22 @@ static uint16_t Get_Fan_Adc_Channel_0(uint32_t ch)
 {
    // HAL_StatusTypeDef status;
 
-    ADC_ChannelConfTypeDef ADC1_ChanConf;
+    //ADC_ChannelConfTypeDef ADC1_ChanConf;
 
-	ADC1_ChanConf.Channel=ADC_CHANNEL_0;                                   //Í¨µÀ
-    ADC1_ChanConf.Rank= ADC_REGULAR_RANK_1;                                    //第一个序�?
-    ADC1_ChanConf.SamplingTime=ADC_SAMPLETIME_1CYCLE_5;//ADC_SAMPLETIME_239CYCLES_5;      //²ÉÑùÊ±¼ä               
+	//ADC1_ChanConf.Channel=ADC_CHANNEL_0;                                   //Í¨µÀ
+   // ADC1_ChanConf.Rank= ADC_REGULAR_RANK_1;                                    //第一个序�?
+   // ADC1_ChanConf.SamplingTime=ADC_SAMPLETIME_1CYCLE_5;//ADC_SAMPLETIME_239CYCLES_5;      //²ÉÑùÊ±¼ä               
 
 
-	HAL_ADC_ConfigChannel(&hadc1,&ADC1_ChanConf);        //Í¨µÀÅäÖÃ
+	//HAL_ADC_ConfigChannel(&hadc1,&ADC1_ChanConf);        //Í¨µÀÅäÖÃ
 	
-    HAL_ADC_Start(&hadc1);                               //start ADC transmit
+   // HAL_ADC_Start(&hadc1);                               //start ADC transmit
 	
-     HAL_ADC_PollForConversion(&hadc1,10);                //轮询转换
+    // HAL_ADC_PollForConversion(&hadc1,10);                //轮询转换
 
     
  
-	   return (uint16_t)HAL_ADC_GetValue(&hadc1);	        	//·µ»Ø×î½üÒ»´ÎADC1¹æÔò×éµÄ×ª»»½á¹û
+	 //  return (uint16_t)HAL_ADC_GetValue(&hadc1);	        	//·µ»Ø×î½üÒ»´ÎADC1¹æÔò×éµÄ×ª»»½á¹û
 
   
 }
@@ -71,20 +71,20 @@ static uint16_t Get_Fan_Adc_Channel_0(uint32_t ch)
 *****************************************************************/
 static uint16_t Get_Ptc_Adc_Channel_1(uint32_t ch)   
 {
-    ADC_ChannelConfTypeDef ADC1_ChanConf;
+//    ADC_ChannelConfTypeDef ADC1_ChanConf;
 
-	ADC1_ChanConf.Channel=ADC_CHANNEL_1;                                   //Í¨µÀ
-    ADC1_ChanConf.Rank= ADC_REGULAR_RANK_1 ;                               //第一个序�?
-    ADC1_ChanConf.SamplingTime=ADC_SAMPLETIME_1CYCLE_5;//ADC_SAMPLETIME_239CYCLES_5;      //²ÉÑùÊ±¼ä               
+//	ADC1_ChanConf.Channel=ADC_CHANNEL_1;                                   //Í¨µÀ
+//    ADC1_ChanConf.Rank= ADC_REGULAR_RANK_1 ;                               //第一个序�?
+//    ADC1_ChanConf.SamplingTime=ADC_SAMPLETIME_1CYCLE_5;//ADC_SAMPLETIME_239CYCLES_5;      //²ÉÑùÊ±¼ä               
 
 
-	HAL_ADC_ConfigChannel(&hadc1,&ADC1_ChanConf);        //Í¨µÀÅäÖÃ
-	
-    HAL_ADC_Start(&hadc1);                               //start ADC transmit
-	
-    HAL_ADC_PollForConversion(&hadc1,10);                //轮询转换
- 
-	return (uint16_t)HAL_ADC_GetValue(&hadc1);	        	//·µ»Ø×î½üÒ»´ÎADC1¹æÔò×éµÄ×ª»»½á¹û
+//	HAL_ADC_ConfigChannel(&hadc1,&ADC1_ChanConf);        //Í¨µÀÅäÖÃ
+//	
+//    HAL_ADC_Start(&hadc1);                               //start ADC transmit
+//	
+//    HAL_ADC_PollForConversion(&hadc1,10);                //轮询转换
+// 
+//	return (uint16_t)HAL_ADC_GetValue(&hadc1);	        	//·µ»Ø×î½üÒ»´ÎADC1¹æÔò×éµÄ×ª»»½á¹û
 }
 
 

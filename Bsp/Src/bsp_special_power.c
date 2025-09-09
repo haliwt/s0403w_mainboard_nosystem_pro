@@ -83,7 +83,7 @@ void SetPowerOff_ForDoing(void)
 
     
 	PLASMA_SetLow(); //
-	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+//	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
 	PTC_SetLow();
 	
 
@@ -164,7 +164,7 @@ void ActionEvent_Handler(void)
 	if(gctl_t.gUlransonic ==1){
 	
 	 
-		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
+	//	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
 	 if(ultrasonic_default!=gpro_t.ultrasonic_switch_flag){
 	   ultrasonic_default = gpro_t.ultrasonic_switch_flag;
 		 if(wifi_link_net_state()==1){ 
@@ -174,7 +174,7 @@ void ActionEvent_Handler(void)
 		}
 	}
 	else{
-	  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
+//	  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
 		if(ultrasonic_default!=gpro_t.ultrasonic_switch_flag){
 			ultrasonic_default = gpro_t.ultrasonic_switch_flag;	
 			if(wifi_link_net_state()==1){ 
@@ -231,11 +231,11 @@ void twoHours_afterWorks_Handler(void)
 	if(gctl_t.gUlransonic ==1){
 	
 	 
-		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
+//		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
 	
 	}
 	else{
-	  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
+//	  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
 		
 
 	}
@@ -264,7 +264,7 @@ void every_power_on_run(void)
 	  gpro_t.ultrasonic_switch_flag =1;
 	  gpro_t.plasma_switch_flag =1;
       PLASMA_SetHigh();
-      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
+ //     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
       PTC_SetHigh();
 	  
 

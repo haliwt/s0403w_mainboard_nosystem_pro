@@ -252,13 +252,13 @@ void AppTaskCreate (void)
 	*Return Ref:NO
 	*
 *******************************************************************************/
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void HAL_UART_IRS_RxCpltCallback(void)
 {
      
      BaseType_t xHigherPriorityTaskWoken = pdFALSE;
    //  MSG_T *ptMsg;
 
-    if(huart->Instance==USART2)
+   // if(huart->Instance==USART2)
     {
 	
    //  DISABLE_INT();
@@ -287,10 +287,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	 }
 	
      //  ENABLE_INT();
-	  __HAL_UART_CLEAR_OREFLAG(&huart2);
-      HAL_UART_Receive_IT(&huart2,wifi_rx_inputBuf,1);
+	 // __HAL_UART_CLEAR_OREFLAG(&huart2);
+    //  HAL_UART_Receive_IT(&huart2,wifi_rx_inputBuf,1);
 	}
-    else if(huart->Instance==USART1)//if(huart==&huart1) // Motor Board receive data (filter)
+   // else if(huart->Instance==USART1)//if(huart==&huart1) // Motor Board receive data (filter)
 	{
       // DISABLE_INT();
 		switch(state)
@@ -359,8 +359,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		}
 
       //  ENABLE_INT();
-	    __HAL_UART_CLEAR_OREFLAG(&huart1);
-		HAL_UART_Receive_IT(&huart1,inputBuf,1);//UART receive data interrupt 1 byte
+	  //  __HAL_UART_CLEAR_OREFLAG(&huart1);
+		//HAL_UART_Receive_IT(&huart1,inputBuf,1);//UART receive data interrupt 1 byte
 		
 	 }
     

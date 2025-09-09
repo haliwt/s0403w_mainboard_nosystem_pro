@@ -38,8 +38,8 @@ void SendWifiData_Answer_Cmd(uint8_t cmd ,uint8_t data);
 
 
 
-void USART1_Cmd_Error_Handler(UART_HandleTypeDef *huart);
-void USART2_Cmd_Error_Handler(UART_HandleTypeDef *huart);
+//void USART1_Cmd_Error_Handler(UART_HandleTypeDef *huart);
+//void USART2_Cmd_Error_Handler(UART_HandleTypeDef *huart);
 
 
 #endif 

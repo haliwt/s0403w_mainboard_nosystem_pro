@@ -396,7 +396,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 	        wifi_t.soft_ap_config_flag =1;
              auto_link_net_flag =2;
    
-	        HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//瀵�1�?7?婵绻涢幒?
+//	        HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//瀵�1�?7?婵绻涢幒?
             vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
          
            
