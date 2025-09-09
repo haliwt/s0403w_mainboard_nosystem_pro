@@ -41,20 +41,19 @@ volatile uint8_t stopHoursCounter;
 //}
 /********************************************************************************
 	**
-	*Function Name:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-	*Function :UART callback function  for UART interrupt for receive data
-	*Input Ref: structure UART_HandleTypeDef pointer
+	*Function Name:void tim17_isr_callback_handler(void)
+	*Function : TIM17 interruput ISR 
+	*Input Ref: 
 	*Return Ref:NO
 	*
 *******************************************************************************/
-void time17_isq_callback_handler(void)
+void tim17_isr_callback_handler(void)
+
 {
-   static  uint16_t tm0, tm1;
+   static  uint16_t tm0;
 	
 
-  
-		
-	   tm0 ++ ;
+    tm0 ++ ;
        
      
 	 if(tm0 > 999){//10ms *100 = 1000ms =1s

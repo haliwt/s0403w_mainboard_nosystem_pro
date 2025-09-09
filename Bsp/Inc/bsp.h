@@ -33,6 +33,10 @@
 #include "bsp_poweron.h"
 #include "bsp_time.h"
 #include "bsp_netparse.h"
+#include "bsp_usart.h"
+#include "bsp_usart_wifi.h"
+#include "bsp_tim.h"
+#include "bsp_dma_usart.h"
 
 #include "interrupt_manager.h"
 

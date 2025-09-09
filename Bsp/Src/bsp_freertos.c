@@ -60,21 +60,14 @@ void LED_Thread2(void const * argument)
 
 #define LOWEST_PRIORITY   1  // ???????
 #define HIGHEST_PRIORITY  2
-typedef struct Msg
-{
-	uint8_t  ucMessageID;
-	uint8_t usData[12];
-	uint8_t link_wifi_net_flag;
-}MSG_T;
 
-MSG_T   gl_tMsg; /* ?????????????? */
 
-uint8_t rx_data_counter,rx_end_flag;
-
-uint8_t notify_counter;
-
-uint8_t wifi_counter;
-uint8_t state;
+//uint8_t rx_data_counter,rx_end_flag;
+//
+//uint8_t notify_counter;
+//
+//uint8_t wifi_counter;
+//uint8_t state;
 
 
 /**********************************************************************************************************
@@ -120,12 +113,7 @@ static void vTaskMsgPro(void *pvParameters)
         if(xResult == pdPASS){
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
-                gpro_t.disp_rx_cmd_done_flag = 0;
-				rx_data_counter=0;
-				state=0;
-
-               
-                 receive_data_from_display(gl_tMsg.usData);
+                   parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
 
 				 	vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
 	       			taskYIELD();  // ??????
@@ -183,7 +171,7 @@ static void vTaskStart(void *pvParameters)
 
       
               gpro_t.process_run_step=0;
-              gl_tMsg.link_wifi_net_flag=0;
+              //gl_tMsg.link_wifi_net_flag=0;
               power_off_handler();
              break;
           }
@@ -198,15 +186,14 @@ static void vTaskStart(void *pvParameters)
 			
 		  }
 		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
-		  	    wifi_counter++;
+		  	  //  wifi_counter++;
              wifi_communication_tnecent_handler();//
              getBeijingTime_cofirmLinkNetState_handler();
              wifi_auto_detected_link_state();
            }
 		  
 		
-			
-          send_cmd_ack_hanlder();
+		
 		  vTaskDelay(pdMS_TO_TICKS(100));//ï¿?1ï¿?7?0
 
 
@@ -246,129 +233,12 @@ void AppTaskCreate (void)
 
 /********************************************************************************
 	**
-	*Function Name:void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-	*Function :UART callback function  for UART interrupt for receive data
-	*Input Ref: structure UART_HandleTypeDef pointer
+	*Function Name:void freertos_set_prority(void)
+	*Function :
+	*Input Ref: 
 	*Return Ref:NO
 	*
 *******************************************************************************/
-void HAL_UART_IRS_RxCpltCallback(void)
-{
-     
-     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-   //  MSG_T *ptMsg;
-
-   // if(huart->Instance==USART2)
-    {
-	
-   //  DISABLE_INT();
-     if(net_t.linking_tencent_cloud_doing ==1){
-
-			gpro_t.wifi_rx_data_array[gpro_t.wifi_rx_data_counter] =wifi_rx_inputBuf[0];
-			gpro_t.wifi_rx_data_counter++;
-
-			if(*wifi_rx_inputBuf==0x0A) // 0x0A = "\n"
-			{
-				
-				Wifi_Rx_InputInfo_Handler();
-				gpro_t.wifi_rx_data_counter=0;
-			}
-
-	 } 
-     else{
-
-		    if(wifi_t.get_rx_beijing_time_enable==1){
-					gpro_t.wifi_rx_data_array[gpro_t.wifi_rx_data_counter] = wifi_rx_inputBuf[0];
-					gpro_t.wifi_rx_data_counter++;
-					
-			}
-			else
-			    Subscribe_Rx_Interrupt_Handler();
-	 }
-	
-     //  ENABLE_INT();
-	 // __HAL_UART_CLEAR_OREFLAG(&huart2);
-    //  HAL_UART_Receive_IT(&huart2,wifi_rx_inputBuf,1);
-	}
-   // else if(huart->Instance==USART1)//if(huart==&huart1) // Motor Board receive data (filter)
-	{
-      // DISABLE_INT();
-		switch(state)
-		{
-		case 0:  //#0
-			if(inputBuf[0] == 0xA5){  // 0xA5 --didplay command head
-               rx_data_counter=0;
-               gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-			   state=1; //=1
-
-             }
-            else
-                state=0;
-		break;
-
-       
-		case 1: //#1
-
-            if(gpro_t.disp_rx_cmd_done_flag ==0){
-              /* ???????? */
-               rx_data_counter++;
-		     
-	          gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-              
-
-               
-              if(gl_tMsg.usData[rx_data_counter] ==0xFE && rx_end_flag == 0 &&  rx_data_counter > 4){
-                     
-				     gpro_t.disp_rx_cmd_done_flag = 0 ;
-         
-
-                state = 0;
-            
-                //uid = rx_data_counter;
-                //rx_end_flag=0;
-
-                rx_data_counter =0;
-
-             
-               // state=0;
-
-                //bcc_check_code=inputBuf[0];
-
-               // gpro_t.gTimer_rx_cmd_done =0;
-
-                #if 1
-
-                xTaskNotifyFromISR(xHandleTaskMsgPro,  /* ???? */
-                DECODER_BIT_0,     /* ???????????bit0  */
-                eSetBits,  /* ????????????BIT_0?????, ??????????? */
-                &xHigherPriorityTaskWoken);
-
-                /* ??xHigherPriorityTaskWoken = pdTRUE,???????????????????? */
-                portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-                #endif 
-                  
-              }
-
-              }
-
-
-        break;
-
-
-			
-		}
-
-      //  ENABLE_INT();
-	  //  __HAL_UART_CLEAR_OREFLAG(&huart1);
-		//HAL_UART_Receive_IT(&huart1,inputBuf,1);//UART receive data interrupt 1 byte
-		
-	 }
-    
-    
-  
- }
-
-
 void freertos_set_prority(void)
 {
 	
@@ -379,4 +249,16 @@ void freertos_set_prority(void)
    
 } 
 
+void app_decoder_task_isr_handler(void)
+{
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
+	xTaskNotifyFromISR(xHandleTaskMsgPro,  /* ???? */
+						DECODER_BIT_0,	   /* ???????????bit0  */
+						eSetBits,  /* ????????????BIT_0?????, ??????????? */
+						&xHigherPriorityTaskWoken);
+
+	/* ??xHigherPriorityTaskWoken = pdTRUE,???????????????????? */
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+}

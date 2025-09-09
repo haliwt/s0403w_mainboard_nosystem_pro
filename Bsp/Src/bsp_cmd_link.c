@@ -23,9 +23,7 @@ void USART1_ERROR_Callback(void);
 void (*EUSART_TxDefaultInterruptHandler)(void);
 void (*EUSART_RxDefaultInterruptHandler)(void);
 
-//void (*EUSART_FramingErrorHandler)(void);
-//void (*EUSART_OverrunErrorHandler)(void);
-//void (*EUSART_ErrorHandler)(void);
+
 
 
 
@@ -100,6 +98,7 @@ void SendWifiData_To_PanelTime(uint8_t hours,uint8_t minutes,uint8_t seconds)
     outputBuf[9] = bcc_check(outputBuf,9);
 
 	transferSize=10;
+	usart1_dma_send(outputBuf,transferSize);
 //	if(transferSize)
 //	{
 //	while(transOngoingFlag); //UART interrupt transmit flag ,disable one more send data.
@@ -126,6 +125,8 @@ void SendData_Set_Command(uint8_t cmd,uint8_t data)
 
 
 		transferSize=7;
+
+		usart1_dma_send(outputBuf,transferSize);
 //		if(transferSize)
 //		{
 //			while(transOngoingFlag);
@@ -157,6 +158,7 @@ void SendWifiData_To_PanelWindSpeed(uint8_t dat1)
         outputBuf[7] = bcc_check(outputBuf,7);
         
         transferSize=8;
+		usart1_dma_send(outputBuf,transferSize);
 //        if(transferSize)
 //        {
 //            while(transOngoingFlag); //UART interrupt transmit flag ,disable one more send data.
@@ -186,6 +188,7 @@ void SendWifiData_To_Cmd(uint8_t cmd,uint8_t data)
         outputBuf[6] = bcc_check(outputBuf,6);
         
         transferSize=7;
+		usart1_dma_send(outputBuf,transferSize);
 //        if(transferSize)
 //        {
 //            while(transOngoingFlag); //UART interrupt transmit flag ,disable one more send data.
@@ -216,6 +219,7 @@ void SendWifiData_To_Data(uint8_t cmd,uint8_t data)
         outputBuf[7] = bcc_check(outputBuf,7);
         
         transferSize=8;
+		usart1_dma_send(outputBuf,transferSize);
 //        if(transferSize)
 //        {
 //            while(transOngoingFlag); //UART interrupt transmit flag ,disable one more send data.
@@ -245,6 +249,7 @@ void SendWifiData_Answer_Cmd(uint8_t cmd ,uint8_t data)
         outputBuf[6] = bcc_check(outputBuf,6);
         
         transferSize=7;
+		usart1_dma_send(outputBuf,transferSize);
 //        if(transferSize)
 //        {
 //            while(transOngoingFlag); //UART interrupt transmit flag ,disable one more send data.
@@ -254,10 +259,6 @@ void SendWifiData_Answer_Cmd(uint8_t cmd ,uint8_t data)
 	
 }
 
-void EUSART_SetTxInterruptHandler(void (* interruptHandler)(void))
-{
-    EUSART_TxDefaultInterruptHandler = interruptHandler;
-}
 
 
 /********************************************************************************
@@ -268,21 +269,6 @@ void EUSART_SetTxInterruptHandler(void (* interruptHandler)(void))
 *Return Ref:NO
 *
 *******************************************************************************/
-//void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//	if(huart==&huart1)
-//	{
-//		transOngoingFlag=0; //UART Transmit interrupt flag =0 ,RUN
-//	}
-
-//	if(huart== &huart2){
-
-//       usart2_transOngoingFlag =0;
-
-//	}
-
-//}
-
 
 
 

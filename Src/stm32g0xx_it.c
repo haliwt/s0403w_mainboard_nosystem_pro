@@ -23,7 +23,7 @@
 #include "stm32g0xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "bsp.h"
+#include "bsp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,9 +109,18 @@ void HardFault_Handler(void)
 void DMA1_Channel1_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+   if(LL_DMA_IsActiveFlag_TC1(DMA1)){
+      LL_DMA_ClearFlag_TC1(DMA1);
+
+   	}
 
   /* USER CODE END DMA1_Channel1_IRQn 0 */
   /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+   if(LL_DMA_IsActiveFlag_TE1(DMA1)){
+        LL_DMA_ClearFlag_TE1(DMA1);
+      
+   }
 
   /* USER CODE END DMA1_Channel1_IRQn 1 */
 }
@@ -149,20 +158,24 @@ void TIM14_IRQHandler(void)
 void TIM17_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM17_IRQn 0 */
-  timer17++;
-  if(timer17 > 999){
-	  timer17 =0;
-	  timer18++;
-      if(timer18 > 59){
-	  	timer18=0;
-	    gTimer_check_twohours ++ ; //119
+  if(LL_TIM_IsActiveFlag_UPDATE(TIM17)){
+       LL_TIM_IsActiveFlag_UPDATE(TIM17);
+      tim17_isr_callback_handler();
 
-      }
-   }
 
+  }
   /* USER CODE END TIM17_IRQn 0 */
   /* USER CODE BEGIN TIM17_IRQn 1 */
- 
+     if(LL_USART_IsActiveFlag_ORE(USART1)){
+
+       LL_USART_ClearFlag_ORE(USART1);
+   }
+   if(LL_USART_IsActiveFlag_FE(USART1)){
+       LL_USART_ClearFlag_FE(USART1);
+   }
+   if(LL_USART_IsActiveFlag_NE(USART1)){
+      LL_USART_ClearFlag_NE(USART1);
+   }
  
   /* USER CODE END TIM17_IRQn 1 */
 }
@@ -173,10 +186,37 @@ void TIM17_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
+	 volatile uint8_t data;
+   if(LL_USART_IsActiveFlag_RXNE(USART1)){
+   
+      //LL_USART_ClearFlag_RXNE(USART1);
+	  data = LL_USART_ReceiveData8(USART1);
 
+        usart1_isr_callback_handler(data);
+	   // 存入缓冲区（简单环形缓冲）
+//        usart1_rx_buffer[usart1_rx_index++] = data;
+//       if (usart1_rx_index >= RX_BUFFER_SIZE)
+//       {
+//          usart1_rx_index = 0; // 环回
+//        }
+
+     
+
+   }
   /* USER CODE END USART1_IRQn 0 */
-  /* USER CODE BEGIN USART1_IRQn 1 */
 
+  
+  /* USER CODE BEGIN USART1_IRQn 1 */
+	if(LL_USART_IsActiveFlag_ORE(USART1)){
+
+       LL_USART_ClearFlag_ORE(USART1);
+   }
+   if(LL_USART_IsActiveFlag_FE(USART1)){
+       LL_USART_ClearFlag_FE(USART1);
+   }
+   if(LL_USART_IsActiveFlag_NE(USART1)){
+      LL_USART_ClearFlag_NE(USART1);
+   }
   /* USER CODE END USART1_IRQn 1 */
 }
 
@@ -186,9 +226,29 @@ void USART1_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
+  volatile uint8_t data;
+
+  if(LL_USART_IsActiveFlag_RXNE(USART2)){
+
+     //LL_USART_ClearFlag_RXNE(USART2);
+    data = LL_USART_ReceiveData8(USART1);
+    usart2_isr_callback_handler(data);
+
+  }
 
   /* USER CODE END USART2_IRQn 0 */
+  
   /* USER CODE BEGIN USART2_IRQn 1 */
+   if(LL_USART_IsActiveFlag_ORE(USART2)){
+
+       LL_USART_ClearFlag_ORE(USART2);
+   }
+   if(LL_USART_IsActiveFlag_FE(USART2)){
+       LL_USART_ClearFlag_FE(USART2);
+   }
+   if(LL_USART_IsActiveFlag_NE(USART2)){
+      LL_USART_ClearFlag_NE(USART2);
+   }
 
   /* USER CODE END USART2_IRQn 1 */
 }
