@@ -121,6 +121,7 @@ void MX_USART1_UART_Init(void)
   LL_USART_ConfigAsyncMode(USART1);
 
   /* USER CODE BEGIN WKUPType USART1 */
+  
 
   /* USER CODE END WKUPType USART1 */
 

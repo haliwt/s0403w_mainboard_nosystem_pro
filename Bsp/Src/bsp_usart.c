@@ -96,6 +96,10 @@ typedef struct Msg
 
 MSG_T   gl_tMsg; 
 
+uint8_t inputBuf[1];
+uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
+
+
 
 static void receive_cmd_or_data_handler(void);
 
@@ -227,7 +231,7 @@ void usart1_isr_callback_handler(uint8_t data)
 	                state=0;
 	                rx_data_counter=0; 
 					 gl_tMsg.tx_data_success = 1;
-	                app_decoder_task_isr_handler();
+	                freertos_decoder_isr_handler();
 
 	            }
 	            else{
@@ -248,7 +252,7 @@ void usart1_isr_callback_handler(uint8_t data)
 				state=0;
 				rx_data_counter=0;  
 				 gl_tMsg.tx_data_success = 1;
-				app_decoder_task_isr_handler();
+				freertos_decoder_isr_handler();
 
 			}
 			else{
@@ -328,7 +332,7 @@ void usart1_isr_callback_handler(uint8_t data)
                 state=0;
                 rx_data_counter=0; 
 				 gl_tMsg.tx_data_success = 1;
-                app_decoder_task_isr_handler();
+                freertos_decoder_isr_handler();
 				
                
 

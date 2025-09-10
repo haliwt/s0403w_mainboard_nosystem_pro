@@ -51,14 +51,14 @@ void tim17_isr_callback_handler(void)
 
 {
    static  uint16_t tm0;
-	
+   static uint8_t tm1;
 
     tm0 ++ ;
        
      
 	 if(tm0 > 999){//10ms *100 = 1000ms =1s
         tm0 =0;
-        
+        tm1++;
         gpro_t.gTimer_link_net_timer_time++;
 	    gctl_t.gTimer_senddata_panel++;
        
@@ -90,6 +90,11 @@ void tim17_isr_callback_handler(void)
 
 	    gpro_t.gTimer_poweroff_fan++;
 		gpro_t.gTimer_read_dth11_sensor ++;
+        if(tm1>59){ //one minutes
+			tm1=0;
+			gpro_t.gTimer_check_twohours++;
+
+        }
 		
 		
        

@@ -43,9 +43,8 @@ void power_on_handler(void)
 		
        
         /*this works two hours reference start -WT.EDIT 2025.08.11*/
-	    gTimer_check_twohours=0;
-         timer17=0;
-         timer18=0;
+	    gpro_t.gTimer_check_twohours=0;
+    
 		 gpro_t.stopTwoHours_flag =0;
 		/*end */
        

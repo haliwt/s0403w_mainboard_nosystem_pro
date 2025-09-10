@@ -2,7 +2,7 @@
 
 #define MAX_BUFFER_SIZE  12
 
-//uint8_t  inputBuf[4];
+
 uint8_t  inputCmd[30];
 uint8_t  wifiInputBuf[1];
 //uint8_t test_counter;

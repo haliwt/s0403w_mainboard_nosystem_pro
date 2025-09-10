@@ -32,10 +32,10 @@ uint8_t dht11_read_flag;
 void DHT11_Init(void)
 {
 
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	DHT11_Mode_Out_PP();
+	//__HAL_RCC_GPIOA_CLK_ENABLE();
+	//DHT11_Mode_Out_PP();
 	
-	DHT11_Dout_HIGH();  // ??GPIO
+	///DHT11_Dout_HIGH();  // ??GPIO
 }
 
 /**
@@ -46,12 +46,15 @@ void DHT11_Init(void)
   */
 static void DHT11_Mode_IPU(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-	GPIO_InitStruct.Pin = DHT11_Dout_PIN;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(DHT11_Dout_PORT, &GPIO_InitStruct);
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+ 	LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
+
+     /**/
+	  GPIO_InitStruct.Pin = TEMP_SENSOR_Pin;
+	  GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+	  GPIO_InitStruct.Pull = LL_GPIO_PULL_DOWN;
+	  LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 }
 
 /**
@@ -62,12 +65,18 @@ static void DHT11_Mode_IPU(void)
   */
 static void DHT11_Mode_Out_PP(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-	GPIO_InitStruct.Pin = DHT11_Dout_PIN;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(DHT11_Dout_PORT, &GPIO_InitStruct);
+	
+
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+	LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
+/**/
+	GPIO_InitStruct.Pin = TEMP_SENSOR_Pin ;
+	GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+	GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+	LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 }
 
 /**

@@ -145,6 +145,7 @@ static void vTaskStart(void *pvParameters)
             power_on_sound_flag ++;
             FAN_Stop();  //WT.EDIT.2025.01.03
             buzzer_sound();//buzzer_sound();
+			printf("buzzer_sound !!!\r\n");
 
         }
 
@@ -192,7 +193,7 @@ static void vTaskStart(void *pvParameters)
              wifi_auto_detected_link_state();
            }
 		  
-		
+		 printf("vTaskStart run !!!\r\n");
 		
 		  vTaskDelay(pdMS_TO_TICKS(100));//�?1�?7?0
 
@@ -224,7 +225,7 @@ void AppTaskCreate (void)
 
    xTaskCreate( vTaskStart,     		/* 任务函数  */
                  "vTaskStart",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 256,            		/* 任务栈大小，单位word，也就是4字节 */
+                 128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskStart );   /* 任务句柄  */
@@ -249,7 +250,7 @@ void freertos_set_prority(void)
    
 } 
 
-void app_decoder_task_isr_handler(void)
+void freertos_decoder_isr_handler(void)
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 

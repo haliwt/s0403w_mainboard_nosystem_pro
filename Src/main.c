@@ -24,8 +24,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-uint8_t wifi_rx_inputBuf[1];
-uint8_t inputBuf[1];
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -96,6 +95,10 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+   bsp_init();
+   
+   freeRTOS_Handler();
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -108,13 +111,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  // bsp_init();
-   
-
-   //HAL_TIM_Base_Start_IT(&htim17);
-  // UART_Start_Receive_IT(&huart1,inputBuf,1);
-  // UART_Start_Receive_IT(&huart2,wifi_rx_inputBuf,1);
-   freeRTOS_Handler();
+  
 
   while (1)
   {

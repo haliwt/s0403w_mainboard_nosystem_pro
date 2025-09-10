@@ -90,20 +90,9 @@ void SysTick_Handler(void)
  */  
 void delay_init(uint16_t sysclk)
 {
-#if SYS_SUPPORT_OS                                      /* 如果需要支持OS */
-    uint32_t reload;
-#endif
-    g_fac_us = sysclk;                                  /* 由于在HAL_Init中已对systick做了配置，所以这里无需重新配置 */
-#if SYS_SUPPORT_OS                                      /* 如果需要支持OS. */
-    reload = sysclk;                                    /* 每秒钟的计数次数 单位为M */
-    reload *= 1000000 / delay_ostickspersec;            /* 根据delay_ostickspersec设定溢出时间,reload为24位
-                                                         * 寄存器,最大值:16777216,在72M下,约合0.233s左右
-                                                         */
-    g_fac_ms = 1000 / delay_ostickspersec;              /* 代表OS可以延时的最少单位 */
-    SysTick->CTRL |= 1 << 1;                            /* 开启SYSTICK中断 */
-    SysTick->LOAD = reload;                             /* 每1/delay_ostickspersec秒中断一次 */
-    SysTick->CTRL |= 1 << 0;                            /* 开启SYSTICK */
-#endif 
+	g_fac_us = sysclk;  
+    SysTick->CTRL |= SysTick_CTRL_CLKSOURCE_Msk; // 确保使用 HCLK 作为时钟源
+
 }
 
 /**
@@ -115,40 +104,29 @@ void delay_init(uint16_t sysclk)
  */
 void delay_us(uint32_t nus)
 {
-    uint32_t ticks;
+    uint32_t ticks = nus * g_fac_us;
     uint32_t told, tnow, tcnt = 0;
-    uint32_t reload = SysTick->LOAD;        /* LOAD的值 */
-    ticks = nus * g_fac_us;                 /* 需要的节拍数 */
-    
-#if SYS_SUPPORT_OS                          /* 如果需要支持OS */
-    delay_osschedlock();                    /* 锁定 OS 的任务调度器 */
-#endif
+    uint32_t reload = SysTick->LOAD;
 
-    told = SysTick->VAL;                    /* 刚进入时的计数器值 */
+    vTaskSuspendAll();  // 锁定任务调度器（不影响中断）
+
+    told = SysTick->VAL;
     while (1)
     {
         tnow = SysTick->VAL;
         if (tnow != told)
         {
             if (tnow < told)
-            {
-                tcnt += told - tnow;        /* 这里注意一下SYSTICK是一个递减的计数器就可以了 */
-            }
+                tcnt += told - tnow; // 正常递减
             else
-            {
-                tcnt += reload - tnow + told;
-            }
+                tcnt += reload - tnow + told; // 发生重装载
+
             told = tnow;
-            if (tcnt >= ticks) 
-            {
-                break;                      /* 时间超过/等于要延迟的时间,则退出 */
-            }
+            if (tcnt >= ticks) break;
         }
     }
 
-#if SYS_SUPPORT_OS                          /* 如果需要支持OS */
-    delay_osschedunlock();                  /* 恢复 OS 的任务调度器 */
-#endif 
+    xTaskResumeAll();   // 恢复任务调度器
 
 }
 

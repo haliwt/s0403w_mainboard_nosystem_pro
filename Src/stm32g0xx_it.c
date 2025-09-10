@@ -60,9 +60,8 @@
 extern TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN EV */
-volatile  uint16_t timer17;
-volatile  uint8_t timer18;
-volatile  uint8_t  gTimer_check_twohours;
+ volatile uint8_t rx_data;
+
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -186,13 +185,13 @@ void TIM17_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-	 volatile uint8_t data;
+	
    if(LL_USART_IsActiveFlag_RXNE(USART1)){
    
       //LL_USART_ClearFlag_RXNE(USART1);
-	  data = LL_USART_ReceiveData8(USART1);
+	  rx_data = LL_USART_ReceiveData8(USART1);
 
-        usart1_isr_callback_handler(data);
+        usart1_isr_callback_handler(rx_data);
 	   // 存入缓冲区（简单环形缓冲）
 //        usart1_rx_buffer[usart1_rx_index++] = data;
 //       if (usart1_rx_index >= RX_BUFFER_SIZE)
