@@ -68,7 +68,7 @@ void LED_Thread2(void const * argument)
 //
 //uint8_t wifi_counter;
 //uint8_t state;
-
+uint8_t power_on_sound_flag ;
 
 /**********************************************************************************************************
 *
@@ -124,10 +124,10 @@ static void vTaskMsgPro(void *pvParameters)
 			 
                 
          }
-		 else{
-		   printf("vTaskMsgPro run2 !!!\r\n");
+//		 else{
+//		 /  printf("vTaskMsgPro run2 !!!\r\n");
 
-		 }
+//		 }
 				                                   
  	}
 }	
@@ -140,7 +140,7 @@ static void vTaskMsgPro(void *pvParameters)
  */
 static void vTaskStart(void *pvParameters)
 {
-    static uint8_t power_on_sound_flag ;
+    
 
 	while(1)
     {
@@ -149,7 +149,7 @@ static void vTaskStart(void *pvParameters)
             power_on_sound_flag ++;
             FAN_Stop();  //WT.EDIT.2025.01.03
             buzzer_sound();//buzzer_sound();
-			printf("buzzer_sound !!!\r\n");
+			//printf("buzzer_sound !!!\r\n");
 
         }
 
@@ -197,7 +197,7 @@ static void vTaskStart(void *pvParameters)
              wifi_auto_detected_link_state();
            }
 		  
-		 printf("vTaskStart run !!!\r\n");
+		// printf("vTaskStart run !!!\r\n");
 		
 		  vTaskDelay(pdMS_TO_TICKS(100));//ï¿?1ï¿?7?0
 

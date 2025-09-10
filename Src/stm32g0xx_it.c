@@ -158,23 +158,15 @@ void TIM17_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM17_IRQn 0 */
   if(LL_TIM_IsActiveFlag_UPDATE(TIM17)){
-       LL_TIM_IsActiveFlag_UPDATE(TIM17);
+  	
+       LL_TIM_ClearFlag_UPDATE(TIM17); // ✅ 清除更新中断标志
       tim17_isr_callback_handler();
 
 
   }
   /* USER CODE END TIM17_IRQn 0 */
   /* USER CODE BEGIN TIM17_IRQn 1 */
-     if(LL_USART_IsActiveFlag_ORE(USART1)){
-
-       LL_USART_ClearFlag_ORE(USART1);
-   }
-   if(LL_USART_IsActiveFlag_FE(USART1)){
-       LL_USART_ClearFlag_FE(USART1);
-   }
-   if(LL_USART_IsActiveFlag_NE(USART1)){
-      LL_USART_ClearFlag_NE(USART1);
-   }
+ 
  
   /* USER CODE END TIM17_IRQn 1 */
 }
