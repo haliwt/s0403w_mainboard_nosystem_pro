@@ -2,8 +2,9 @@
 
 // 为协议中的魔术字节定义常量，提高可读性
 #define FRAME_HEADER        0xA5        //receive display board header  
-#define FRAME_NUM           0x01          //main deviece number is 0x10    
-#define FRAME_ACK_NUM       0x80          //from main answer singnal 0x80 new version . 
+#define FRAME_NUM           0x02          //main deviece number is 0x10 
+#define FRAME_OLD_NUM       0x01          //older version device NUM
+#define FRAME_ACK_NUM       0x80          //new version from main answer singnal 0x80 new version . 
 #define FRAME_END_BYTE              0xFE
 #define DATA_FRAME_TYPE_INDICATOR   0x0F
 #define FRAME_COPY_NUM              0xFF   //this is older version .
@@ -101,6 +102,7 @@ typedef struct Msg
 	uint8_t   total_data_length;
 	uint8_t   rx_data[4];
 	uint8_t   usData[12];
+	uint8_t   desData[12];
 
 }MSG_T;
 
@@ -130,7 +132,7 @@ volatile uint8_t rx_data_counter=0;
 void usart1_isr_callback_handler(void)
 {
        
-	   uint8_t next_head ,data;
+	   uint8_t data;
 
 	    data = LL_USART_ReceiveData8(USART1);
 
@@ -146,7 +148,7 @@ void usart1_isr_callback_handler(void)
 		  break;
 
 		  case 1:
-		    if(data == FRAME_NUM || data == FRAME_ACK_NUM){
+		    if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
 	   	       gl_tMsg.usData[rx_data_counter]=data;
 		       rx_data_counter++;
 		       rx_state =2;
@@ -159,7 +161,7 @@ void usart1_isr_callback_handler(void)
 
 		  break;
 
-		  case 2:
+		  case 2: //rx command or notice or oxFF 
 		      gl_tMsg.usData[rx_data_counter]=data;
 			  rx_data_counter++;
 			  rx_state =3;
@@ -167,7 +169,7 @@ void usart1_isr_callback_handler(void)
 
 		  break;
 
-		  case 3:
+		  case 3: //rx excuite command or notice 
 		      gl_tMsg.usData[rx_data_counter]=data;
 			  rx_data_counter++;
 			  rx_state =4;
@@ -175,11 +177,11 @@ void usart1_isr_callback_handler(void)
 
 		  break;
 
-		  case 4:
+		  case 4: //old version: 0x0F or 0x0, new version is frame end "0xFE"
 			  gl_tMsg.usData[rx_data_counter]=data;
 			  rx_data_counter++;
 			 
-		      if(gl_tMsg.usData[rx_data_counter]==0x0F){
+		      if(gl_tMsg.usData[rx_data_counter]==0x0F){ //0x0F -> is receive data .
 			  	gl_tMsg.data_length = gl_tMsg.usData[rx_data_counter];
 				gl_tMsg.rc_data_length =0;
 			    gl_tMsg.rx_data_flag = 1;
@@ -187,6 +189,12 @@ void usart1_isr_callback_handler(void)
 			  	rx_state =7;
 
 			  }
+			  else if(gl_tMsg.usData[rx_data_counter]==0xFE){//new version id frame end 
+			         gl_tMsg.cmd_notice_flag = 1;
+					 gl_tMsg.rx_data_flag = 0;
+					 rx_state =6; //new version 
+
+              }
 			  else{
 			  	gl_tMsg.cmd_notice_flag = 1;
 				gl_tMsg.rx_data_flag = 0;
@@ -224,7 +232,7 @@ void usart1_isr_callback_handler(void)
 
 		  break;
 
-		  case 7:
+		  case 7: //receive is data of length.
 		  	 gl_tMsg.rc_data_length++;
 			 gl_tMsg.usData[rx_data_counter]=data;
 			 rx_data_counter++;
@@ -257,18 +265,18 @@ void usart1_isr_callback_handler(void)
 
        	}
 	   
-        next_head = (uart1_rx_head + 1) % UART1_RX_BUF_SIZE;
-
-        // 防止缓冲区溢出
-        if (next_head != uart1_rx_tail)
-        {
-            uart1_rx_buf[uart1_rx_head] = data;
-            uart1_rx_head = next_head;
-        }
-        else
-        {
-            // 缓冲区满了，可以选择丢弃或覆盖
-        }
+//        next_head = (uart1_rx_head + 1) % UART1_RX_BUF_SIZE;
+//
+//        // 防止缓冲区溢出
+//        if (next_head != uart1_rx_tail)
+//        {
+//            uart1_rx_buf[uart1_rx_head] = data;
+//            uart1_rx_head = next_head;
+//        }
+//        else
+//        {
+//            // 缓冲区满了，可以选择丢弃或覆盖
+//        }
 
 
 }
@@ -280,6 +288,22 @@ void usart1_protocol_state_machine(void)
    if(gl_tMsg.cmd_notice_flag == 1){
     
       gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
+	  if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
+            memcpy(gl_tMsg.desData,gl_tMsg.usData,12);
+            memset(gl_tMsg.usData,0,12);
+
+		}
+
+   }
+   else if(gl_tMsg.rx_data_flag == 1){
+
+        gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
+        if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
+            memcpy(gl_tMsg.desData,gl_tMsg.usData,12);
+            memset(gl_tMsg.usData,0,12);
+
+		}
+
 
    }
 
