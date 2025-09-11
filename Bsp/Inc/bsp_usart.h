@@ -5,8 +5,9 @@
 
 void parse_recieve_data_handler(void);
 
-void usart1_isr_callback_handler(uint8_t data);
+void usart1_isr_callback_handler(void);
 
+void usart1_protocol_state_machine(void);
 
 #endif 
 

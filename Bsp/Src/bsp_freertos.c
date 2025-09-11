@@ -113,11 +113,11 @@ static void vTaskMsgPro(void *pvParameters)
         if(xResult == pdPASS){
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
-                   parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
-
-				 	vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
-	       			taskYIELD();  // ??????
-	    			vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
+                  // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
+                    usart1_protocol_state_machine();
+				 	//vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
+	       			//taskYIELD();  // ??????
+	    			//vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
 
                   
              }
@@ -173,8 +173,6 @@ static void vTaskStart(void *pvParameters)
           break;
 
             case power_off:
-
-      
               gpro_t.process_run_step=0;
               //gl_tMsg.link_wifi_net_flag=0;
               power_off_handler();

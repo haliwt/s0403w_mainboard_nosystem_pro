@@ -2,7 +2,7 @@
 
 // 为协议中的魔术字节定义常量，提高可读性
 #define FRAME_HEADER        0xA5        //receive display board header  
-#define FRAME_NUM           0x02          //main deviece number is 0x10    
+#define FRAME_NUM           0x01          //main deviece number is 0x10    
 #define FRAME_ACK_NUM       0x80          //from main answer singnal 0x80 new version . 
 #define FRAME_END_BYTE              0xFE
 #define DATA_FRAME_TYPE_INDICATOR   0x0F
@@ -10,6 +10,13 @@
 
 #define ACK_SUCCESS 0x00U
 #define ACK_FAILURE 0x01U
+
+#define UART1_RX_BUF_SIZE 20
+
+volatile uint8_t uart1_rx_buf[UART1_RX_BUF_SIZE];
+volatile uint8_t uart1_rx_head = 0;
+volatile uint8_t uart1_rx_tail = 0;
+volatile uint8_t rx_state;
 
 typedef enum ack_sig{
 
@@ -83,12 +90,15 @@ typedef struct Msg
     uint8_t   tx_data_success;
 	uint8_t   cmd_notice;
 	uint8_t   copy_cmd_notice;
+	uint8_t   cmd_notice_flag;
     uint8_t   execuite_cmd_notice;
 	uint8_t   rx_data_flag;	
     uint8_t   bcc_check_code;
+	uint8_t   check_code_hex;
     uint8_t   receive_data_length;
     uint8_t   data_length;
 	uint8_t   rc_data_length;
+	uint8_t   total_data_length;
 	uint8_t   rx_data[4];
 	uint8_t   usData[12];
 
@@ -116,9 +126,170 @@ volatile uint8_t rx_data_counter=0;
 	*Return Ref:NO
 	*
 *******************************************************************************/
-#if 1
-void usart1_isr_callback_handler(uint8_t data)
+
+void usart1_isr_callback_handler(void)
 {
+       
+	   uint8_t next_head ,data;
+
+	    data = LL_USART_ReceiveData8(USART1);
+
+        switch(rx_state){
+	
+         case 0:
+	      if(data == FRAME_HEADER){
+	   	   gl_tMsg.usData[rx_data_counter]=data;
+		    rx_data_counter++;
+		    rx_state =1;
+
+	      }
+		  break;
+
+		  case 1:
+		    if(data == FRAME_NUM || data == FRAME_ACK_NUM){
+	   	       gl_tMsg.usData[rx_data_counter]=data;
+		       rx_data_counter++;
+		       rx_state =2;
+
+	         }
+			 else{
+			    rx_state =0;
+			    rx_data_counter=0;
+            }
+
+		  break;
+
+		  case 2:
+		      gl_tMsg.usData[rx_data_counter]=data;
+			  rx_data_counter++;
+			  rx_state =3;
+
+
+		  break;
+
+		  case 3:
+		      gl_tMsg.usData[rx_data_counter]=data;
+			  rx_data_counter++;
+			  rx_state =4;
+
+
+		  break;
+
+		  case 4:
+			  gl_tMsg.usData[rx_data_counter]=data;
+			  rx_data_counter++;
+			 
+		      if(gl_tMsg.usData[rx_data_counter]==0x0F){
+			  	gl_tMsg.data_length = gl_tMsg.usData[rx_data_counter];
+				gl_tMsg.rc_data_length =0;
+			    gl_tMsg.rx_data_flag = 1;
+				gl_tMsg.cmd_notice_flag = 0;
+			  	rx_state =7;
+
+			  }
+			  else{
+			  	gl_tMsg.cmd_notice_flag = 1;
+				gl_tMsg.rx_data_flag = 0;
+			  	rx_state =5;
+			  
+			  }
+
+		  break;
+			  
+	      case 5:
+			  
+		      gl_tMsg.usData[rx_data_counter]=data;
+			 
+			 
+		      if(gl_tMsg.usData[rx_data_counter]==0xFE){
+				    rx_data_counter++;
+				  	rx_state =6;
+			  }
+			  else{
+			   rx_state =0;
+			   rx_data_counter=0;
+			  
+			  }
+		  break;
+
+		  case 6:
+			  
+		  	 gl_tMsg.usData[rx_data_counter]=data;
+			 gl_tMsg.bcc_check_code=data;
+		     gl_tMsg.total_data_length = rx_data_counter;
+			 rx_data_counter=0;
+		     rx_state = 0;
+			 freertos_decoder_isr_handler();
+
+
+		  break;
+
+		  case 7:
+		  	 gl_tMsg.rc_data_length++;
+			 gl_tMsg.usData[rx_data_counter]=data;
+			 rx_data_counter++;
+			 if(gl_tMsg.rc_data_length >=gl_tMsg.data_length){
+                
+			      rx_state =8;
+             }
+		  	
+		  break;
+
+		  case 8:
+			 gl_tMsg.usData[rx_data_counter]=data;
+			 rx_data_counter++;
+
+			 if(gl_tMsg.usData[rx_data_counter]==0xFE){
+
+			      rx_state =5;
+
+			 }
+			 else{
+			 rx_data_counter=0;
+		     rx_state = 0;
+			 }
+
+
+		  break;
+		  
+
+
+
+       	}
+	   
+        next_head = (uart1_rx_head + 1) % UART1_RX_BUF_SIZE;
+
+        // 防止缓冲区溢出
+        if (next_head != uart1_rx_tail)
+        {
+            uart1_rx_buf[uart1_rx_head] = data;
+            uart1_rx_head = next_head;
+        }
+        else
+        {
+            // 缓冲区满了，可以选择丢弃或覆盖
+        }
+
+
+}
+
+void usart1_protocol_state_machine(void)
+{
+
+   
+   if(gl_tMsg.cmd_notice_flag == 1){
+    
+      gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
+
+   }
+
+
+}
+
+#if 0
+{
+
+
      static uint8_t state;
     // BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	 inputBuf[0] = data;

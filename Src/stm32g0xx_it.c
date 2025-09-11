@@ -33,7 +33,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
- 
+#define RX_BUFFER_SIZE  20
+uint8_t usart1_rx_buffer[RX_BUFFER_SIZE];
+uint8_t usart1_rx_index;
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -159,7 +162,7 @@ void TIM17_IRQHandler(void)
   /* USER CODE BEGIN TIM17_IRQn 0 */
   if(LL_TIM_IsActiveFlag_UPDATE(TIM17)){
   	
-       LL_TIM_ClearFlag_UPDATE(TIM17); // ✅ 清除更新中断标志
+      LL_TIM_ClearFlag_UPDATE(TIM17); // ✅ 清除更新中断标志
       tim17_isr_callback_handler();
 
 
@@ -177,19 +180,34 @@ void TIM17_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-	
+   static uint8_t rx_flag;
    if(LL_USART_IsActiveFlag_RXNE(USART1)){
    
       //LL_USART_ClearFlag_RXNE(USART1);
-	  rx_data = LL_USART_ReceiveData8(USART1);
-
-        usart1_isr_callback_handler(rx_data);
-	   // 存入缓冲区（简单环形缓冲）
-//        usart1_rx_buffer[usart1_rx_index++] = data;
+      usart1_isr_callback_handler();
+//	  rx_data = LL_USART_ReceiveData8(USART1);
+//	  
+//      // 存入缓冲区（简单环形缓冲）
+//      
+//       usart1_rx_buffer[usart1_rx_index++] = rx_data;
+//	  
+//	  
 //       if (usart1_rx_index >= RX_BUFFER_SIZE)
 //       {
 //          usart1_rx_index = 0; // 环回
 //        }
+
+	   // 空闲中断
+//    if (LL_USART_IsActiveFlag_IDLE(USART1))
+//    {
+//        LL_USART_ClearFlag_IDLE(USART1); // 必须清除标志位
+//
+//        // 此时 rx_buf[0..rx_len-1] 就是一帧数据
+//        //uart_frame_handler(rx_buf, rx_len);
+//
+//        // 重置计数器，准备接收下一帧
+//        usart1_rx_index = 0;
+//    }
 
      
 
@@ -202,12 +220,12 @@ void USART1_IRQHandler(void)
 
        LL_USART_ClearFlag_ORE(USART1);
    }
-   if(LL_USART_IsActiveFlag_FE(USART1)){
-       LL_USART_ClearFlag_FE(USART1);
-   }
-   if(LL_USART_IsActiveFlag_NE(USART1)){
-      LL_USART_ClearFlag_NE(USART1);
-   }
+//   if(LL_USART_IsActiveFlag_FE(USART1)){
+//       LL_USART_ClearFlag_FE(USART1);
+//   }
+//   if(LL_USART_IsActiveFlag_NE(USART1)){
+//      LL_USART_ClearFlag_NE(USART1);
+//   }
   /* USER CODE END USART1_IRQn 1 */
 }
 
