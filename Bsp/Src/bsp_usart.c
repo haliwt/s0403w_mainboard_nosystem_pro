@@ -113,7 +113,7 @@ uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 
 
 
-static void receive_cmd_or_data_handler(void);
+static void receive_cmd_or_notice_handler(void);
 
 static void receive_copy_cmd_or_data_handler(void);
 
@@ -265,18 +265,7 @@ void usart1_isr_callback_handler(void)
 
        	}
 	   
-//        next_head = (uart1_rx_head + 1) % UART1_RX_BUF_SIZE;
-//
-//        // 防止缓冲区溢出
-//        if (next_head != uart1_rx_tail)
-//        {
-//            uart1_rx_buf[uart1_rx_head] = data;
-//            uart1_rx_head = next_head;
-//        }
-//        else
-//        {
-//            // 缓冲区满了，可以选择丢弃或覆盖
-//        }
+
 
 
 }
@@ -291,6 +280,9 @@ void usart1_protocol_state_machine(void)
 	  if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
             memcpy(gl_tMsg.desData,gl_tMsg.usData,12);
             memset(gl_tMsg.usData,0,12);
+	        gl_tMsg.cmd_notice=gl_tMsg.desData[2];
+			gl_tMsg.execuite_cmd_notice=gl_tMsg.desData[3];
+			receive_cmd_or_notice_handler();
 
 		}
 
@@ -310,241 +302,7 @@ void usart1_protocol_state_machine(void)
 
 }
 
-#if 0
-{
 
-
-     static uint8_t state;
-    // BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	 inputBuf[0] = data;
-	 if(gl_tMsg.tx_data_success ==0){
-     switch(state)
-		{
-		case UART_STATE_WAIT_HEADER:  //#0
-			if(inputBuf[0] == FRAME_HEADER){  // 0x5A --main board singla
-               rx_data_counter=0;
-               gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-				state=UART_STATE_NUM; //=1
-				gl_tMsg.copy_cmd_notice=0;
-				 gl_tMsg.cmd_notice=0;
-
-             }
-            
-		break;
-
-        case UART_STATE_NUM:
-
-             if(inputBuf[0] == FRAME_NUM ||inputBuf[0] == FRAME_ACK_NUM){  // 0x5A --main board singla or copy cmd
-               rx_data_counter++;
-               gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-			   if(inputBuf[0] == FRAME_ACK_NUM){
-                  gl_tMsg.copy_cmd_notice  = 0x80; //new version protocol is copy cmd notice.
-                   state=UART_STATE_CMD_NOTICE; //=1
-			   }
-			   else{ 
-			   	  gl_tMsg.copy_cmd_notice = 0;
-			      state=UART_STATE_CMD_NOTICE; //=1
-			   	}
-
-            }
-            else{
-                state=0;
-                rx_data_counter=0;
-            }
-
-        break;
-
-        case UART_STATE_CMD_NOTICE://2
-               rx_data_counter++;
-               gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-			   gl_tMsg.cmd_notice = inputBuf[0];
-			   if(gl_tMsg.cmd_notice == 0xFF){//this is older version protocol 0x02 -> copy command.
-				   gl_tMsg.copy_cmd_notice = 0xFF;
-				   state=UART_STATE_EXEC_CMD_OR_LEN; //1
-			   }
-			   else{
-                 state=UART_STATE_EXEC_CMD_OR_LEN; //1
-			   }
-    
-        break;
-
-        case UART_STATE_EXEC_CMD_OR_LEN:
-            rx_data_counter++;
-            gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-            if(gl_tMsg.usData[rx_data_counter] !=0x0F && gl_tMsg.copy_cmd_notice != 0xFF){
-                gl_tMsg.execuite_cmd_notice =  gl_tMsg.usData[rx_data_counter];
-                state = UART_STATE_FRAME_END;
-
-            }
-            else if(gl_tMsg.usData[rx_data_counter] ==0x0F){
-               gl_tMsg.rx_data_flag =  0x0F;
-               state = UART_STATE_DATA_LEN; //receive data.
-           }
-		   else if(gl_tMsg.copy_cmd_notice == 0xFF){ //this is older compatibility 
-		        gl_tMsg.cmd_notice = gl_tMsg.usData[rx_data_counter];
-                state = UART_STATE_DATA_LEN; //receive data.
-            }
-
-
-        break;
-
-
-        case  UART_STATE_FRAME_END: //receive comd and notice frame  end
-            rx_data_counter++;
-            gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-            if(inputBuf[0] == 0xFE){  // frame is tail of end "0xFE"
-             
-			   state=UART_STATE_BCC_CHECK; //=1
-
-             }
-		     else if(inputBuf[0] == 0x0){ //this is older version cmd[3]= 0 -> is cmd or notice don't "data"
-		     
-			    state=UART_STATE_BCC_CHECK; //=1
-
-		     }
-			 else{
-                state=0;
-                rx_data_counter=0;
-			 }
-         
-
-        break;
-
-
-        case UART_STATE_BCC_CHECK: //frem
-            rx_data_counter++;
-            gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-		    if(gl_tMsg.usData[rx_data_counter]==0xFE){
-                  state = UART_STATE_OLDER_BCC_CHECK;
-
-			}
-			else{
-                gl_tMsg.bcc_check_code =  gl_tMsg.usData[rx_data_counter];
-				gl_tMsg.data_length = rx_data_counter;
-	            if(gl_tMsg.bcc_check_code == bcc_check(gl_tMsg.usData, gl_tMsg.data_length))
-	            {
-	                state=0;
-	                rx_data_counter=0; 
-					 gl_tMsg.tx_data_success = 1;
-	                freertos_decoder_isr_handler();
-
-	            }
-	            else{
-	                state=0;
-	                rx_data_counter=0;
-	            }
-			}
-
-        break;
-
-		case UART_STATE_OLDER_BCC_CHECK:
-			rx_data_counter++;
-            gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-            gl_tMsg.bcc_check_code = inputBuf[0];
-			gl_tMsg.data_length = rx_data_counter;
-			if(gl_tMsg.bcc_check_code == bcc_check(gl_tMsg.usData, gl_tMsg.data_length))
-			{
-				state=0;
-				rx_data_counter=0;  
-				 gl_tMsg.tx_data_success = 1;
-				freertos_decoder_isr_handler();
-
-			}
-			else{
-				state=0;
-				rx_data_counter=0;
-			}
-
-
-		break;
-
-        //this is receive data 
-		case UART_STATE_DATA_LEN: //receive is data ->"0x04"
-
-             rx_data_counter++;
-             gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-
-              gl_tMsg.receive_data_length = gl_tMsg.usData[rx_data_counter];
-              gl_tMsg.data_length=0;
-           // 根据数据长度判断是否需要接收载荷
-            if(gl_tMsg.receive_data_length > 0 && gl_tMsg.copy_cmd_notice != 0xFF) {
-				 gl_tMsg.rc_data_length=0;
-                 state = UART_STATE_DATA;
-            } 
-            else if(gl_tMsg.copy_cmd_notice == 0xFF){ //this is older compatibility 
-                 gl_tMsg.execuite_cmd_notice =  gl_tMsg.usData[rx_data_counter];
-				 state = UART_STATE_FRAME_END; //receive data.
-			}
-			else {
-                // 如果数据长度为0，直接跳到帧尾
-                rx_data_counter=0;
-                state = 0;
-            }
-        break;
-
-        case UART_STATE_DATA:
-
-        rx_data_counter++;
-        gl_tMsg.data_length ++;
-        gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-		gl_tMsg.rx_data[gl_tMsg.rc_data_length]=inputBuf[0];
-		gl_tMsg.rc_data_length++;
-         
-        if(gl_tMsg.data_length == gl_tMsg.receive_data_length){
-              
-             state = UART_STATE_DATA_END;
-
-        }
-
-        break;
-
-        case UART_STATE_DATA_END:
-
-        rx_data_counter++;
-        gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-        if(gl_tMsg.usData[rx_data_counter]==0xFE){
-             
-             state = UART_STATE_DATA_BCC;
-
-        }
-        else{
-            state=0;
-            rx_data_counter=0;
-
-        }
-       break;
-
-       case UART_STATE_DATA_BCC:
-
-            rx_data_counter++;
-           // gl_tMsg.data_length = rx_data_counter;
-            gl_tMsg.usData[rx_data_counter] = inputBuf[0];
-            gl_tMsg.bcc_check_code = inputBuf[0];
-			gl_tMsg.data_length = rx_data_counter;
-			
-            if(gl_tMsg.bcc_check_code == bcc_check(gl_tMsg.usData,gl_tMsg.data_length ))
-            {
-                state=0;
-                rx_data_counter=0; 
-				 gl_tMsg.tx_data_success = 1;
-                freertos_decoder_isr_handler();
-				
-               
-
-            }
-            else{
-                state=0;
-                rx_data_counter=0;
-            }
-
-
-       break;
-     	}
-
-	}
-}
-
-#endif 
 /********************************************************************************
 	**
 	*Function Name:void usart1_isr_callback_handler(void)
@@ -561,7 +319,7 @@ void parse_recieve_data_handler(void)
 
 	case 0:
       
-       receive_cmd_or_data_handler();
+       receive_cmd_or_notice_handler();
 	   gl_tMsg.tx_data_success = 0;
 
    break;
@@ -587,7 +345,7 @@ void parse_recieve_data_handler(void)
     *Return Ref:NO
     *
 **********************************************************************/
-void receive_cmd_or_data_handler(void)
+static void receive_cmd_or_notice_handler(void)
 {
 
  
