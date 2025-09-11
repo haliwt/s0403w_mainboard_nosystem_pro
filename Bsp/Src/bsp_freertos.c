@@ -109,7 +109,7 @@ static void vTaskMsgPro(void *pvParameters)
        xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
 						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
-						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
+						          portMAX_DELAY);  /* ????????,????-block portMAX_DELAY */
         if(xResult == pdPASS){
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
@@ -195,7 +195,7 @@ static void vTaskStart(void *pvParameters)
              wifi_auto_detected_link_state();
            }
 		  
-		   printf("vTaskStart run !!!\r\n");
+		  // printf("vTaskStart run !!!\r\n");
 		
 		  vTaskDelay(pdMS_TO_TICKS(100));//ï¿?1ï¿?7?0
 
