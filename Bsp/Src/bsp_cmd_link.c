@@ -25,20 +25,6 @@ void (*EUSART_RxDefaultInterruptHandler)(void);
 
 
 
-
-
-
-    
-/********************************************
-	*
-	*Function Name:
-    *Function: receive dsipay panel of order
-    *Input Ref:NO
-    *Return Ref:NO
-
-*********************************************/ 
-
-
 /********************************************************************************
 	**
 	*Function Name:sendData_Real_TimeHum(uint8_t hum,uint8_t temp)
@@ -65,6 +51,7 @@ void sendData_Real_TimeHum(uint8_t hum,uint8_t temp)
 	//for(i=3;i<6;i++) crc ^= outputBuf[i];
 	//outputBuf[i]=crc;
 	transferSize=9;
+	usart1_dma_send(outputBuf,transferSize);
 //	if(transferSize)
 //	{
 //		while(transOngoingFlag); //UART interrupt transmit flag ,disable one more send data.
@@ -258,17 +245,6 @@ void SendWifiData_Answer_Cmd(uint8_t cmd ,uint8_t data)
 //        }
 	
 }
-
-
-
-/********************************************************************************
-**
-*Function Name:
-*Function :
-*Input Ref: 
-*Return Ref:NO
-*
-*******************************************************************************/
 
 
 

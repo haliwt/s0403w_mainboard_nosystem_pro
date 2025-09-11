@@ -195,7 +195,7 @@ static void vTaskStart(void *pvParameters)
              wifi_auto_detected_link_state();
            }
 		  
-		// printf("vTaskStart run !!!\r\n");
+		   printf("vTaskStart run !!!\r\n");
 		
 		  vTaskDelay(pdMS_TO_TICKS(100));//ï¿?1ï¿?7?0
 

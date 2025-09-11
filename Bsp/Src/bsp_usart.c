@@ -161,7 +161,7 @@ void usart1_isr_callback_handler(void)
 
 		  break;
 
-		  case 2: //rx command or notice or oxFF 
+		  case 2: //rx command or notice or oxFF --> copy command or notice .
 		      gl_tMsg.usData[rx_data_counter]=data;
 			  rx_data_counter++;
 			  rx_state =3;
@@ -220,14 +220,23 @@ void usart1_isr_callback_handler(void)
 			  }
 		  break;
 
-		  case 6:
+		  case 6: //BCC CHECK CODE 
 			  
 		  	 gl_tMsg.usData[rx_data_counter]=data;
 			 gl_tMsg.bcc_check_code=data;
 		     gl_tMsg.total_data_length = rx_data_counter;
+			// memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
+             if(gl_tMsg.cmd_notice_flag  ==1){
+			     gl_tMsg.cmd_notice=gl_tMsg.usData[2];
+			     gl_tMsg.execuite_cmd_notice=gl_tMsg.usData[3];
+             }
+			
 			 rx_data_counter=0;
 		     rx_state = 0;
+			 
+			// memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
 			 freertos_decoder_isr_handler();
+			
 
 
 		  break;
@@ -249,7 +258,7 @@ void usart1_isr_callback_handler(void)
 
 			 if(gl_tMsg.usData[rx_data_counter]==0xFE){
 
-			      rx_state =5;
+			      rx_state =6;
 
 			 }
 			 else{
@@ -278,10 +287,10 @@ void usart1_protocol_state_machine(void)
     
       gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
 	  if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
-            memcpy(gl_tMsg.desData,gl_tMsg.usData,12);
-            memset(gl_tMsg.usData,0,12);
-	        gl_tMsg.cmd_notice=gl_tMsg.desData[2];
-			gl_tMsg.execuite_cmd_notice=gl_tMsg.desData[3];
+          //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
+            memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
+	       // gl_tMsg.cmd_notice=gl_tMsg.desData[2];
+			//gl_tMsg.execuite_cmd_notice=gl_tMsg.desData[3];
 			receive_cmd_or_notice_handler();
 
 		}
@@ -291,8 +300,8 @@ void usart1_protocol_state_machine(void)
 
         gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
         if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
-            memcpy(gl_tMsg.desData,gl_tMsg.usData,12);
-            memset(gl_tMsg.usData,0,12);
+            memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
+            memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
 
 		}
 
@@ -374,9 +383,10 @@ static void receive_cmd_or_notice_handler(void)
         }
         else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
 
-              SendWifiData_Answer_Cmd(0x01,0x02); //power off .
-              vTaskDelay(pdMS_TO_TICKS(10)); 
               buzzer_sound();
+			  SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+              //vTaskDelay(pdMS_TO_TICKS(10)); 
+             
               freertos_set_prority();
              
               
