@@ -191,10 +191,8 @@ void usart1_isr_callback_handler(void)
 		      gl_tMsg.usData[rx_data_counter]=data;
 			
 		      if(gl_tMsg.usData[rx_data_counter]==0x0F){ //0x0F -> is receive data .
-		         
-			  	// gl_tMsg.data_length = gl_tMsg.usData[rx_data_counter];
 				 rx_data_counter++;
-				//gl_tMsg.rc_data_length =0;
+				
 			  	rx_state =7;
 
 			  }
@@ -260,9 +258,8 @@ void usart1_isr_callback_handler(void)
 			 rx_data_counter=0;
 		     rx_state = 0;
 			 
-			// memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
 			 freertos_decoder_isr_handler();
-			//usart1_protocol_state_machine();
+			
 
 
 		  break;
@@ -329,10 +326,6 @@ void usart1_protocol_state_machine(void)
 	  if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
           //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
             memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
-	       // gl_tMsg.cmd_notice=gl_tMsg.desData[2];
-			//gl_tMsg.execuite_cmd_notice=gl_tMsg.desData[3];
-			//gl_tMsg.usData[0]=0;
-	        ///gl_tMsg.usData[1]=0;
 			receive_cmd_or_notice_handler();
 
 		}
