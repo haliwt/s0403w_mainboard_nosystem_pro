@@ -4,7 +4,7 @@
 
 
 
-
+ void set_temperature_compare_value_fun(void);
 
 
 #endif 

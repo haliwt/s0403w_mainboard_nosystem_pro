@@ -12,7 +12,7 @@
 void power_on_handler(void)
 {
 
-   static uint8_t send_dht11;
+   static uint8_t send_dht11,temp_counter;
     switch(gpro_t.process_run_step){
 
 	case 0: //1
@@ -25,11 +25,13 @@ void power_on_handler(void)
 		 gctl_t.gTimer_fan_adc_times=0;
 		
 		 gctl_t.set_wind_speed_value= 100;
-		 gctl_t.set_temperature_value=40;
+		
 		 gctl_t.first_link_tencent_cloud_flag=1;
 		 /*end*/
          
 	     /*clear error detected flag --start*/
+		
+		 gctl_t.ptc_warning =0;
 		 gctl_t.ptc_warning =0;
 	     gpro_t.fan_warning_flag =0;
 		 gpro_t.gTimer_detect_fan_error=0;
@@ -179,10 +181,18 @@ void power_on_handler(void)
        
         }
       
-       gpro_t.process_run_step= 6; 
+       gpro_t.process_run_step= 10; 
 
 
   break;
+
+  case 10:
+      temp_counter++;
+	  if(temp_counter>6){
+		  temp_counter=0;
+          set_temperature_compare_value_fun();
+	  }
+	   gpro_t.process_run_step= 6;	
 
      default:
 		//gpro_t.process_run_step= 1;

@@ -97,13 +97,9 @@ typedef struct _RUN_T{
 
     uint8_t process_run_step;
     uint8_t fan_stop_flag ;
+	uint8_t set_temperature_flag;
    
-
-	
- 
-
-
-	uint8_t iwdg_the_first_falg;
+  uint8_t iwdg_the_first_falg;
    
 	//uint8_t gTimer_usart_error;
     //app timer
@@ -159,6 +155,7 @@ typedef struct _RUN_T{
 	  uint8_t  set_wind_speed_value;
 	  uint8_t auto_link_cloud_flag;
 	  uint8_t reconnect_tencent_cloud_flag;
+	  uint8_t rx_set_temp_flag;
 	
 	
       

@@ -2,11 +2,14 @@
 
 
 _run_t gctl_t; 
+
+ uint8_t first_open_set_temp_flag;
+ uint8_t first_set_ptc_on ,set_temp_first;
+
+
 uint8_t powerOffFanRun_flag ;
+
 uint8_t powerOffTunrOff_flag;
-
-
-
 
 
 
@@ -54,5 +57,96 @@ if(gctl_t.gTimer_senddata_panel >1  &&  cmd ==0){ //300ms
 
 }
 
+/**********************************************************************
+    *
+    *Functin Name: void main_function_detected_handler(uint8_t cmd)
+    *Function : 
+    *Input Ref:  key of value
+    *Return Ref: NO
+    *
+************************************************************************/
+ void set_temperature_compare_value_fun(void)
+{
+      
+ 
 
-  
+  switch(gctl_t.set_temperature_flag){
+
+    case 1:
+     if(gctl_t.set_temperature_value  <= gctl_t.gDht11_temperature ){ //gpro_t.temp_real_value && gpro_t.smart_phone_turn_off_ptc_flag ==0){
+
+              PTC_SetLow();
+              gctl_t.gDry=0;
+		      if(gctl_t.rx_set_temp_flag ==1){
+				  gctl_t.rx_set_temp_flag++;
+			  }
+              else set_temp_first = 1;
+			 
+	           SendData_Set_Command(0x02,0x00); //close ptc 
+	           osDelay(5);
+
+  }
+  else{
+
+	      if(set_temp_first==0){//the first open ptc heating //WT.DEDIT 2028.08.27 modify this flow codes
+	          
+              PTC_SetHigh();
+              gctl_t.gDry=1;//
+	            SendData_Set_Command(0x02,0x01); //open ptc 
+	            osDelay(5);
+			
+            
+	      }
+		   else if(set_temp_first==1 && (gctl_t.set_temperature_value -3) >= gctl_t.set_temperature_value){//WT.DEDIT 2028.08.27 modify this flow codes
+                
+				     PTC_SetHigh();
+              gctl_t.gDry=1;//
+	            SendData_Set_Command(0x02,0x01); //open ptc 
+	            osDelay(5);
+	      
+			}
+
+
+      }
+
+   break;
+
+	case 0 :
+        
+    if(gctl_t.gDht11_temperature > 39){ // must be clouse ptc.
+    
+             PTC_SetLow();
+            gctl_t.gDry=0;
+            first_set_ptc_on = 1 ;
+               
+            SendData_Set_Command(0x02,0x00); //close ptc 
+            osDelay(5);
+      }
+    else{
+      if(first_set_ptc_on == 1){
+               
+              if(gctl_t.gDht11_temperature < 38){
+                 PTC_SetHigh();
+                  gctl_t.gDry=1;
+                     
+                  SendData_Set_Command(0x22,0x01); //open ptc  
+                  osDelay(5);
+                }
+                   
+
+      }
+      else{
+
+        PTC_SetHigh();
+        gctl_t.gDry=1;
+          
+        SendData_Set_Command(0x22,0x01); //open ptc  
+        osDelay(5);
+
+      }
+              
+    }
+    break;
+  }
+ 
+} 

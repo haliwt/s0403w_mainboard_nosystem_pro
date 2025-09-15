@@ -549,13 +549,13 @@ static void receive_cmd_or_notice_handler(void)
 
 
       case 0x1A: //??????
-
-      
-
-           gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
+        gctl_t.set_temperature_flag = 1; 
+        gctl_t.rx_set_temp_flag=1; 
+       gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
+       set_temperature_compare_value_fun();
            if(wifi_link_net_state()==1){
              MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-		     vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+		          vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
             }
 
         
