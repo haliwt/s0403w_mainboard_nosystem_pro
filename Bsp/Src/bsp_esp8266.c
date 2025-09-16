@@ -22,6 +22,9 @@ uint8_t usart2_flag;
  */
 uint8_t at_send_data(uint8_t* pdata, uint16_t len)
 {
+
+    USART2_DAM_Send(pdata,len);
+	 //LL_USART_TransmitData8(USART2, pdata);
 //	if(HAL_OK == HAL_UART_Transmit(&huart2, pdata, len, 10000))
 //	{
 //		return len;
@@ -30,6 +33,7 @@ uint8_t at_send_data(uint8_t* pdata, uint16_t len)
 //	{
 //		return 0;
 //	}	
+    
 }
 
 

@@ -141,6 +141,26 @@ void DMA1_Channel2_3_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles DMA1 channel 4, channel 5 and DMAMUX1 interrupts.
+  */
+void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Ch4_5_DMAMUX1_OVR_IRQn 0 */
+    if(LL_DMA_IsActiveFlag_TC5(DMA1)){
+      LL_DMA_ClearFlag_TC5(DMA1);
+
+   	}
+  /* USER CODE END DMA1_Ch4_5_DMAMUX1_OVR_IRQn 0 */
+  /* USER CODE BEGIN DMA1_Ch4_5_DMAMUX1_OVR_IRQn 1 */
+	  if(LL_DMA_IsActiveFlag_TE5(DMA1)){
+        LL_DMA_ClearFlag_TE5(DMA1);
+      
+   }
+  /* USER CODE END DMA1_Ch4_5_DMAMUX1_OVR_IRQn 1 */
+}
+
+
+/**
   * @brief This function handles TIM14 global interrupt.
   */
 void TIM14_IRQHandler(void)
@@ -240,7 +260,7 @@ void USART2_IRQHandler(void)
   if(LL_USART_IsActiveFlag_RXNE(USART2)){
 
      //LL_USART_ClearFlag_RXNE(USART2);
-    data = LL_USART_ReceiveData8(USART1);
+    data = LL_USART_ReceiveData8(USART2);
     usart2_isr_callback_handler(data);
 
   }
@@ -252,12 +272,12 @@ void USART2_IRQHandler(void)
 
        LL_USART_ClearFlag_ORE(USART2);
    }
-   if(LL_USART_IsActiveFlag_FE(USART2)){
-       LL_USART_ClearFlag_FE(USART2);
-   }
-   if(LL_USART_IsActiveFlag_NE(USART2)){
-      LL_USART_ClearFlag_NE(USART2);
-   }
+//   if(LL_USART_IsActiveFlag_FE(USART2)){
+//       LL_USART_ClearFlag_FE(USART2);
+//   }
+//   if(LL_USART_IsActiveFlag_NE(USART2)){
+//      LL_USART_ClearFlag_NE(USART2);
+//   }
 
   /* USER CODE END USART2_IRQn 1 */
 }

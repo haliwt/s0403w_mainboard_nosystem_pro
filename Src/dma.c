@@ -38,7 +38,7 @@
   */
 void MX_DMA_Init(void)
 {
-
+  #if 0 
   /* Init with LL driver */
   /* DMA controller clock enable */
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
@@ -50,6 +50,25 @@ void MX_DMA_Init(void)
   /* DMA1_Channel2_3_IRQn interrupt configuration */
   NVIC_SetPriority(DMA1_Channel2_3_IRQn, 3);
   NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
+
+  #else 
+   /* Init with LL driver */
+  /* DMA controller clock enable */
+  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  NVIC_SetPriority(DMA1_Channel1_IRQn, 3);
+  NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  /* DMA1_Channel2_3_IRQn interrupt configuration */
+  NVIC_SetPriority(DMA1_Channel2_3_IRQn, 3);
+  NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
+  /* DMA1_Ch4_5_DMAMUX1_OVR_IRQn interrupt configuration */
+  NVIC_SetPriority(DMA1_Ch4_5_DMAMUX1_OVR_IRQn, 3);
+  NVIC_EnableIRQ(DMA1_Ch4_5_DMAMUX1_OVR_IRQn);
+
+
+  #endif
 
 }
 

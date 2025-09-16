@@ -4,6 +4,7 @@
 
 void usart2_isr_callback_handler(uint8_t data);
 
+void USART2_DAM_Send(uint8_t *txBuf,uint16_t txlen);
 
 
 
