@@ -88,7 +88,7 @@ typedef enum{
 
 typedef struct Msg
 {
-    uint8_t   tx_data_success;
+    
 	uint8_t   cmd_notice;
 	uint8_t   execuite_cmd_notice;
 	uint8_t   copy_cmd_flag;
@@ -114,7 +114,8 @@ uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 
 static void receive_cmd_or_notice_handler(void);
 
-static void receive_copy_cmd_or_data_handler(void);
+static void parse_recieve_copy_data_handler(void);
+
 
 volatile uint8_t rx_data_counter=0;
 
@@ -150,7 +151,7 @@ void usart1_isr_callback_handler(void)
 		    if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
 	   	       gl_tMsg.usData[rx_data_counter]=data;
 		       
-			   if(gl_tMsg.usData[rx_data_counter]==0x80){
+			   if(gl_tMsg.usData[rx_data_counter]==0x80){ //new version is copy command or notice 0x80
 			   	 rx_data_counter++;
 			   	 gl_tMsg.copy_cmd_flag=0x80;
 			   	}
@@ -171,7 +172,7 @@ void usart1_isr_callback_handler(void)
 		  case 2: //rx command or notice or oxFF --> copy command or notice .
 		      gl_tMsg.usData[rx_data_counter]=data;
 			
-		      if(gl_tMsg.usData[rx_data_counter]==0xFF){
+		      if(gl_tMsg.usData[rx_data_counter]==0xFF){ //older version is copy command or notice "0xFF"
 			  	gl_tMsg.copy_cmd_flag=0xFF;
 			    rx_data_counter++;
 
@@ -186,37 +187,57 @@ void usart1_isr_callback_handler(void)
 
 		  break;
 
-		  case 3: //rx excuite command or notice 
+		  case 3: //rx excuite command and notice or data 
 		     
 		      gl_tMsg.usData[rx_data_counter]=data;
 			
 		      if(gl_tMsg.usData[rx_data_counter]==0x0F){ //0x0F -> is receive data .
 				 rx_data_counter++;
-				
+			
 			  	rx_state =7;
+
+			  }
+			  else if(gl_tMsg.copy_cmd_flag==0xFF){
+			      gl_tMsg.cmd_notice= gl_tMsg.usData[rx_data_counter];
+				  rx_data_counter++;
+			      rx_state =4;
+
 
 			  }
 			  else{
 			  	 gl_tMsg.execuite_cmd_notice=gl_tMsg.usData[rx_data_counter];
 				  rx_data_counter++;
-				
-				
-		         rx_state =4;
+				  rx_state =4;
 
 			  	}
 
 
 		  break;
 
-		   case 4: //
+		   case 4: //rx is cmmand and notice (new version is frame end "0xFE")
 			  gl_tMsg.usData[rx_data_counter]=data;
 			 
-			  if(gl_tMsg.usData[rx_data_counter]==0){//new version id frame end 
+			  if(gl_tMsg.usData[rx_data_counter]==0){//older version is frame command "0x00"
 			         rx_data_counter++;
 					 gl_tMsg.rx_data_flag = 0;
-					 rx_state =5; //new version 
+					 rx_state =5; //older version 
 
               }
+			  else if(gl_tMsg.copy_cmd_flag==0xFF){ //copy command or notice execuite 
+                  gl_tMsg.execuite_cmd_notice=gl_tMsg.usData[rx_data_counter];
+				  rx_data_counter++;
+			      rx_state =5; //older version 
+
+
+			  }
+			  else if(gl_tMsg.usData[rx_data_counter]==0xFE){ //new verson protocol is frame end "0xFE"
+
+			          rx_data_counter++;
+					  gl_tMsg.rx_data_flag = 0;
+					  rx_state =6; //new version 
+
+
+			  }
 			  else{
 			  	rx_state =0;
 			    rx_data_counter=0;
@@ -228,9 +249,7 @@ void usart1_isr_callback_handler(void)
 
 
 		  
-			  
-
-		  case 5: //old version: 0x0F or 0x0, new version is frame end "0xFE"
+		case 5: //old version is frame end "0xFE"
 			  gl_tMsg.usData[rx_data_counter]=data;
 			 
 			  if(gl_tMsg.usData[rx_data_counter]==0xFE){//new version id frame end 
@@ -337,50 +356,13 @@ void usart1_protocol_state_machine(void)
         if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
            
             memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
-			 parse_recieve_data_handler();
+			 parse_recieve_copy_data_handler();
 
-		}
-
-
-   }
+	   }
+    }
 
 
 }
-
-
-/********************************************************************************
-	**
-	*Function Name:void usart1_isr_callback_handler(void)
-	*Function : parse this is receive data from mainboard.
-	*Input Ref:NO
-	*Return Ref:NO
-	*
-*******************************************************************************/
-void parse_recieve_data_handler(void)
-{
-  
-    
-	switch(gl_tMsg.copy_cmd_flag){ //cmd or notice .
-
-	case 0:
-      
-       receive_cmd_or_notice_handler();
-	   gl_tMsg.tx_data_success = 0;
-
-   break;
-
-   case 0x0FF: //copy cmd or notice,this is older version protocol.
-		receive_copy_cmd_or_data_handler();
-		 gl_tMsg.tx_data_success = 0;
-
-   case 0x80:
-       receive_copy_cmd_or_data_handler();
-	    gl_tMsg.tx_data_success = 0;
-   break;
-
-    }
- }
-
 
 /**********************************************************************
     *
@@ -615,59 +597,15 @@ static void receive_cmd_or_notice_handler(void)
      break;
      	}
 }
-
-
-#if 0
-     case 0xFF: //copy send cmd acknowlege
-     //power on or power off 
-        if(pdata[3]==0x31){ //smart phone normal :power on
-            if(pdata[4]==1){ //power on
-
-                gpro_t.receive_copy_cmd = ack_app_power_on;
-
-            }
-            else if(pdata[4]==2){ //smart phone normal :power off
-               gpro_t.receive_copy_cmd = ack_app_power_off;
-            }
-
-        }
-        else if(pdata[3]==0x21){ //smart phone of App timer power on .
-
-            if(pdata[4]==1){ //power on
-
-                gpro_t.receive_copy_cmd = ack_app_timer_power_on;
-
-            }
-            else if(pdata[4]==2){ //smart phone normal :power off
-               gpro_t.receive_copy_cmd = ack_app_power_off;
-            }
-
-
-        }
-        else if(pdata[3] == 0x05){ //link wifi command copy command..
-
-        if(pdata[4]==1){
-
-            gpro_t.receive_copy_cmd = ack_wifi_on;
-
-        }
-
-
-        }
-
-      break;
-        
-#endif 
-
 /**********************************************************************
-*
-*Function Name:void send_cmd_ack_hanlder(void);
-*Function: 
-*Input Ref:NO
-*Return Ref:NO
-*
+	*
+	*Function Name:void parse_recieve_copy_data_handler(void)
+	*Function: display board send to mainboard answer signal
+	*Input Ref:NO
+	*Return Ref:NO
+	*
 **********************************************************************/
-void receive_copy_cmd_or_data_handler(void)
+static void parse_recieve_copy_data_handler(void)
 {
 
     
@@ -678,33 +616,44 @@ void receive_copy_cmd_or_data_handler(void)
     
         break;
     
-        case power_on_off:
+        case 0x10: //power on or off notice .
             
-          if(gpro_t.receive_copy_cmd == ack_app_power_on){
-             gpro_t.receive_copy_cmd =0;
-             gpro_t.send_ack_cmd = 0;
+          if(gl_tMsg.execuite_cmd_notice == 0x01){
+		  	 if(gpro_t.gpower_on == power_on)
+               gpro_t.copy_cmd_notice_buff[1] =COPY_OK;
+			 else 
+             	gpro_t.copy_cmd_notice_buff[1] =COPY_NG;
             
           }
-          else if(gpro_t.receive_copy_cmd != 0 && gpro_t.gTimer_again_send_power_on_off >1){
-             gpro_t.gTimer_again_send_power_on_off =0;
-              SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
-              vTaskDelay(pdMS_TO_TICKS(10));
+          else if(gl_tMsg.execuite_cmd_notice == 0){
+             if(gpro_t.gpower_on == power_off)
+                gpro_t.copy_cmd_notice_buff[1] =COPY_OK;
+			 else 
+             	 gpro_t.copy_cmd_notice_buff[1] =COPY_NG;
+             
           }
                     
          
         break;
     
-        case ack_app_power_off :
+        case 0x012 ://ptc open or close
     
-         if(gpro_t.receive_copy_cmd == ack_app_power_off){
-            gpro_t.receive_copy_cmd =0;
-             gpro_t.send_ack_cmd = 0;
-             
+          
+          if(gl_tMsg.execuite_cmd_notice == 0x01){
+
+		     if(gctl_t.gDry ==1)
+               gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
+			else
+			  gpro_t.copy_cmd_notice_buff[2] =COPY_NG;
+            
+            
           }
-          else if(gpro_t.receive_copy_cmd != 0 && gpro_t.gTimer_again_send_power_on_off >1){
-              gpro_t.gTimer_again_send_power_on_off =0;
-               SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
-               vTaskDelay(pdMS_TO_TICKS(10));
+          else if(gl_tMsg.execuite_cmd_notice == 0){
+             if(gctl_t.gDry ==0)
+               gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
+			else
+			  gpro_t.copy_cmd_notice_buff[2] =COPY_NG;
+             
           }
     
     
@@ -712,33 +661,13 @@ void receive_copy_cmd_or_data_handler(void)
 
         case ack_app_timer_power_on:
 
-           if(gpro_t.receive_copy_cmd == ack_app_timer_power_on){
-             gpro_t.receive_copy_cmd =0;
-             gpro_t.send_ack_cmd = 0;
-            
-          }
-          else if(gpro_t.receive_copy_cmd != 0 && gpro_t.gTimer_again_send_power_on_off >1){
-             gpro_t.gTimer_again_send_power_on_off =0;
-              SendWifiData_To_Cmd(0x21,0x01); //smart phone is power on
-              vTaskDelay(pdMS_TO_TICKS(10));
-          }
+          
 
         break;
     
         case ack_wifi_on:
     
-          if(gpro_t.receive_copy_cmd == ack_wifi_on){
-             gpro_t.receive_copy_cmd =0;
-             gpro_t.send_ack_cmd = 0;
-            
-          }
-          else if(gpro_t.receive_copy_cmd != 0 && gpro_t.gTimer_again_send_power_on_off >1){
-             gpro_t.gTimer_again_send_power_on_off =0;
-             SendWifiData_To_Data(0x1F,0x0);
-		     vTaskDelay(pdMS_TO_TICKS(10));
-
-			 
-          }
+         
     
     
         break;

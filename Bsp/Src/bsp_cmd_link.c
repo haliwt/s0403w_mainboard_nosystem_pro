@@ -102,8 +102,8 @@ void SendWifiData_To_PanelTime(uint8_t hours,uint8_t minutes,uint8_t seconds)
 *********************************************************/
 void SendData_Set_Command(uint8_t cmd,uint8_t data)
 {
-    outputBuf[0]=0x5A; //display board head = 0xA5
-	outputBuf[1]= 0x10; //display device Number:is 0x01
+    outputBuf[0]=0x5A; //main board head = 0x5A
+	outputBuf[1]= 0x10; //main board device Number:is 0x10
 	outputBuf[2]=cmd; // command type = 0x06 ->buzzer sound open or not
 	outputBuf[3]= data; // command order -> 01 - buzzer sound done, 00- don't buzzer sound 
 	outputBuf[4]=0x00; // data is length: 00 ->don't data 

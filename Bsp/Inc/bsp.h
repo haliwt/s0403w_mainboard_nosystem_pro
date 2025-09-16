@@ -124,6 +124,7 @@ typedef struct PROCESS_T{
    uint8_t  wifi_rx_data_array[150];
    uint8_t wifi_rx_data_counter;
    uint8_t fan_run_initial_times;
+   uint8_t copy_cmd_notice_buff[10];
 
 
    uint8_t get_beijing_flag;

@@ -54,7 +54,7 @@ void tim17_isr_callback_handler(void)
    static uint8_t tm1;
 
     tm0 ++ ;
-       
+       gctl_t.gTimer_copy_cmd_counter++;
      
 	 if(tm0 > 999){//10ms *100 = 1000ms =1s
         tm0 =0;
@@ -65,6 +65,7 @@ void tim17_isr_callback_handler(void)
 
 	   gctl_t.gTimer_fan_adc_times++;
 	   gctl_t.gTimer_ptc_adc_times++;
+	   gctl_t.gTimer_read_dht11_counter++;
 
 	
 	  gctl_t.gTimer_linkTencentCounter++;

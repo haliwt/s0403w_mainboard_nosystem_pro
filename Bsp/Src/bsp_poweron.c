@@ -1,6 +1,7 @@
 #include "bsp.h"
 
 
+
 /**********************************************************************
 	*
 	*Functin Name: 
@@ -12,7 +13,7 @@
 void power_on_handler(void)
 {
 
-   static uint8_t send_dht11,temp_counter;
+   static uint8_t send_dht11;
     switch(gpro_t.process_run_step){
 
 	case 0: //1
@@ -187,9 +188,9 @@ void power_on_handler(void)
   break;
 
   case 10:
-      temp_counter++;
-	  if(temp_counter>6){
-		  temp_counter=0;
+     
+	  if( gctl_t.gTimer_read_dht11_counter>2){
+		   gctl_t.gTimer_read_dht11_counter=0;
           set_temperature_compare_value_fun();
 	  }
 	   gpro_t.process_run_step= 6;	
