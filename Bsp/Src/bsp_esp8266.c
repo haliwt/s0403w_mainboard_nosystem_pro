@@ -7,6 +7,9 @@
 
 ESP8266DATATypedef net_t;
 
+ uint8_t dma_tx_done;
+
+
  uint8_t *sub_buf;
 
 char *CloudInfo="+TCMQTTCONN:OK";
@@ -22,6 +25,7 @@ uint8_t usart2_flag;
  */
 uint8_t at_send_data(const uint8_t* pdata, uint16_t len)
 {
+   #if 0
     uint8_t i ;
     //USART2_DAM_Send(pdata,len);
 	//LL_USART_TransmitData8(USART2,&pdata);
@@ -37,15 +41,19 @@ uint8_t at_send_data(const uint8_t* pdata, uint16_t len)
     // 等待发送完成
     while (!LL_USART_IsActiveFlag_TC(USART2));
 	return len;
-//	if(HAL_OK == HAL_UART_Transmit(&huart2, pdata, len, 10000))
-//	{
-//		return len;
-//	}
-//	else
-//	{
-//		return 0;
-//	}	
-    
+   #else 
+	if (pdata == NULL || len == 0)
+        return 0;
+
+    dma_tx_done = dma_false;
+    USART2_DMA_Send((uint8_t *)pdata, len);
+
+    // 等待 DMA 发送完成（可加超时机制）
+    uint32_t timeout = 100000;
+    while (!dma_tx_done && --timeout);
+    return (timeout == 0) ? 0 : len;
+
+   #endif 
 }
 
 
@@ -79,7 +87,7 @@ void InitWifiModule_Hardware(void)
 	//WIFI_IC_DISABLE();
 	//HAL_Delay(1000);
 	//WIFI_IC_ENABLE();
-	at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
+	at_send_data((const uint8_t *)"AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
 	vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
 	vTaskDelay(pdMS_TO_TICKS(1000));
 	vTaskDelay(pdMS_TO_TICKS(1000));
@@ -97,7 +105,7 @@ void ReConnect_Wifi_Net_ATReset_Hardware(void)
 		//HAL_Delay(1000);
 		//WIFI_IC_ENABLE();
 		//at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
-		at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
+		at_send_data((const uint8_t *)"AT+RST\r\n", strlen("AT+RST\r\n"));
 		 vTaskDelay(pdMS_TO_TICKS(3000));//HAL_Delay(1000);
        // HAL_Delay(1000);
 		//osDelay(1000);
@@ -303,7 +311,7 @@ void SmartPhone_LinkTencent_Cloud(void)
 
        net_t.soft_ap_config_success=0;
 	 //  HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//�?始连�?
-         at_send_data("AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
+         at_send_data((const uint8_t *)"AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
 	     vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
          vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
        //HAL_Delay(1000);
@@ -322,7 +330,7 @@ void wifi_Disconnect_Fun(void)
 {
 
 //  HAL_UART_Transmit(&huart2, "AT+TCMQTTDISCONN\r\n", strlen("AT+TCMQTTDISCONN\r\n"), 5000);//�?始连�?
-    at_send_data("AT+TCMQTTDISCONN\r\n", strlen("AT+TCMQTTDISCONN\r\n"));
+    at_send_data((const uint8_t *)"AT+TCMQTTDISCONN\r\n", strlen("AT+TCMQTTDISCONN\r\n"));
 }
 
 void Get_BeiJing_Time_Cmd(void)
@@ -331,7 +339,7 @@ void Get_BeiJing_Time_Cmd(void)
  // HAL_UART_Transmit(&huart2, "AT+CIPSNTPCFG=1,8,\"cn.ntp.org.cn\",\"ntp.sjtu.edu.cn\"\r\n", strlen("AT+CIPSNTPCFG=1,800,\"cn.ntp.org.cn\",\"ntp.sjtu.edu.cn\"\r\n"), 5000);//�?始连�?
  // at_send_data("AT+CIPSNTPCFG=1,8,\"cn.ntp.org.cn\",\"ntp.sjtu.edu.cn\"\r\n", strlen("AT+CIPSNTPCFG=1,800,\"cn.ntp.org.cn\",\"ntp.sjtu.edu.cn\"\r\n"));
 //   HAL_UART_Transmit(&huart2, "AT+CIPSNTPCFG=1,8\r\n", strlen("AT+CIPSNTPCFG=1,8\r\n"), 0xffff);//�?
-	at_send_data("AT+CIPSNTPCFG=1,8\r\n", strlen("AT+CIPSNTPCFG=1,8\r\n"));
+	at_send_data((const uint8_t *)"AT+CIPSNTPCFG=1,8\r\n", strlen("AT+CIPSNTPCFG=1,8\r\n"));
 
 }
 
@@ -339,7 +347,7 @@ void Get_Beijing_Time(void)
 {
 
 //   HAL_UART_Transmit(&huart2, "AT+CIPSNTPTIME?\r\n", strlen("AT+CIPSNTPTIME?\r\n"), 0xffff);//�?始连�?
-     at_send_data("AT+CIPSNTPTIME?\r\n", strlen("AT+CIPSNTPTIME?\r\n"));
+     at_send_data((const uint8_t *)"AT+CIPSNTPTIME?\r\n", strlen("AT+CIPSNTPTIME?\r\n"));
 
 
 }
@@ -368,7 +376,7 @@ void PowerOn_Self_Auto_Link_Tencent_Cloud(void)
 	 case wifi_set_cwmode:
     	   // WIFI_IC_ENABLE();
 //         	HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
-           at_send_data("AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
+           at_send_data((const uint8_t *)"AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
            vTaskDelay(pdMS_TO_TICKS(1000));// HAL_Delay(1000);
            vTaskDelay(pdMS_TO_TICKS(1000));
 		
@@ -391,7 +399,7 @@ void SmartPhone_TryToLink_TencentCloud(void)
     gpro_t.wifi_rx_data_counter=0;
 	wifi_t.soft_ap_config_flag =0;
 //    HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//�?始连�?
-    at_send_data("AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
+    at_send_data((const uint8_t *)"AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
 	
 	vTaskDelay(pdMS_TO_TICKS(1000));
 	vTaskDelay(pdMS_TO_TICKS(1000));
@@ -403,7 +411,7 @@ void SmartPhone_TryToLink_TencentCloud(void)
 void Reconnection_Wifi_Order(void)
 {
 //	HAL_UART_Transmit(&huart2, "AT+TCMQTTSTATE?\r\n", strlen("AT+TCMQTTSTATE?\r\n"), 0xffff);
-    at_send_data("AT+TCMQTTSTATE?\r\n", strlen("AT+TCMQTTSTATE?\r\n"));
+    at_send_data((const uint8_t *)"AT+TCMQTTSTATE?\r\n", strlen("AT+TCMQTTSTATE?\r\n"));
     vTaskDelay(pdMS_TO_TICKS(2000));//HAL_Delay(200);
     
   

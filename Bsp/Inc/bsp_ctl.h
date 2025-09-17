@@ -204,6 +204,7 @@ void copy_cmd_notice_hanlder(void);
 void main_function_detected_handler(uint8_t cmd);
 
 
+void set_temperature_compare_value_fun(void);
 
 
 #endif 

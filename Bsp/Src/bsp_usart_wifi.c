@@ -33,6 +33,8 @@ void usart2_isr_callback_handler(uint8_t data)
 
 void USART2_DMA_Send(uint8_t *txBuf,uint16_t txlen)
 {
+    if(txBuf ==NULL || txlen ==0) return ;
+	
 	LL_DMA_DisableChannel(DMA1,LL_DMA_CHANNEL_5);
 
     LL_DMA_ConfigAddresses(DMA1,LL_DMA_CHANNEL_5,
@@ -41,8 +43,10 @@ void USART2_DMA_Send(uint8_t *txBuf,uint16_t txlen)
                             LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
     LL_DMA_SetDataLength(DMA1,LL_DMA_CHANNEL_5,txlen);
 
-    LL_DMA_ClearFlag_TC5(DMA1);//TC5 -> clear transfer complete flag
+   
     LL_DMA_EnableChannel(DMA1,LL_DMA_CHANNEL_5);
+
+	 LL_DMA_ClearFlag_TC5(DMA1);//TC5 -> clear transfer complete flag
 
     LL_USART_EnableDMAReq_TX(USART2);
 

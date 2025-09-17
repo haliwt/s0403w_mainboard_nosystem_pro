@@ -13,7 +13,7 @@
 void power_on_handler(void)
 {
 
-   static uint8_t send_dht11;
+  // static uint8_t send_dht11;
     switch(gpro_t.process_run_step){
 
 	case 0: //1
@@ -174,7 +174,7 @@ void power_on_handler(void)
 
   case 9:
   	 
-       adc_detected_hundler();
+      // adc_detected_hundler();
        if(wifi_link_net_state() ==1 && gpro_t.gTimer_publis_dht11_data >8){
         gpro_t.gTimer_publis_dht11_data=0;
 
@@ -302,7 +302,7 @@ void twoHours_afterWorks_Handler(void)
 
 {
 
-   static uint8_t ptc_default =1,plasma_default =1,ultrasonic_default =1;
+  // static uint8_t ptc_default =1,plasma_default =1,ultrasonic_default =1;
    
    if( gctl_t.gDry==1){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning != 1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag

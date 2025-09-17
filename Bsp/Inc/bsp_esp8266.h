@@ -21,6 +21,14 @@
 //#define WIFI_IC_ENABLE()         HAL_GPIO_WritePin(WIFI_EN_GPIO_Port,WIFI_EN_Pin,GPIO_PIN_SET)
 //#define WIFI_IC_DISABLE()        HAL_GPIO_WritePin(WIFI_EN_GPIO_Port,WIFI_EN_Pin,GPIO_PIN_RESET)
 
+extern uint8_t dma_tx_done ;
+
+typedef enum{
+
+  dma_false,
+  dma_true
+
+}dma_tx_state_t;
 
 typedef enum _esp8266_para{
 

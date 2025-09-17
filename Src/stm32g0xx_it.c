@@ -148,6 +148,7 @@ void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Ch4_5_DMAMUX1_OVR_IRQn 0 */
     if(LL_DMA_IsActiveFlag_TC5(DMA1)){
       LL_DMA_ClearFlag_TC5(DMA1);
+	  dma_tx_done=dma_true;
 
    	}
   /* USER CODE END DMA1_Ch4_5_DMAMUX1_OVR_IRQn 0 */
