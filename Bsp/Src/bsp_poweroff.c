@@ -96,7 +96,7 @@ void power_off_handler(void)
               gpro_t.gTimer_poweroff_fan =0;
 
               powerOffFanRun_flag=2;
-              gctl_t.fan_stop_flag =1;
+           
               FAN_Stop();
 
 

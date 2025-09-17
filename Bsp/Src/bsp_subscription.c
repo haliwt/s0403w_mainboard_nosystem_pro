@@ -56,16 +56,18 @@ void Receive_Data_FromCloud_Data(int type, char *str)
 ********************************************************************************/
 void Subscriber_Data_FromCloud_Handler(void)
 {
-   uint8_t *device_massage;
+  // uint8_t *device_massage;
 
-         device_massage = (uint8_t *)malloc(128);
+        uint8_t  device_massage[128] ={0} ;//(uint8_t *)malloc(128);
           gctl_t.randomName[0]=HAL_GetUIDw0();
       
          sprintf((char *)device_massage,"AT+TCMQTTSUB=\"$thing/down/property/%s/UYIJIA01-%d\",0\r\n", PRODUCT_ID, gctl_t.randomName[0]);
 //         HAL_UART_Transmit(&huart2, device_massage, strlen((const char *)device_massage), 5000); 
-         at_send_data(device_massage, strlen((const char *)device_massage));
-         osDelay(200);
-         free(device_massage);
+         //at_send_data(device_massage, strlen((const char *)device_massage));
+         //osDelay(200);
+        // free(device_massage);
+         USART2_DMA_Send(device_massage, sizeof(device_massage));
+         vTaskDelay(pdMS_TO_TICKS(200));
 }
 /*******************************************************************************
 **
@@ -550,7 +552,7 @@ void Json_Parse_Command_Fun(void)
 	        gpro_t.fan_warning_flag =0;
 	        powerOffTunrOff_flag=1;
 	        powerOffFanRun_flag = 1;
-			gctl_t.ptc_remove_warning_send_data =0;
+	
 			gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
 			gpro_t.send_ack_cmd = 1; //ack_app_power_on;
 	        gpro_t.gTimer_again_send_power_on_off=0;

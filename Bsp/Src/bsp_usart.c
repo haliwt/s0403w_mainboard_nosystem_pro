@@ -269,16 +269,21 @@ void usart1_isr_callback_handler(void)
 		  case 6: //BCC CHECK CODE 
 			  
 		  	 gl_tMsg.usData[rx_data_counter]=data;
-			 gl_tMsg.bcc_check_code=data;
+			 gl_tMsg.bcc_check_code=gl_tMsg.usData[rx_data_counter];
 		     gl_tMsg.total_data_length = rx_data_counter;
 			// memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
           
 			
+			
+			gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
+	        if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
 			 rx_data_counter=0;
 		     rx_state = 0;
-			 
 			 freertos_decoder_isr_handler();
-			
+
+	        }
+			 rx_data_counter=0;
+		     rx_state = 0;
 
 
 		  break;
@@ -341,24 +346,27 @@ void usart1_protocol_state_machine(void)
    
    if(gl_tMsg.copy_cmd_flag == 0){
     
-      gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
-	  if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
+     // gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
+	 // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
           //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
-            memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
+            gl_tMsg.copy_cmd_flag ++;
+	        memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
 			receive_cmd_or_notice_handler();
+	       
 
-		}
+		//}
 
    }
    else {
 
-        gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
-        if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
+       // gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
+       // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
+           memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
            
-            memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
-			 parse_recieve_copy_data_handler();
+			parse_recieve_copy_data_handler();
+	         
 
-	   }
+	  // }
     }
 
 
@@ -537,7 +545,7 @@ static void receive_cmd_or_notice_handler(void)
        set_temperature_compare_value_fun();
            if(wifi_link_net_state()==1){
              MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-		          vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+		         // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
             }
 
         
@@ -573,24 +581,46 @@ static void receive_cmd_or_notice_handler(void)
      case 0x27:
 
       if(gl_tMsg.execuite_cmd_notice == 0x02){
-       
+	  	gl_tMsg.execuite_cmd_notice=0;
+		  gl_tMsg.cmd_notice=0;
+		    gl_tMsg.usData[0]=0;
+		   gl_tMsg.usData[1]=0;
+		 if(gctl_t.mode_ai_switch_flag ==0){
+		 	gctl_t.mode_ai_switch_flag ++;
+         buzzer_sound();
+		 vTaskDelay(200);
          gctl_t.gModel=2;
+		  
+		 }
+		  printf("mode_short_key-2 !!!\r\n");
+		
          //SendWifiData_Answer_Cmd(0x27,0x02); //don't AI mode,   WT.EDIT 2025.01.06
-          if(wifi_link_net_state()==1){
-            MqttData_Publish_SetState(2);
-	        vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-           }
+//          if(wifi_link_net_state()==1){
+//            MqttData_Publish_SetState(2);
+//	       // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+//           }
         
           
        }
        else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
-       
+        gl_tMsg.execuite_cmd_notice=0;
+		   gl_tMsg.cmd_notice=0;
+		   gl_tMsg.usData[0]=0;
+		   gl_tMsg.usData[1]=0;
+		 if(gctl_t.mode_ai_switch_flag ==0){
+		 	  gctl_t.mode_ai_switch_flag++;
+         buzzer_sound();
+		 vTaskDelay(200);
          gctl_t.gModel=1;
+	   
+		 }
+		 printf("mode_short_key-1 !!!\r\n");
+		
         // SendWifiData_Answer_Cmd(0x27,0x01); //AI mode,WT.EDIT 2025.01.06
-         if(wifi_link_net_state()==1){
-             MqttData_Publish_SetState(1);
-    	     vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-         }
+//         if(wifi_link_net_state()==1){
+//             MqttData_Publish_SetState(1);
+//    	   //  vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+//         }
        }
 
 

@@ -73,33 +73,12 @@ typedef enum{
 
 typedef struct _RUN_T{
     
-	uint8_t gPower_On;
-
-
-
-	uint8_t gDht11_flag;
-	uint8_t gTemperature;
-
-	uint8_t gDht11_humidity ;
+	
+    uint8_t gDht11_humidity ;
 	uint8_t gDht11_temperature;
-
-
-    
-
-
-	uint8_t dp_link_wifi_fail;
-	uint8_t wifi_set_temperature_value_flag;
-
-    //iwdg ref
-	uint8_t process_run_guarantee_flag;
-	uint8_t usart2_error_falg ;
-	uint8_t power_off_fan_state ;
-
-    uint8_t process_run_step;
-    uint8_t fan_stop_flag ;
-	uint8_t set_temperature_flag;
+    uint8_t set_temperature_flag;
    
-  uint8_t iwdg_the_first_falg;
+
    
 	//uint8_t gTimer_usart_error;
     //app timer
@@ -107,52 +86,34 @@ typedef struct _RUN_T{
 	uint8_t app_timer_power_on_flag ;
 
 
-    
-    uint8_t decodeFlag;
-	uint8_t sendtimes;
-    uint8_t setup_timer_flag;
-
-    uint8_t gTimer_send_0xaa;
-	uint8_t response_wifi_signal_label;
-    uint8_t flash_write_data_error;
-	uint8_t flash_write_data_flag;
-    uint8_t flash_read_data;
+   uint8_t response_wifi_signal_label;
 
 
-
-
-
-	//fan:
+ //fan:
 	uint8_t gFan_pwm_duty_level;
 
 	uint8_t gTimer_fan_run_one_minute;
 	uint8_t  gFan;
     //ptc:
    
-  
-      
-
-      uint8_t  gAi;
- 
       uint8_t  gDry;
 
 	  uint8_t  gUlransonic;
 	  uint8_t  gModel;
 	  uint8_t gPlasma;
-	  uint16_t ptc_temp_voltage;
+
+	  uint8_t  mode_ai_switch_flag;
     
 
-	  
-      uint8_t  Single_cmd ;
-	  uint8_t send_link_cloud_times;
+	 
 	  //wifi link ref
 	  uint8_t first_link_tencent_cloud_flag ;
 	
-	  uint8_t noBuzzer_sound_dry_flag;
+
 	  
 	  uint8_t  set_temperature_value;
-	  uint8_t  set_temperature_decade;
-	  uint8_t  set_temperature_unit;
+
+
 	  uint8_t  set_wind_speed_value;
 	  uint8_t auto_link_cloud_flag;
 	  uint8_t reconnect_tencent_cloud_flag;
@@ -164,7 +125,7 @@ typedef struct _RUN_T{
     
 	  //ADC
 	  uint8_t ptc_warning;
-	  uint8_t ptc_remove_warning_send_data;
+
 	  uint8_t gTimer_fan_adc_times;
 	  uint8_t gTimer_ptc_adc_times;
      // uint8_t fan_warning;

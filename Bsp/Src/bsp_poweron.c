@@ -94,7 +94,7 @@ void power_on_handler(void)
      if(wifi_link_net_state() ==1 &&  gctl_t.app_timer_power_on_flag==0){
     
 		  MqttData_Publish_Init();
-		  vTaskDelay(pdMS_TO_TICKS(200));
+		 // vTaskDelay(pdMS_TO_TICKS(200));
      	}
 	  gpro_t.process_run_step= 5;
 	 
@@ -103,12 +103,7 @@ void power_on_handler(void)
 
     case 5:
 		
-	
-		if(wifi_link_net_state() ==1){
-         
-			Update_Dht11_Totencent_Value();
-          
-         }
+
 	     gpro_t.process_run_step=6 ;
 	break;
 
@@ -127,7 +122,7 @@ void power_on_handler(void)
 	
 		           
        }
-
+       
        gpro_t.process_run_step=7 ;
 
 
@@ -141,7 +136,7 @@ void power_on_handler(void)
 		  gctl_t.first_link_tencent_cloud_flag++;
 
                MqttData_Publish_Update_Data();
-			   vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
+			  // vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
 
           
     	}
@@ -151,7 +146,8 @@ void power_on_handler(void)
             Subscriber_Data_FromCloud_Handler();
     	  
 	    }
-		
+		 SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+         vTaskDelay(pdMS_TO_TICKS(5));
 	
 	  }
     

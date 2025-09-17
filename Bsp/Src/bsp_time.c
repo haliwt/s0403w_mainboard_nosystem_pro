@@ -78,7 +78,7 @@ void works_run_two_hours_state(void)
 			   gctl_t.gTimer_fan_run_one_minute=0;
 			
 			  timer_fan_flag=0;
-               gctl_t.fan_stop_flag = 1;
+      
 			   FAN_Stop();
 			   gpro_t.fan_run_initial_times =0;
 	       }

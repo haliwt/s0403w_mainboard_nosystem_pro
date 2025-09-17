@@ -116,7 +116,7 @@ static void vTaskMsgPro(void *pvParameters)
                   // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
                     usart1_protocol_state_machine();
 				 	//vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
-	       			//taskYIELD();  // ??????
+	       			///taskYIELD();  // ??????
 	    			//vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
 
                   
@@ -157,7 +157,19 @@ static void vTaskStart(void *pvParameters)
             power_on_handler();
            
             link_wifi_to_tencent_handler(gpro_t.wifi_led_fast_blink_flag); //detected ADC of value 
-        
+
+		   if(gctl_t.mode_ai_switch_flag == 1){
+                 gctl_t.mode_ai_switch_flag=0;
+             if(wifi_link_net_state()==1 && gctl_t.gModel ==1){
+                MqttData_Publish_SetState(1);
+    	        //vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+             }
+			 else if(wifi_link_net_state()==1 && gctl_t.gModel ==2){
+                MqttData_Publish_SetState(2);
+    	        //vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+             }
+		   	}
+		   
 		    if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
 
 				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28

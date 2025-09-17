@@ -209,7 +209,7 @@ void wifi_auto_detected_link_state(void)
          
 
           SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-          vTaskDelay(pdMS_TO_TICKS(10));
+          vTaskDelay(pdMS_TO_TICKS(5));
    }
    
    if(gpro_t.gTimer_power_on_auto_link  > 6 && link_counter_times < 3){
