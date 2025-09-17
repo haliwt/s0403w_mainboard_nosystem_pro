@@ -146,6 +146,7 @@ static void property_report_state(void)
 	//at_send_data((uint8_t *)message, message_len);
 	//osDelay(200);
 	USART2_DMA_Send((uint8_t *)message, message_len);
+	vTaskDelay(pdMS_TO_TICKS(200));
    
 }
 

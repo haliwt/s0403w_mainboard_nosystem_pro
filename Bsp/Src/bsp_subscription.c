@@ -543,7 +543,7 @@ void Json_Parse_Command_Fun(void)
 			vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(100);//osDelay(100);//HAL_Delay(100);
 
 	        Publish_Data_ToTencent_Initial_Data();
-		    vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
+		    //vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
 
 			gctl_t.ptc_warning =0;
 			
@@ -568,7 +568,7 @@ void Json_Parse_Command_Fun(void)
 
              if(wifi_link_net_state()==1){  //WT.EDIT 2025.03.27
 		 	MqttData_Publish_SetOpen(0);  
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
+			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
 
             gpro_t.gpower_on = power_off;
             powerOffTunrOff_flag=1; //WT.EDIT 2025.01.04
@@ -591,7 +591,7 @@ void Json_Parse_Command_Fun(void)
 	  if(gpro_t.gpower_on ==power_on){
 	    if(gctl_t.ptc_warning ==0){
          MqttData_Publish_SetPtc(0x01);
-	  	  vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(5);//osDelay(100);//HAL_Delay(350);
+	  	 // vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(5);//osDelay(100);//HAL_Delay(350);
 
         // if(gpro_t.stopTwoHours_flag ==0){
 	      gctl_t.gDry=1;
@@ -612,7 +612,7 @@ void Json_Parse_Command_Fun(void)
 	  	if(gpro_t.gpower_on ==power_on){
 	
          MqttData_Publish_SetPtc(0);
-		 vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+		 //vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 	     gctl_t.gDry=0;
          gctl_t.gTimer_senddata_panel=8;
 		
@@ -629,7 +629,7 @@ void Json_Parse_Command_Fun(void)
 	  	if(gpro_t.gpower_on ==power_on){
 			
             MqttData_Publish_SetPlasma(0);
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
              gctl_t.gPlasma=0;
 			gctl_t.gTimer_senddata_panel=8;
 			SendWifiData_To_Cmd(0x03,0x0);
@@ -643,7 +643,7 @@ void Json_Parse_Command_Fun(void)
 	  case ANION_ON_ITEM: //plasma 
 	  	if(gpro_t.gpower_on ==power_on){
             MqttData_Publish_SetPlasma(1);
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 		
               gctl_t.gPlasma=1;
               gctl_t.gTimer_senddata_panel=8;
@@ -660,7 +660,7 @@ void Json_Parse_Command_Fun(void)
         if(gpro_t.gpower_on ==power_on){
 
             MqttData_Publish_SetUltrasonic(0);
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);	//HAL_Delay(350);
+			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);	//HAL_Delay(350);
 			
               gctl_t.gUlransonic=0;
              gctl_t.gTimer_senddata_panel=8; 
@@ -676,7 +676,7 @@ void Json_Parse_Command_Fun(void)
 	    if(gpro_t.gpower_on ==power_on){
 		
              MqttData_Publish_SetUltrasonic(1);
-			 vTaskDelay(pdMS_TO_TICKS(200));osDelay(100);	//HAL_Delay(350);
+			// vTaskDelay(pdMS_TO_TICKS(200));osDelay(100);	//HAL_Delay(350);
 
          
                 gctl_t.gUlransonic=1;
@@ -697,7 +697,7 @@ void Json_Parse_Command_Fun(void)
       
             gctl_t.gModel=2;
              MqttData_Publish_SetState(2);
-    	     vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+    	     //vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
              
     	    SendWifiData_To_Cmd(0x27,0x02);
 		   vTaskDelay(pdMS_TO_TICKS(10));
@@ -714,7 +714,7 @@ void Json_Parse_Command_Fun(void)
 		
               gctl_t.gModel=1;
               MqttData_Publish_SetState(1);
-    		  vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+    		 // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
             
     		   SendWifiData_To_Cmd(0x27,0x01);
                vTaskDelay(pdMS_TO_TICKS(10));
@@ -735,7 +735,7 @@ void Json_Parse_Command_Fun(void)
             if( gctl_t.set_temperature_value > 40)  gctl_t.set_temperature_value=40;
             if( gctl_t.set_temperature_value <20 )  gctl_t.set_temperature_value=20;
             MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 			SendWifiData_To_Data(0x3A, gctl_t.set_temperature_value); //smart phone set temperature value .
 			vTaskDelay(pdMS_TO_TICKS(10));//osDelay(10);//HAL_Delay(10);
           
@@ -760,7 +760,7 @@ void Json_Parse_Command_Fun(void)
 			
          
 			MqttData_Publis_SetFan(gctl_t.set_wind_speed_value);
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
     		SendWifiData_To_PanelWindSpeed(gctl_t.set_wind_speed_value);
 			vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(10);
           
@@ -769,7 +769,7 @@ void Json_Parse_Command_Fun(void)
 				gctl_t.set_wind_speed_value=0;
 
 			    MqttData_Publis_SetFan(gctl_t.set_wind_speed_value);
-				vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+				//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 
 
 			}
@@ -792,7 +792,7 @@ void Json_Parse_Command_Fun(void)
               powerOffFanRun_flag = 1;
 		
 			   MqttData_Publish_SetOpen(1);  
-			   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			  // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 
               
 		
@@ -815,7 +815,7 @@ void Json_Parse_Command_Fun(void)
 		   
 			  
 		 	MqttData_Publish_SetOpen(0);  
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
+			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
 
             gpro_t.gpower_on = power_off;
             powerOffTunrOff_flag=1; //WT.EDIT 2025.01.04
@@ -849,16 +849,7 @@ void Json_Parse_Command_Fun(void)
 			buzzer_temp_on++;
    	        buzzer_sound();
         }
-         
-		
-
-//		for(i=0;i<20;i++){
-//		   gpro_t.wifi_rx_data_array[i]=0;
-//		   
-//
-//        }
-
-         memset(gpro_t.wifi_rx_data_array,'\0',20);
+        memset(gpro_t.wifi_rx_data_array,0,20);
       
 		gctl_t.response_wifi_signal_label=0xf0;
 	}

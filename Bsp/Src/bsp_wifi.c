@@ -169,7 +169,7 @@ void link_wifi_net_handler(void)
 
             case 7:
 
-            if( gpro_t.gTimer_link_net_timer_time  > 10){
+            if( gpro_t.gTimer_link_net_timer_time  > 7){
 
              if(net_t.wifi_link_net_success==1){
 			
