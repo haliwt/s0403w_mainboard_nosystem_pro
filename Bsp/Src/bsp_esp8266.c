@@ -66,8 +66,10 @@ void InitWifiModule(void)
 			//WIFI_IC_ENABLE();
 	
 	
-			at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
-			 vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+			//at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
+
+	     USART2_DMA_Send((uint8_t*)"AT+RST\r\n", strlen("AT+RST\r\n"));
+		 vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
 	}
 		
 }
@@ -117,10 +119,11 @@ void ReConnect_Wifi_Net_ATReset_Hardware(void)
 ****************************************************************************************************/
 void Wifi_SoftAP_Config_Handler(void)
 {
-     uint8_t *device_massage;
+   #if 0
+    // uint8_t *device_massage;
     
-
-    device_massage = (uint8_t *)malloc(128);
+    static uint8_t device_massage=[128];
+   // device_massage = (uint8_t *)malloc(128);
 
 
    switch (gctl_t.wifi_config_net_lable)
@@ -137,7 +140,8 @@ void Wifi_SoftAP_Config_Handler(void)
 	 case wifi_set_cwmode:
     	   // WIFI_IC_ENABLE();
          	//HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
-         	at_send_data("AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
+         	//at_send_data("AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
+		   USART2_DMA_Send((uint8_t*)"AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
         	 vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
            
 			gctl_t.wifi_config_net_lable =wifi_set_softap;
@@ -223,6 +227,65 @@ void Wifi_SoftAP_Config_Handler(void)
 	 }
 
   free(device_massage);
+   #endif 
+
+   
+	static uint8_t device_massage[128];  // 静态分配，避免 malloc/free
+	
+		switch (gctl_t.wifi_config_net_lable)
+		{
+			case wifi_set_restor:
+				ReConnect_Wifi_Net_ATReset_Hardware();
+				vTaskDelay(pdMS_TO_TICKS(1000));
+				gctl_t.wifi_config_net_lable = wifi_set_cwmode;
+				break;
+	
+			case wifi_set_cwmode:
+				USART2_DMA_Send((uint8_t *)"AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
+				vTaskDelay(pdMS_TO_TICKS(1000));
+				gctl_t.wifi_config_net_lable = wifi_set_softap;
+				gctl_t.randomName[0] = HAL_GetUIDw0();
+				break;
+	
+			case wifi_set_softap:
+				sprintf((char *)device_massage,
+						"AT+TCPRDINFOSET=1,\"%s\",\"%s\",\"UYIJIA01-%d\"\r\n",
+						PRODUCT_ID, DEVICE_SECRET, gctl_t.randomName[0]);
+				USART2_DMA_Send(device_massage, strlen((const char *)device_massage));
+				vTaskDelay(pdMS_TO_TICKS(1000));
+				osDelay(4000);
+				gctl_t.wifi_config_net_lable = wifi_set_tcdevreg;
+				break;
+	
+			case wifi_set_tcdevreg:
+				USART2_DMA_Send((uint8_t *)"AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"));
+				vTaskDelay(pdMS_TO_TICKS(1000));
+				osDelay(2000);
+				gctl_t.wifi_config_net_lable = wifi_set_tcsap;
+				break;
+	
+			case wifi_set_tcsap:
+				osDelay(6000);
+				net_t.linking_tencent_cloud_doing = 1;
+				wifi_t.soft_ap_config_flag = 1;
+				sprintf((char *)device_massage, "AT+TCSAP=\"UYIJIA01-%d\"\r\n", gctl_t.randomName[0]);
+				USART2_DMA_Send(device_massage, strlen((const char *)device_massage));
+				vTaskDelay(pdMS_TO_TICKS(4000));
+				gctl_t.wifi_config_net_lable = 0xff;
+				break;
+	
+			case wifi_inquire_register_codes:
+				wifi_t.gTimer_get_beijing_time = 0;
+				osDelay(3000);
+				if (net_t.soft_ap_config_success == 0)
+				{
+					USART2_DMA_Send((uint8_t *)"AT+TCPRDINFOSET?\r\n", strlen("AT+TCPRDINFOSET?\r\n"));
+					vTaskDelay(pdMS_TO_TICKS(1000));
+					gctl_t.wifi_config_net_lable = 0xff;
+				}
+				break;
+		
+	}
 }
 
 /****************************************************************************************************
