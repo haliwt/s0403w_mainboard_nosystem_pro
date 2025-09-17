@@ -22,9 +22,21 @@ uint8_t usart2_flag;
  */
 uint8_t at_send_data(uint8_t* pdata, uint16_t len)
 {
+    uint8_t i ;
+    //USART2_DAM_Send(pdata,len);
+	//LL_USART_TransmitData8(USART2,&pdata);
+	for ( i = 0; i < len; i++)
+    {
+        // 等待发送缓冲区为空
+        while (!LL_USART_IsActiveFlag_TXE(USART2));
+        
+        // 发送一个字节
+        LL_USART_TransmitData8(USART2, pdata[i]);
+    }
 
-    USART2_DAM_Send(pdata,len);
-	 //LL_USART_TransmitData8(USART2, pdata);
+    // 等待发送完成
+    while (!LL_USART_IsActiveFlag_TC(USART2));
+	return len;
 //	if(HAL_OK == HAL_UART_Transmit(&huart2, pdata, len, 10000))
 //	{
 //		return len;
