@@ -244,7 +244,7 @@ static void Auto_InitWifiModule_Hardware(void)
        gpro_t.wifi_rx_data_counter=0;
        net_t.linking_tencent_cloud_doing = 1;
 	   //at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n")); //
-	   at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
+	   at_send_data((const uint8_t *)"AT+RST\r\n", strlen("AT+RST\r\n"));
 	   vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
 
 	}
@@ -270,7 +270,8 @@ static void Auto_SmartPhone_TryToLink_TencentCloud(void)
 	   gpro_t.gTimer_power_on_first_link_tencent=0;
        power_on_login_tencent_cloud_flag++;
       // HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//??
-       vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+       at_send_data((const uint8_t *)"AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
+	   vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
 	  
 	}
    
