@@ -20,7 +20,7 @@ uint8_t usart2_flag;
  *return: the len of data send success
  * @brief hal api for at data send
  */
-uint8_t at_send_data(uint8_t* pdata, uint16_t len)
+uint8_t at_send_data(const uint8_t* pdata, uint16_t len)
 {
     uint8_t i ;
     //USART2_DAM_Send(pdata,len);
@@ -78,7 +78,9 @@ void InitWifiModule_Hardware(void)
 	//HAL_Delay(1000);
 	//WIFI_IC_ENABLE();
 	at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
-	 vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+	vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	vTaskDelay(pdMS_TO_TICKS(1000));
 			//at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
 		
 }
@@ -94,7 +96,7 @@ void ReConnect_Wifi_Net_ATReset_Hardware(void)
 		//WIFI_IC_ENABLE();
 		//at_send_data("AT+RESTORE\r\n", strlen("AT+RESTORE\r\n"));
 		at_send_data("AT+RST\r\n", strlen("AT+RST\r\n"));
-		 vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+		 vTaskDelay(pdMS_TO_TICKS(3000));//HAL_Delay(1000);
        // HAL_Delay(1000);
 		//osDelay(1000);
         ///osDelay(1000);
@@ -135,12 +137,9 @@ void Wifi_SoftAP_Config_Handler(void)
 	 case wifi_set_cwmode:
     	   // WIFI_IC_ENABLE();
          	//HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
+         	at_send_data("AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
         	 vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
            
-			//HAL_Delay(1000);
-           // osDelay(1000);
-           /// osDelay(1000);
-			//HAL_UART_Transmit(&huart2, "AT+CIPMUX=1\r\n", strlen("AT+CIPMUX=1\r\n"), 5000);
 			gctl_t.wifi_config_net_lable =wifi_set_softap;
 			gctl_t.randomName[0]=HAL_GetUIDw0();
 		
@@ -151,16 +150,14 @@ void Wifi_SoftAP_Config_Handler(void)
            // WIFI_IC_ENABLE();
 			
             sprintf((char *)device_massage, "AT+TCPRDINFOSET=1,\"%s\",\"%s\",\"UYIJIA01-%d\"\r\n", PRODUCT_ID, DEVICE_SECRET,gctl_t.randomName[0]);
-			usart2_flag = at_send_data(device_massage, strlen((const char *)device_massage));
+			at_send_data(device_massage, strlen((const char *)device_massage));
 	  		 vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
         
-           // HAL_Delay(1000);
-     
-			//HAL_Delay(1000);
+           
 			osDelay(1000);
             osDelay(1000);
-       osDelay(1000);
-           osDelay(1000);
+            osDelay(1000);
+            osDelay(1000);
          
 	        
 			gctl_t.wifi_config_net_lable=wifi_set_tcdevreg;
@@ -170,12 +167,9 @@ void Wifi_SoftAP_Config_Handler(void)
 
 	 case wifi_set_tcdevreg://dynamic register
 		// HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //Âä®Ê?ÅÊ≥®ÂÜ? 
+		  at_send_data("AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"));
 	       vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
-      
-
-	    
-   
-		osDelay(1000);
+       osDelay(1000);
         osDelay(1000);
 
 	  
@@ -186,32 +180,27 @@ void Wifi_SoftAP_Config_Handler(void)
 
 	 case wifi_set_tcsap:
 	 
-          //  HAL_Delay(1000);
-          
-		  // HAL_Delay(1000);
-    //
-			//HAL_Delay(1000);
-      
-		    ///HAL_Delay(1000);
-          osDelay(1000);
-           osDelay(1000);
-      osDelay(1000);
-           osDelay(1000);
-      osDelay(1000);
-           osDelay(1000);
+ 
+			osDelay(1000);
+			osDelay(1000);
+			osDelay(1000);
+			osDelay(1000);
+			osDelay(1000);
+			osDelay(1000);
 		  
          
             net_t.linking_tencent_cloud_doing =1;
             wifi_t.soft_ap_config_flag =1; //WE.EIDT 
 	        sprintf((char *)device_massage, "AT+TCSAP=\"UYIJIA01-%d\"\r\n",gctl_t.randomName[0]);
-            usart2_flag = at_send_data(device_massage, strlen((const char *)device_massage));
+            at_send_data(device_massage, strlen((const char *)device_massage));
 		
-            vTaskDelay(pdMS_TO_TICKS(4000));
-            //vTaskDelay(pdMS_TO_TICKS(2000));//HAL_Delay(1000);
-            //vTaskDelay(pdMS_TO_TICKS(5));//HAL_Delay(1000);
+            vTaskDelay(pdMS_TO_TICKS(2000));
+
+			vTaskDelay(pdMS_TO_TICKS(2000));
+         
          
 			gctl_t.wifi_config_net_lable=0xff;//
-		  //   gctl_t.wifi_config_net_lable=wifi_inquire_register_codes;
+		
 	break;
           
 	case wifi_inquire_register_codes: //0x06//WT.EDIT 2024.07.22
@@ -225,7 +214,8 @@ void Wifi_SoftAP_Config_Handler(void)
          
 		// net_t.wifi_uart_counter=0;
   //      HAL_UART_Transmit(&huart2, "AT+TCPRDINFOSET?\r\n", strlen("AT+TCPRDINFOSET?\r\n"), 0xffff); //Âä?
-         vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+        at_send_data("AT+TCPRDINFOSET?\r\n", strlen("AT+TCPRDINFOSET?\r\n"));
+		vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
         gctl_t.wifi_config_net_lable=0xff;//
 
         }
@@ -250,7 +240,9 @@ void SmartPhone_LinkTencent_Cloud(void)
 
        net_t.soft_ap_config_success=0;
 	 //  HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//Âº?ÂßãËøûÊé?
-        vTaskDelay(pdMS_TO_TICKS(2000));//HAL_Delay(1000);
+         at_send_data("AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
+	     vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+         vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
        //HAL_Delay(1000);
        ///HAL_Delay(1000);
        
@@ -267,20 +259,24 @@ void wifi_Disconnect_Fun(void)
 {
 
 //  HAL_UART_Transmit(&huart2, "AT+TCMQTTDISCONN\r\n", strlen("AT+TCMQTTDISCONN\r\n"), 5000);//Âº?ÂßãËøûÊé?
-
+    at_send_data("AT+TCMQTTDISCONN\r\n", strlen("AT+TCMQTTDISCONN\r\n"));
 }
 
 void Get_BeiJing_Time_Cmd(void)
 {
 
  // HAL_UART_Transmit(&huart2, "AT+CIPSNTPCFG=1,8,\"cn.ntp.org.cn\",\"ntp.sjtu.edu.cn\"\r\n", strlen("AT+CIPSNTPCFG=1,800,\"cn.ntp.org.cn\",\"ntp.sjtu.edu.cn\"\r\n"), 5000);//Âº?ÂßãËøûÊé?
+ // at_send_data("AT+CIPSNTPCFG=1,8,\"cn.ntp.org.cn\",\"ntp.sjtu.edu.cn\"\r\n", strlen("AT+CIPSNTPCFG=1,800,\"cn.ntp.org.cn\",\"ntp.sjtu.edu.cn\"\r\n"));
 //   HAL_UART_Transmit(&huart2, "AT+CIPSNTPCFG=1,8\r\n", strlen("AT+CIPSNTPCFG=1,8\r\n"), 0xffff);//Âº?
+	at_send_data("AT+CIPSNTPCFG=1,8\r\n", strlen("AT+CIPSNTPCFG=1,8\r\n"));
+
 }
 
 void Get_Beijing_Time(void)
 {
 
 //   HAL_UART_Transmit(&huart2, "AT+CIPSNTPTIME?\r\n", strlen("AT+CIPSNTPTIME?\r\n"), 0xffff);//Âº?ÂßãËøûÊé?
+     at_send_data("AT+CIPSNTPTIME?\r\n", strlen("AT+CIPSNTPTIME?\r\n"));
 
 
 }
@@ -309,11 +305,10 @@ void PowerOn_Self_Auto_Link_Tencent_Cloud(void)
 	 case wifi_set_cwmode:
     	   // WIFI_IC_ENABLE();
 //         	HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
-     
-           vTaskDelay(pdMS_TO_TICKS(2000));// HAL_Delay(1000);
-		  //HAL_Delay(1000);
-			//HAL_UART_Transmit(&huart2, "AT+CIPMUX=1\r\n", strlen("AT+CIPMUX=1\r\n"), 5000);
-		//	auto_link_cloud_flag =wifi_set_softap;
+           at_send_data("AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
+           vTaskDelay(pdMS_TO_TICKS(1000));// HAL_Delay(1000);
+           vTaskDelay(pdMS_TO_TICKS(1000));
+		
 			gctl_t.randomName[0]=HAL_GetUIDw0();
 		
 
@@ -333,11 +328,11 @@ void SmartPhone_TryToLink_TencentCloud(void)
     gpro_t.wifi_rx_data_counter=0;
 	wifi_t.soft_ap_config_flag =0;
 //    HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//Âº?ÂßãËøûÊé?
-
-	//HAL_Delay(1000);
-   // HAL_Delay(1000);
-	//HAL_Delay(1000);
-	vTaskDelay(pdMS_TO_TICKS(3000));
+    at_send_data("AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
+	
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	vTaskDelay(pdMS_TO_TICKS(1000));
 	   
 }
 
@@ -345,6 +340,7 @@ void SmartPhone_TryToLink_TencentCloud(void)
 void Reconnection_Wifi_Order(void)
 {
 //	HAL_UART_Transmit(&huart2, "AT+TCMQTTSTATE?\r\n", strlen("AT+TCMQTTSTATE?\r\n"), 0xffff);
+    at_send_data("AT+TCMQTTSTATE?\r\n", strlen("AT+TCMQTTSTATE?\r\n"));
     vTaskDelay(pdMS_TO_TICKS(2000));//HAL_Delay(200);
     
   
