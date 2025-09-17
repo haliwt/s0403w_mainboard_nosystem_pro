@@ -65,9 +65,8 @@ void link_wifi_net_handler(void)
           
         		at_send_data((const uint8_t *)"AT+RST\r\n", strlen("AT+RST\r\n"));
         
-        		vTaskDelay(pdMS_TO_TICKS(1000));//osDelay(1000);
-        		vTaskDelay(pdMS_TO_TICKS(1000));//osDelay(1000);
-                vTaskDelay(pdMS_TO_TICKS(1000));//osDelay(1000);
+        		vTaskDelay(pdMS_TO_TICKS(3000));//osDelay(1000);
+        		
               gpro_t.link_net_step = 1;
 
             break;
@@ -157,10 +156,7 @@ void link_wifi_net_handler(void)
  //           HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//å¼?å§‹è¿žæŽ?
             at_send_data((const uint8_t *)"AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
 			vTaskDelay(pdMS_TO_TICKS(1000));
-			vTaskDelay(pdMS_TO_TICKS(1000));
-
-            vTaskDelay(pdMS_TO_TICKS(1000));
-            gpro_t.link_net_step = 7;
+	         gpro_t.link_net_step = 7;
             gpro_t.gTimer_link_net_timer_time = 0;
             }
 
@@ -203,7 +199,7 @@ void link_wifi_net_handler(void)
 			 
 				MqttData_Publish_SetOpen(0x01);
 		      
-		       vTaskDelay(pdMS_TO_TICKS(300));
+		       vTaskDelay(pdMS_TO_TICKS(100));
 		        
 				 
 			  gpro_t.link_net_step = 9; // this is flag: link wifi times 119s is over.
@@ -221,7 +217,7 @@ void link_wifi_net_handler(void)
 
 				Subscriber_Data_FromCloud_Handler();
 		
-	             vTaskDelay(pdMS_TO_TICKS(300));
+	             vTaskDelay(pdMS_TO_TICKS(100));
 
 			 gpro_t.link_net_step = 0xfe;
 
