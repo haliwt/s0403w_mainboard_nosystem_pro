@@ -73,7 +73,8 @@ void link_wifi_net_handler(void)
 
             case 1:
                // WIFI_IC_ENABLE();
-   //             HAL_UART_Transmit(&huart2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"), 5000);
+               //LL_USART_TransmitData8(USART2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
+               at_send_data("AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
                 vTaskDelay(pdMS_TO_TICKS(1000));
                 gctl_t.randomName[0]=HAL_GetUIDw0();
 			          vTaskDelay(pdMS_TO_TICKS(1000));
@@ -109,7 +110,10 @@ void link_wifi_net_handler(void)
            // WIFI_IC_ENABLE();
 			
 //                 HAL_UART_Transmit(&huart2, "AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"), 0xffff); //Âä®Ê?ÅÊ≥®ÂÜ? 
-	  		         vTaskDelay(pdMS_TO_TICKS(1000));
+
+				at_send_data("AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"));
+
+			    vTaskDelay(pdMS_TO_TICKS(1000));
         
                   gpro_t.link_net_step = 4;
             }
@@ -150,7 +154,8 @@ void link_wifi_net_handler(void)
 
             net_t.soft_ap_config_success=0;
  //           HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//Âº?ÂßãËøûÊé?
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            at_send_data("AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
+			vTaskDelay(pdMS_TO_TICKS(1000));
 
             vTaskDelay(pdMS_TO_TICKS(1000));
             gpro_t.link_net_step = 7;
