@@ -173,12 +173,11 @@ static void vTaskStart(void *pvParameters)
 
             case power_off:
               gpro_t.process_run_step=0;
-              //gl_tMsg.link_wifi_net_flag=0;
               power_off_handler();
              break;
           }
 
-          if(gpro_t.process_run_step > 9){
+          if(gpro_t.process_run_step > 10){
 
 		      gpro_t.process_run_step=6;
 
@@ -194,7 +193,6 @@ static void vTaskStart(void *pvParameters)
              wifi_auto_detected_link_state();
            }
 		  
-		  // printf("vTaskStart run !!!\r\n");
 		
 		  vTaskDelay(pdMS_TO_TICKS(10));//ï¿?1ï¿?7?0
 

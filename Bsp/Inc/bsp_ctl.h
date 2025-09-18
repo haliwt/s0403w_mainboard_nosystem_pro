@@ -78,21 +78,14 @@ typedef struct _RUN_T{
 	uint8_t gDht11_temperature;
     uint8_t set_temperature_flag;
    
-
-   
-	//uint8_t gTimer_usart_error;
-    //app timer
-	//uint8_t app_timer_power_on_ref;
-	uint8_t app_timer_power_on_flag ;
-
+   uint8_t app_timer_power_on_flag ;
 
    uint8_t response_wifi_signal_label;
-
+   uint8_t ptc_on_off_flag ;
+   uint8_t set_temp_first_closeptc ;
 
  //fan:
-	uint8_t gFan_pwm_duty_level;
-
-	uint8_t gTimer_fan_run_one_minute;
+    
 	uint8_t  gFan;
     //ptc:
    
@@ -126,14 +119,17 @@ typedef struct _RUN_T{
 	  //ADC
 	  uint8_t ptc_warning;
 
+
+	  
+      //timer ref 
 	  uint8_t gTimer_fan_adc_times;
 	  uint8_t gTimer_ptc_adc_times;
-     // uint8_t fan_warning;
+   
 	
 
 	 uint8_t gTimer_senddata_panel;
 	
-	
+	 uint8_t gTimer_fan_run_one_minute;
      uint8_t gTimer_read_dht11_counter;
 	 uint8_t gTimer_linkTencentCounter;
 	 
@@ -145,9 +141,6 @@ typedef struct _RUN_T{
 	uint32_t randomName[1];
 	
 
-	
-
-	
 }_run_t;
 
 //#define CProcessInit(me_) ((me_)->cmdCtr__ =0,(me_)->state__ = IDLE)
@@ -162,7 +155,7 @@ extern uint8_t powerOffTunrOff_flag;
 void copy_cmd_notice_hanlder(void);
 
 
-void main_function_detected_handler(uint8_t cmd);
+//void main_function_detected_handler(uint8_t cmd);
 
 
 void set_temperature_compare_value_fun(void);

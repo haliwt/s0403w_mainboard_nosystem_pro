@@ -380,7 +380,7 @@ void usart1_protocol_state_machine(void)
 	 // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
           //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
             //gl_tMsg.copy_cmd_flag ++;
-	        //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
+	        memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
 			receive_cmd_or_notice_handler();
 	       
 
@@ -593,6 +593,7 @@ static void receive_cmd_or_notice_handler(void)
         gctl_t.set_temperature_flag = 1; 
         gctl_t.rx_set_temp_flag=1; 
        gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
+	   gctl_t.ptc_on_off_flag =0;
        set_temperature_compare_value_fun();
            if(wifi_link_net_state()==1){
              MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
