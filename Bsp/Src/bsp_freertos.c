@@ -158,17 +158,7 @@ static void vTaskStart(void *pvParameters)
            
             link_wifi_to_tencent_handler(gpro_t.wifi_led_fast_blink_flag); //detected ADC of value 
 
-		   if(gctl_t.mode_ai_switch_flag == 1){
-                 gctl_t.mode_ai_switch_flag=0;
-             if(wifi_link_net_state()==1 && gctl_t.gModel ==1){
-                MqttData_Publish_SetState(1);
-    	        //vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-             }
-			 else if(wifi_link_net_state()==1 && gctl_t.gModel ==2){
-                MqttData_Publish_SetState(2);
-    	        //vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-             }
-		   	}
+		    ai_mode_display_fun();
 		   
 		    if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
 

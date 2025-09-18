@@ -193,3 +193,19 @@ void copy_cmd_notice_hanlder(void)
 
 }
 
+void ai_mode_display_fun(void)
+{
+	if(gctl_t.mode_ai_switch_flag == 1 && wifi_link_net_state()==1){
+	gctl_t.mode_ai_switch_flag=0;
+	if(gctl_t.gModel ==1){
+	MqttData_Publish_SetState(1);
+	//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+	}
+	else if(gctl_t.gModel ==2){
+	MqttData_Publish_SetState(2);
+	//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+	}
+	}
+
+}
+

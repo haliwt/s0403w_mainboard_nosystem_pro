@@ -128,7 +128,6 @@ volatile uint8_t rx_data_counter=0;
 	*Return Ref:NO
 	*
 *******************************************************************************/
-
 void usart1_isr_callback_handler(void)
 {
        
@@ -165,6 +164,8 @@ void usart1_isr_callback_handler(void)
 			 else{
 			    rx_state =0;
 			    rx_data_counter=0;
+			    gl_tMsg.usData[0]=0;
+			    gl_tMsg.usData[1]=0;
             }
 
 		  break;
@@ -208,6 +209,7 @@ void usart1_isr_callback_handler(void)
 			  	 gl_tMsg.execuite_cmd_notice=gl_tMsg.usData[rx_data_counter];
 				  rx_data_counter++;
 				  rx_state =4;
+				 
 
 			  	}
 
@@ -241,8 +243,11 @@ void usart1_isr_callback_handler(void)
 			  else{
 			  	rx_state =0;
 			    rx_data_counter=0;
-            
-			  
+                 gl_tMsg.usData[0]=0;
+				 gl_tMsg.usData[1]=0;
+				 gl_tMsg.usData[2]=0;
+				 gl_tMsg.usData[3]=0;
+				 gl_tMsg.usData[4]=0;
 			  }
 
 		  break;
@@ -260,6 +265,11 @@ void usart1_isr_callback_handler(void)
 			  else{
 			  	rx_state =0;
 			    rx_data_counter=0;
+			     gl_tMsg.usData[0]=0;
+				 gl_tMsg.usData[1]=0;
+				 gl_tMsg.usData[2]=0;
+				 gl_tMsg.usData[3]=0;
+				 gl_tMsg.usData[4]=0;
 			  
 			  }
 
@@ -270,20 +280,28 @@ void usart1_isr_callback_handler(void)
 			  
 		  	 gl_tMsg.usData[rx_data_counter]=data;
 			 gl_tMsg.bcc_check_code=gl_tMsg.usData[rx_data_counter];
-		     gl_tMsg.total_data_length = rx_data_counter;
+		     gl_tMsg.total_data_length = rx_data_counter+1;
 			// memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
           
 			
 			
-			gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
-	        if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
+			//gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, (gl_tMsg.total_data_length-1));
+	        //if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
 			 rx_data_counter=0;
 		     rx_state = 0;
+			gl_tMsg.usData[0]=0;
+			gl_tMsg.usData[1]=0;
+	         gl_tMsg.usData[6]=0;
 			 freertos_decoder_isr_handler();
+			
 
-	        }
-			 rx_data_counter=0;
-		     rx_state = 0;
+	       // }
+//			else{
+//			 rx_data_counter=0;
+//		     rx_state = 0;
+//		      memcpy(gl_tMsg.desData,gl_tMsg.usData,gl_tMsg.total_data_length);
+//
+//			}
 
 
 		  break;
@@ -303,6 +321,11 @@ void usart1_isr_callback_handler(void)
 			  	
 				 rx_data_counter =0;
 		         rx_state =0;
+				 gl_tMsg.usData[0]=0;
+				 gl_tMsg.usData[1]=0;
+				 gl_tMsg.usData[2]=0;
+				 gl_tMsg.usData[3]=0;
+				 gl_tMsg.usData[4]=0;
 
 			  	}
 
@@ -339,7 +362,14 @@ void usart1_isr_callback_handler(void)
 
 
 }
-
+/********************************************************************************
+	**
+	*Function Name:void usart1_protocol_state_machine(void)
+	*Function :  in process bsp_freertos.c xTaskMsgPro
+	*Input Ref:NO
+	*Return Ref:NO
+	*
+*******************************************************************************/
 void usart1_protocol_state_machine(void)
 {
 
@@ -349,8 +379,8 @@ void usart1_protocol_state_machine(void)
      // gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
 	 // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
           //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
-            gl_tMsg.copy_cmd_flag ++;
-	        memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
+            //gl_tMsg.copy_cmd_flag ++;
+	        //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
 			receive_cmd_or_notice_handler();
 	       
 
@@ -526,6 +556,27 @@ static void receive_cmd_or_notice_handler(void)
 		  //vTaskDelay(pdMS_TO_TICKS(5));
      break;
 
+	 case 0x07: //AI command
+	  if(gl_tMsg.execuite_cmd_notice == 0x02){
+	       buzzer_sound();
+		
+          gctl_t.gModel=2;
+          gctl_t.mode_ai_switch_flag =1;
+        
+          
+       }
+       else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
+       
+	
+         buzzer_sound();
+         gctl_t.gModel=1;
+	     gctl_t.mode_ai_switch_flag =1;
+		 
+       }
+
+
+	 break;
+
      case 0x16 : //buzzer sound command with answer .
 
         buzzer_sound();
@@ -581,46 +632,23 @@ static void receive_cmd_or_notice_handler(void)
      case 0x27:
 
       if(gl_tMsg.execuite_cmd_notice == 0x02){
-	  	gl_tMsg.execuite_cmd_notice=0;
-		  gl_tMsg.cmd_notice=0;
-		    gl_tMsg.usData[0]=0;
-		   gl_tMsg.usData[1]=0;
-		 if(gctl_t.mode_ai_switch_flag ==0){
-		 	gctl_t.mode_ai_switch_flag ++;
-         buzzer_sound();
-		 vTaskDelay(200);
+	 
          gctl_t.gModel=2;
-		  
-		 }
-		  printf("mode_short_key-2 !!!\r\n");
-		
-         //SendWifiData_Answer_Cmd(0x27,0x02); //don't AI mode,   WT.EDIT 2025.01.06
-//          if(wifi_link_net_state()==1){
-//            MqttData_Publish_SetState(2);
-//	       // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-//           }
+		  gctl_t.mode_ai_switch_flag =1;
+		 
+		 
         
           
        }
        else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
-        gl_tMsg.execuite_cmd_notice=0;
-		   gl_tMsg.cmd_notice=0;
-		   gl_tMsg.usData[0]=0;
-		   gl_tMsg.usData[1]=0;
-		 if(gctl_t.mode_ai_switch_flag ==0){
-		 	  gctl_t.mode_ai_switch_flag++;
-         buzzer_sound();
-		 vTaskDelay(200);
+
+	
+  
          gctl_t.gModel=1;
-	   
-		 }
-		 printf("mode_short_key-1 !!!\r\n");
+	     gctl_t.mode_ai_switch_flag =1; 
+		 
 		
-        // SendWifiData_Answer_Cmd(0x27,0x01); //AI mode,WT.EDIT 2025.01.06
-//         if(wifi_link_net_state()==1){
-//             MqttData_Publish_SetState(1);
-//    	   //  vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-//         }
+
        }
 
 

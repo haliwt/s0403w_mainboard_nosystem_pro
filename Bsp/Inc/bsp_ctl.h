@@ -167,6 +167,8 @@ void main_function_detected_handler(uint8_t cmd);
 
 void set_temperature_compare_value_fun(void);
 
+void ai_mode_display_fun(void);
+
 
 #endif 
 
