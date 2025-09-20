@@ -76,9 +76,9 @@ void SystemReset(void)
               gctl_t.gDry=0;
 		      if(gctl_t.rx_set_temp_flag ==1){
 				  gctl_t.rx_set_temp_flag++;
-				  gctl_t.set_temp_first_closeptc =0;
+				  gctl_t.set_temp_first_closeptc =1;
 			  }
-              else gctl_t.set_temp_first_closeptc = 1;
+           
 			 
 	           SendData_Set_Command(0x02,0x00); //close ptc 
 	           vTaskDelay(pdMS_TO_TICKS(5));
@@ -91,10 +91,12 @@ void SystemReset(void)
 	          
               PTC_SetHigh();
               gctl_t.gDry=1;//
-	            SendData_Set_Command(0x02,0x01); //open ptc 
-	            vTaskDelay(pdMS_TO_TICKS(5));
-			     gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
-				  gctl_t.gTimer_copy_cmd_counter=0;
+	          SendData_Set_Command(0x02,0x01); //open ptc 
+	          vTaskDelay(pdMS_TO_TICKS(5));
+			  gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
+			  gctl_t.gTimer_copy_cmd_counter=0;
+			  gctl_t.rx_set_temp_flag=1;
+			 
             
 	      }
 		   else if(gctl_t.set_temp_first_closeptc ==1 && (gctl_t.set_temperature_value -3) >= gctl_t.set_temperature_value && gctl_t.ptc_on_off_flag==0){//WT.DEDIT 2028.08.27 modify this flow codes
@@ -156,7 +158,10 @@ void SystemReset(void)
     }
     break;
   }
- 
+  if( gctl_t.set_temp_first_closeptc ==1 && (gctl_t.rx_set_temp_flag==0 || gctl_t.rx_set_temp_flag==1)){
+      gctl_t.set_temp_first_closeptc=0;
+
+  }
 } 
 
 

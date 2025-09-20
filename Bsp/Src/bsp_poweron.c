@@ -31,6 +31,7 @@ void power_on_handler(void)
 		 gctl_t.ptc_on_off_flag =0; //WT.EDIT 2025.09.18
 		 gctl_t.set_temperature_flag=0;
 		  gctl_t.set_temp_first_closeptc =0;
+		  gctl_t.rx_set_temp_flag =0;
 
 		 /*end*/
          

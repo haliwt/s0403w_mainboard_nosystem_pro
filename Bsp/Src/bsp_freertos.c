@@ -187,7 +187,6 @@ static void vTaskStart(void *pvParameters)
 			
 		  }
 		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
-		  	  //  wifi_counter++;
              wifi_communication_tnecent_handler();//
              getBeijingTime_cofirmLinkNetState_handler();
              wifi_auto_detected_link_state();
