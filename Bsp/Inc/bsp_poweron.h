@@ -19,6 +19,11 @@ void every_power_on_run(void);
 
 void twoHours_afterWorks_Handler(void);
 
+void power_off_handler(void);
+
+    
+
+void power_off_action_fun(void);
 
 
 
