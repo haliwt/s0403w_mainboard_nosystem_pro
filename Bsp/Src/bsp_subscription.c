@@ -396,7 +396,7 @@ void clear_rx_copy_data(void)
    #endif 
    if( wifi_t.once_rx_data_done == 1){
       wifi_t.once_rx_data_done ++; //WT.EDIT 2024.08.17
-      memset(gpro_t.wifi_rx_data_array,'\0',150);
+      memset(gpro_t.wifi_rx_data_array,0,150);
     }
 }
 
