@@ -194,7 +194,8 @@ void power_on_handler(void)
      
 	  if( gctl_t.gTimer_read_dht11_counter>1){
 		   gctl_t.gTimer_read_dht11_counter=0;
-          set_temperature_compare_value_fun();
+           set_temperature_compare_value_fun();
+	   
 	  }
 	   gpro_t.process_run_step= 6;	
 
