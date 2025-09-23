@@ -134,6 +134,7 @@ typedef struct _RUN_T{
 	 uint8_t gTimer_linkTencentCounter;
 	 
 	 uint16_t gTimer_copy_cmd_counter;
+	 uint8_t gTimer_wifi_detected_counter;
 	
 
 

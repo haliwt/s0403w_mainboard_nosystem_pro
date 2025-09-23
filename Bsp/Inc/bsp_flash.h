@@ -1,19 +1,17 @@
-#ifndef __BSP_FLASH_H_
-#define __BSP_FLASH_H_
+#ifndef __BSP_FLASH_H
+#define __BSP_FLASH_H
 #include "main.h"
 
-typedef enum{
-   error,
-   success
 
-}flash_state_t;
+void EEPROM_Write(uint16_t virtAddr, uint32_t data);
 
 
-void Flash_Erase_Data(void);
-void Flash_Write_Data(void);
-uint8_t Flash_Read_Data(void);
+
+uint32_t read_flash_value(void);
+
+
+
 
 
 #endif 
-
 

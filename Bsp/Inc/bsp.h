@@ -38,6 +38,8 @@
 #include "bsp_usart_wifi.h"
 #include "bsp_tim.h"
 #include "bsp_dma_usart.h"
+#include "bsp_flash.h"
+
 
 #include "interrupt_manager.h"
 
@@ -73,7 +75,7 @@
 
 
 
-#define Enable_EventRecorder  0
+#define Enable_EventRecorder  1
 
 #define DEBUG_FLAG        Enable_EventRecorder //(Enable_EventRecorder? 1:0)
 

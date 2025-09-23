@@ -174,7 +174,7 @@ void link_wifi_net_handler(void)
 				wifi_t.get_rx_beijing_time_enable=0;
                 
                SendWifiData_To_Data(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-               vTaskDelay(pdMS_TO_TICKS(5));
+               vTaskDelay(pdMS_TO_TICKS(10));
 			    gpro_t.link_net_step = 8;
               
 				
@@ -184,7 +184,7 @@ void link_wifi_net_handler(void)
                   gpro_t.wifi_led_fast_blink_flag=0;
                   gpro_t.link_net_step = 11;
                   SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
-                  vTaskDelay(pdMS_TO_TICKS(5));
+                  vTaskDelay(pdMS_TO_TICKS(10));
            
                 }
                 

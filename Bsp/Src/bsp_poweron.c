@@ -136,7 +136,7 @@ void power_on_handler(void)
         
   case 7: 
 
-   if(gpro_t.wifi_led_fast_blink_flag==0 && wifi_link_net_state() ==1){
+   if(gpro_t.wifi_led_fast_blink_flag==0 && net_t.wifi_link_net_success ==1){
       if( gctl_t.app_timer_power_on_flag==0 && gctl_t.first_link_tencent_cloud_flag ==1){
 	
 		  gctl_t.first_link_tencent_cloud_flag++;
@@ -153,11 +153,20 @@ void power_on_handler(void)
             Subscriber_Data_FromCloud_Handler();
     	  
 	    }
+		
 		 SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-         vTaskDelay(pdMS_TO_TICKS(5));
+         vTaskDelay(pdMS_TO_TICKS(10));
 	
 	  }
-    
+      else if(net_t.wifi_link_net_success ==0 && gctl_t.gTimer_wifi_detected_counter >3){
+	  	 gctl_t.gTimer_wifi_detected_counter=0;
+
+	       SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
+		    vTaskDelay(pdMS_TO_TICKS(10));
+			printf("wifi is not !!!\r\n");
+		    
+
+	  }
       
 	 gpro_t.process_run_step=8 ;
  break; 

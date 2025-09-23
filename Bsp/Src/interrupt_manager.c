@@ -70,6 +70,7 @@ void tim17_isr_callback_handler(void)
 	
 	  gctl_t.gTimer_linkTencentCounter++;
 	  gctl_t.gTimer_fan_run_one_minute++;
+	  gctl_t.gTimer_wifi_detected_counter++;
 	  //wifi function 
        wifi_t.gTimer_auto_detected_net_state_times ++;
        wifi_t.gTimer_auto_link_net_time++ ;

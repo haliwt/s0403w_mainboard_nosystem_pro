@@ -33,6 +33,8 @@ static void Auto_SmartPhone_TryToLink_TencentCloud(void);
 //  /* USER CODE END Callback 1 */
 //}
 
+uint32_t readFlash_value;
+
 /**********************************************************************
     *
     *Function Name:uint8_t bcc_check(const unsigned char *data, int len) 
@@ -269,9 +271,19 @@ static void Auto_SmartPhone_TryToLink_TencentCloud(void)
 		
 	   gpro_t.gTimer_power_on_first_link_tencent=0;
        power_on_login_tencent_cloud_flag++;
-      // HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//??
-       at_send_data((const uint8_t *)"AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
-	   vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+
+	   readFlash_value = read_flash_value();
+	   if(readFlash_value == 0x00000001){
+	      // HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//??
+	       at_send_data((const uint8_t *)"AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
+		   vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
+	   }
+	   else{
+	        SendWifiData_To_Cmd(0x1F,0x00);
+			vTaskDelay(pdMS_TO_TICKS(10));
+
+
+	   }
 	  
 	}
    
