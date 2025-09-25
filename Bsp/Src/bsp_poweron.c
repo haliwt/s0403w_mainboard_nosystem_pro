@@ -201,7 +201,7 @@ void power_on_handler(void)
 
   case 10:
      
-	  if( gctl_t.gTimer_read_dht11_counter>1){
+	  if( gctl_t.gTimer_read_dht11_counter>2){
 		   gctl_t.gTimer_read_dht11_counter=0;
            set_temperature_compare_value_fun();
 	   
