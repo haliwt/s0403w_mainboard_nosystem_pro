@@ -98,8 +98,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
    
    bsp_init();
- 
-   EEPROM_Write(0x0001,1);
+   EEPROM_Write(0x0001,10);
    freeRTOS_Handler();
 
    

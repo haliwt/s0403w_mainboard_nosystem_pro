@@ -169,9 +169,10 @@ void link_wifi_net_handler(void)
 
              if(net_t.wifi_link_net_success==1){
 			
-			
+			    EEPROM_Write(0x0001,1);//
 				gctl_t.first_link_tencent_cloud_flag =1;
 				wifi_t.get_rx_beijing_time_enable=0;
+			 
                 
                SendWifiData_To_Data(0x1F,0x01); //link wifi order 1 --link wifi net is success.
                vTaskDelay(pdMS_TO_TICKS(10));
