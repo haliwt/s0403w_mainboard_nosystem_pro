@@ -351,16 +351,7 @@ void usart1_isr_callback_handler(void)
 		  	
 		  break;
 
-		
-		  
-
-
-
-       	}
-	   
-
-
-
+		}
 }
 /********************************************************************************
 	**
@@ -380,9 +371,16 @@ void usart1_protocol_state_machine(void)
 	 // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
           //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
             //gl_tMsg.copy_cmd_flag ++;
-	        memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
-			receive_cmd_or_notice_handler();
+
+     // #if DEBUG_FLAG
+
+       // printf("cmd_notice = %02X\r\n",gl_tMsg.cmd_notice);
+     // printf("rx_execuite = \r\n",gl_tMsg.execuite_cmd_notice);
+
+    //  #endif
 	       
+		receive_cmd_or_notice_handler();
+	    //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));  
 
 		//}
 
@@ -391,9 +389,10 @@ void usart1_protocol_state_machine(void)
 
        // gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
        // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
-           memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
+          // memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
            
 			parse_recieve_copy_data_handler();
+	   //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
 	         
 
 	  // }
@@ -429,7 +428,7 @@ static void receive_cmd_or_notice_handler(void)
           
             buzzer_sound();//buzzer_sound_fun();
             SendWifiData_Answer_Cmd(0x01,0x01);
-            vTaskDelay(pdMS_TO_TICKS(5));
+            vTaskDelay(pdMS_TO_TICKS(10));
             
            
            	gpro_t.gpower_on = power_on;
@@ -441,7 +440,7 @@ static void receive_cmd_or_notice_handler(void)
 
               buzzer_sound();
 			  SendWifiData_Answer_Cmd(0x01,0x02); //power off .
-              //vTaskDelay(pdMS_TO_TICKS(10)); 
+              vTaskDelay(pdMS_TO_TICKS(10)); 
              
               freertos_set_prority();
              
@@ -584,7 +583,7 @@ static void receive_cmd_or_notice_handler(void)
 
 		  gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
           SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-		  vTaskDelay(pdMS_TO_TICKS(5));
+		  vTaskDelay(pdMS_TO_TICKS(10));
 		  
        break;
 

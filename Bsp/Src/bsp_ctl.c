@@ -98,7 +98,7 @@ void SystemReset(void)
 			  gctl_t.rx_set_temp_flag=1;
 			   #if DEBUG_FLAG 
  
-                 printf("temp - 0 = value !!!\r\n");
+              //   printf("temp - 0 = value !!!\r\n");
 				#endif 
 			 
             
@@ -113,7 +113,7 @@ void SystemReset(void)
 				 gctl_t.gTimer_copy_cmd_counter=0;
 				 #if DEBUG_FLAG
  
-                  printf("temp - 3 >= value !!!\r\n");
+                //  printf("temp - 3 >= value !!!\r\n");
 				 #endif 
 				 
 	      

@@ -111,7 +111,7 @@ void power_on_handler(void)
 		
 
 	     gpro_t.process_run_step=6 ;
-	break;
+	//break;
 
 
 
@@ -163,7 +163,7 @@ void power_on_handler(void)
 
 	       SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
 		    vTaskDelay(pdMS_TO_TICKS(10));
-			printf("wifi is not !!!\r\n");
+			//printf("wifi is not !!!\r\n");
 		    
 
 	  }
@@ -493,7 +493,8 @@ void power_off_handler(void)
     switch(powerOffTunrOff_flag){
 
     case 1:
-
+		  SendWifiData_Answer_Cmd(0x01,0x02); //compatible older version 
+	      vTaskDelay(pdMS_TO_TICKS(10));
           gpro_t.gTimer_poweroff_fan=0;
           gctl_t.gTimer_fan_run_one_minute=0;
        
