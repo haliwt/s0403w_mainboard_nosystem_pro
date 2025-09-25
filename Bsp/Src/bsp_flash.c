@@ -197,7 +197,7 @@ void EEPROM_Write(uint16_t virtAddr, uint32_t data)
 				EEPROM_Record_t newRec;
 				newRec.virtAddr = virtAddr;
 				newRec.data = data;
-				newRec.bcc = EEPROM_CalcBCC(virtAddr, data);
+				newRec.bcc = 0xFF; //EEPROM_CalcBCC(virtAddr, data);
 				newRec.reserved = 0xFF;
 	
 				uint64_t packed;
@@ -216,6 +216,7 @@ void EEPROM_Write(uint16_t virtAddr, uint32_t data)
 		newRec.virtAddr = virtAddr;
 		newRec.data = data;
 		newRec.bcc = EEPROM_CalcBCC(virtAddr, data);
+		
 		newRec.reserved = 0xFF;
 	
 		uint64_t packed;

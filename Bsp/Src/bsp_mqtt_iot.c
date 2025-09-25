@@ -122,7 +122,7 @@ void property_topic_publish(void)
     //at_send_data((uint8_t *)topic, size);
     //osDelay(300);
     USART2_DMA_Send((uint8_t *)topic, size);
-    vTaskDelay(200);
+    vTaskDelay(pdMS_TO_TICKS(300));
 }
 /********************************************************************************
 	*
@@ -242,7 +242,7 @@ static void property_report_SetTemp(uint8_t temp)
 								  
 	//at_send_data((uint8_t *)message, message_len);
 	USART2_DMA_Send((uint8_t *)message, message_len);
-	vTaskDelay(200);
+	vTaskDelay(pdMS_TO_TICKS(300));
 
 }
 static void property_report_SetOpen(uint8_t open)

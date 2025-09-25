@@ -849,7 +849,7 @@ void Json_Parse_Command_Fun(void)
        
 		    }
 
-	     gctl_t.response_wifi_signal_label=0xff;
+	         gctl_t.response_wifi_signal_label=0xff;
 	       	}
 
 	  break;
