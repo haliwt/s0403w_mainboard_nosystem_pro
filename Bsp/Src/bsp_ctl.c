@@ -26,10 +26,8 @@ uint8_t set_temp_first_closeptc  ;
 **********************************************************************/
 void SystemReset(void)
 {
-    
-		
-		__set_PRIMASK(1) ;
-		HAL_NVIC_SystemReset();
+    __set_PRIMASK(1) ;
+   HAL_NVIC_SystemReset();
 		
 
 }
@@ -87,7 +85,7 @@ void SystemReset(void)
   }
   else{
 
-	      if(gctl_t.set_temp_first_closeptc ==0 && gctl_t.ptc_on_off_flag ==0){//the first open ptc heating //WT.DEDIT 2028.08.27 modify this flow codes
+	      if(gctl_t.set_temp_first_closeptc ==0 && gctl_t.ptc_on_off_flag ==0 && gctl_t.app_timer_power_on_flag ==0){//the first open ptc heating //WT.DEDIT 2028.08.27 modify this flow codes
 	          
               PTC_SetHigh();
               gctl_t.gDry=1;//
@@ -98,12 +96,12 @@ void SystemReset(void)
 			  gctl_t.rx_set_temp_flag=1;
 			   #if DEBUG_FLAG 
  
-                 printf("temp - 0 = value !!!\r\n");
+              //   printf("temp - 0 = value !!!\r\n");
 				#endif 
 			 
             
 	      }
-		   else if(gctl_t.set_temp_first_closeptc ==1 && (gctl_t.set_temperature_value -3) >= gctl_t.gDht11_temperature  && gctl_t.ptc_on_off_flag==0){//WT.DEDIT 2028.08.27 modify this flow codes
+		  else if(gctl_t.set_temp_first_closeptc ==1 && (gctl_t.set_temperature_value -3) >= gctl_t.gDht11_temperature  && gctl_t.ptc_on_off_flag==0){//WT.DEDIT 2028.08.27 modify this flow codes
                 
 				PTC_SetHigh();
                 gctl_t.gDry=1;//
@@ -113,7 +111,7 @@ void SystemReset(void)
 				 gctl_t.gTimer_copy_cmd_counter=0;
 				 #if DEBUG_FLAG
  
-                  printf("temp - 3 >= value !!!\r\n");
+                //  printf("temp - 3 >= value !!!\r\n");
 				 #endif 
 				 
 	      
@@ -138,7 +136,7 @@ void SystemReset(void)
 			 gctl_t.gTimer_copy_cmd_counter=0;
       }
     else{
-      if(set_temp_first_closeptc  == 1 && gctl_t.ptc_on_off_flag ==0){
+      if(set_temp_first_closeptc  == 1 && gctl_t.ptc_on_off_flag ==0 ){
                
               if(gctl_t.gDht11_temperature < 38){
                  PTC_SetHigh();
@@ -152,7 +150,7 @@ void SystemReset(void)
                    
 
       }
-      else if(gctl_t.ptc_on_off_flag ==0 &&  set_temp_first_closeptc==0){
+      else if(gctl_t.ptc_on_off_flag ==0 &&  set_temp_first_closeptc==0 && gctl_t.app_timer_power_on_flag ==0){
 
         PTC_SetHigh();
         gctl_t.gDry=1;

@@ -606,6 +606,7 @@ void Json_Parse_Command_Fun(void)
 		
          }
          }
+	     gctl_t.app_timer_power_on_flag = 0;
 		 buzzer_temp_on=0;
          gctl_t.response_wifi_signal_label=0xff;
 	  	
@@ -616,18 +617,19 @@ void Json_Parse_Command_Fun(void)
 	  	if(gpro_t.gpower_on ==power_on){
 	
          MqttData_Publish_SetPtc(0);
-		 //vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-	     gctl_t.gDry=0;
+		 
+	    
          gctl_t.gTimer_senddata_panel=8;
 		 gctl_t.ptc_on_off_flag = 1;
 		 gctl_t.set_temp_first_closeptc =0;
 		 gctl_t.rx_set_temp_flag =0;
-		
+	
+     	 gctl_t.gDry=0;
 		 PTC_SetLow();
-      
+         gctl_t.app_timer_power_on_flag = 0;
 		
 		 SendWifiData_To_Cmd(0x02,0x0);
-         vTaskDelay(pdMS_TO_TICKS(5));//HAL_Delay(5);
+         vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
          }
 		buzzer_temp_on=0;
 	     gctl_t.response_wifi_signal_label = 0xff;
@@ -635,11 +637,11 @@ void Json_Parse_Command_Fun(void)
 	  	
 	  	break;
 
-	  case ANION_OFF_ITEM: //"Êù?Ëè?" //5
+	  case ANION_OFF_ITEM: //"ÔøΩ?ÔøΩ?" //5
 	  	if(gpro_t.gpower_on ==power_on){
 			
             MqttData_Publish_SetPlasma(0);
-			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+
              gctl_t.gPlasma=0;
 			gctl_t.gTimer_senddata_panel=8;
 			SendWifiData_To_Cmd(0x03,0x0);
@@ -753,6 +755,7 @@ void Json_Parse_Command_Fun(void)
 			set_temperature_compare_value_fun();
 			gctl_t.set_temp_first_closeptc = 0;
 			gctl_t.rx_set_temp_flag =0;
+			 gctl_t.app_timer_power_on_flag = 0;
           
        }
      

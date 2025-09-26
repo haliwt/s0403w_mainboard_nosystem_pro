@@ -27,7 +27,7 @@ static TaskHandle_t xHandleTaskStart = NULL;
 
 
 #if 0
-//LEDО©?1О©?7О©?1О©?7О©?0О©?8О©?1О©?7О©?1О©?7О©?1О©?7О©?1О©?71
+//LEDО©╫?1О©╫?7О©╫?1О©╫?7О©╫?0О©╫?8О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?71
 void LED_Thread1(void const * argument)
 {
 
@@ -36,14 +36,14 @@ void LED_Thread1(void const * argument)
   /* Infinite loop */
   for (;;)
   {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);//PB4О©?1О©?7О©?1О©?7О©?1О©?7О©?1О©?7О©?1О©?7
-  osDelay(100);//О©?1О©?7О©?0О©?9О©?1О©?7100ms
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);//PB4О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?7
+  osDelay(100);//О©╫?1О©╫?7О©╫?0О©╫?9О©╫?1О©╫?7100ms
  
   }
   /* USER CODE END 5 */ 
 }
 
-//LEDО©?1О©?7О©?1О©?7О©?0О©?8О©?1О©?7О©?1О©?7О©?1О©?7О©?1О©?72
+//LEDО©╫?1О©╫?7О©╫?1О©╫?7О©╫?0О©╫?8О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?72
 void LED_Thread2(void const * argument)
 {
   /* USER CODE BEGIN LED_Thread2 */
@@ -51,8 +51,8 @@ void LED_Thread2(void const * argument)
   /* Infinite loop */
   for (;;)
   {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);//PB4О©?1О©?7О©?1О©?7О©?1О©?7О©?1О©?7О©?1О©?7
-  osDelay(250);//О©?1О©?7О©?0О©?9О©?1О©?7250ms
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);//PB4О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?7О©╫?1О©╫?7
+  osDelay(250);//О©╫?1О©╫?7О©╫?0О©╫?9О©╫?1О©╫?7250ms
   }
   /* USER CODE END LED_Thread2 */
 }
@@ -69,7 +69,7 @@ void LED_Thread2(void const * argument)
 //uint8_t wifi_counter;
 //uint8_t state;
 uint8_t power_on_sound_flag ;
-
+uint8_t xTaskDecoder_flag;
 /**********************************************************************************************************
 *
 *	Function Name:void freeRTOS_Handler(void)
@@ -85,14 +85,14 @@ void freeRTOS_Handler(void)
 	  /* Е┬⌡Е╩╨Д╩╩Е┼║И─ Д©║Ф°╨Е┬╤ */
 //	   AppObjCreate();
 	  
-	  /* Е░╞Е┼╗Х╟┐Е╨╕О╪▄Е╪─Е╖▀Ф┴╖Х║▄Д╩╩О©?1О©?7?1О©?1О©?7?7 */
+	  /* Е░╞Е┼╗Х╟┐Е╨╕О╪▄Е╪─Е╖▀Ф┴╖Х║▄Д╩╩О©╫?1О©╫?7?1О©╫?1О©╫?7?7 */
 	   vTaskStartScheduler();
 
 
 }
 /**
- * @brief  :  static void vTaskStart(void *pvParameters)╢╢╫╗йЩ╬щ╢╕юМхннЯё╛сеох╪╤н╙жп╣х
- * @note    хннЯдз╡©й╧сц╤сап╫сйуйЩ╬щё╛пХохЁУй╪╩╞╤сап
+ * @brief  :  static void vTaskStart(void *pvParameters)О©╫О©╫О©╫О©╫О©╫О©╫О©╫щ╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫х╪О©╫н╙О©╫п╣О©╫
+ * @note    О©╫О©╫О©╫О©╫О©╫з╡О©╫й╧О©╫ц╤О©╫О©╫п╫О©╫О©╫О©╫О©╫О©╫О©╫щёО©╫О©╫О©╫О©╫хЁО©╫й╪О©╫О©╫О©╫О©╫О©╫О©╫
  * @param   None
  * @retval  None
  */
@@ -100,7 +100,7 @@ static void vTaskMsgPro(void *pvParameters)
 {
   
 	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 1.?????-?????????50ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(10000); /* 1.?????-?????????50ms */
     uint32_t ulValue;
     
 	
@@ -109,12 +109,13 @@ static void vTaskMsgPro(void *pvParameters)
        xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
 						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
-						          portMAX_DELAY);  /* ????????,????-block portMAX_DELAY */
+						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
         if(xResult == pdPASS){
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
                   // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
-                    usart1_protocol_state_machine();
+                 xTaskDecoder_flag ++;
+				 usart1_protocol_state_machine();
 				 	//vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
 	       			///taskYIELD();  // ??????
 	    			//vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
@@ -130,8 +131,8 @@ static void vTaskMsgPro(void *pvParameters)
 }	
 
 /**
- * @brief  :  static void vTaskStart(void *pvParameters)╢╢╫╗йЩ╬щ╢╕юМхннЯё╛сеох╪╤н╙жп╣х
- * @note    хннЯдз╡©й╧сц╤сап╫сйуйЩ╬щё╛пХохЁУй╪╩╞╤сап
+ * @brief  :  static void vTaskStart(void *pvParameters)О©╫О©╫О©╫О©╫О©╫О©╫О©╫щ╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫х╪О©╫н╙О©╫п╣О©╫
+ * @note    О©╫О©╫О©╫О©╫О©╫з╡О©╫й╧О©╫ц╤О©╫О©╫п╫О©╫О©╫О©╫О©╫О©╫О©╫щёО©╫О©╫О©╫О©╫хЁО©╫й╪О©╫О©╫О©╫О©╫О©╫О©╫
  * @param   None
  * @retval  None
  */
@@ -193,19 +194,15 @@ static void vTaskStart(void *pvParameters)
            }
 		  
 		
-		  vTaskDelay(pdMS_TO_TICKS(10));//О©?1О©?7?0
+		  vTaskDelay(pdMS_TO_TICKS(50));//О©╫?1О©╫?7?0
 
 
         }
        
     }
- 
-       
-
-  
-/**
- * @brief  :  void AppTaskCreate (void)╫╗йЩ╬щ╢╕юМхннЯё╛сеох╪╤н╙жп╣х
- * @note    хннЯдз╡©й╧сц╤сап╫сйуйЩ╬щё╛пХохЁУй╪╩╞╤сап
+ /**
+ * @brief  :  void AppTaskCreate (void)О©╫О©╫О©╫О©╫О©╫щ╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫х╪О©╫н╙О©╫п╣О©╫
+ * @note    О©╫О©╫О©╫О©╫О©╫з╡О©╫й╧О©╫ц╤О©╫О©╫п╫О©╫О©╫О©╫О©╫О©╫О©╫щёО©╫О©╫О©╫О©╫хЁО©╫й╪О©╫О©╫О©╫О©╫О©╫О©╫
  * @param   None
  * @retval  None
  */
@@ -214,18 +211,18 @@ void AppTaskCreate (void)
     
  
   xTaskCreate( vTaskMsgPro,     		/* Д╩╩Е┼║Е┤╫Ф∙╟  */
-                 "vTaskMsgPro",   		/* Д╩╩Е┼║О©?1О©?7?1О©?1О©?7?7    */
+                 "vTaskMsgPro",   		/* Д╩╩Е┼║О©╫?1О©╫?7?1О©╫?1О©╫?7?7    */
                  128,            		/* Д╩╩Е┼║Ф═┬Е╓╖Е╟▐О╪▄Е█∙Д╫█wordО╪▄Д╧÷Е╟╠Ф≤╞4Е╜≈Х┼┌ */
                  NULL,           		/* Д╩╩Е┼║Е▐┌Ф∙╟  */
-                 2,              		/* Д╩╩Е┼║Д╪≤Е┘┬О©?1О©?7?1О©?1О©?7?7 Ф∙╟О©╫1О©?7О©?1О©?7Х╤┼Е╟▐Д╪≤Е┘┬Г╨╖Х╤┼Д╫▌О╪▄Х©≥Д╦╙Х╥÷uCOSГ⌡╦Е▐█ */
+                 2,              		/* Д╩╩Е┼║Д╪≤Е┘┬О©╫?1О©╫?7?1О©╫?1О©╫?7?7 Ф∙╟О©╫1О©╫?7О©╫?1О©╫?7Х╤┼Е╟▐Д╪≤Е┘┬Г╨╖Х╤┼Д╫▌О╪▄Х©≥Д╦╙Х╥÷uCOSГ⌡╦Е▐█ */
                  &xHandleTaskMsgPro);   /* Д╩╩Е┼║Е▐╔Ф÷└  */
 
 
    xTaskCreate( vTaskStart,     		/* Д╩╩Е┼║Е┤╫Ф∙╟  */
-                 "vTaskStart",   		/* Д╩╩Е┼║О©?1О©?7?1О©?1О©?7?7    */
+                 "vTaskStart",   		/* Д╩╩Е┼║О©╫?1О©╫?7?1О©╫?1О©╫?7?7    */
                  128,            		/* Д╩╩Е┼║Ф═┬Е╓╖Е╟▐О╪▄Е█∙Д╫█wordО╪▄Д╧÷Е╟╠Ф≤╞4Е╜≈Х┼┌ */
                  NULL,           		/* Д╩╩Е┼║Е▐┌Ф∙╟  */
-                 1,              		/* Д╩╩Е┼║Д╪≤Е┘┬О©?1О©?7?1О©?1О©?7?7 Ф∙╟О©╫1О©?7О©?1О©?7Х╤┼Е╟▐Д╪≤Е┘┬Г╨╖Х╤┼Д╫▌О╪▄Х©≥Д╦╙Х╥÷uCOSГ⌡╦Е▐█ */
+                 1,              		/* Д╩╩Е┼║Д╪≤Е┘┬О©╫?1О©╫?7?1О©╫?1О©╫?7?7 Ф∙╟О©╫1О©╫?7О©╫?1О©╫?7Х╤┼Е╟▐Д╪≤Е┘┬Г╨╖Х╤┼Д╫▌О╪▄Х©≥Д╦╙Х╥÷uCOSГ⌡╦Е▐█ */
                  &xHandleTaskStart );   /* Д╩╩Е┼║Е▐╔Ф÷└  */
 }
 

@@ -128,14 +128,11 @@ volatile uint8_t rx_data_counter=0;
 	*Return Ref:NO
 	*
 *******************************************************************************/
-void usart1_isr_callback_handler(void)
+void usart1_isr_callback_handler(uint8_t data)
 {
        
-	   uint8_t data;
-
-	    data = LL_USART_ReceiveData8(USART1);
-
-        switch(rx_state){
+	    
+       switch(rx_state){
 	
          case 0:
 	      if(data == FRAME_HEADER){
@@ -351,16 +348,7 @@ void usart1_isr_callback_handler(void)
 		  	
 		  break;
 
-		
-		  
-
-
-
-       	}
-	   
-
-
-
+		}
 }
 /********************************************************************************
 	**
@@ -380,9 +368,16 @@ void usart1_protocol_state_machine(void)
 	 // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
           //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
             //gl_tMsg.copy_cmd_flag ++;
-	        memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
-			receive_cmd_or_notice_handler();
+
+      #if  0 //DEBUG_FLAG
+
+        printf("cmd_notice = %02X\r\n",gl_tMsg.cmd_notice);
+     //printf("rx_execuite = \r\n",gl_tMsg.execuite_cmd_notice);
+
+      #endif
 	       
+		receive_cmd_or_notice_handler();
+	    //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));  
 
 		//}
 
@@ -391,9 +386,10 @@ void usart1_protocol_state_machine(void)
 
        // gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
        // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
-           memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
+          // memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
            
 			parse_recieve_copy_data_handler();
+	   //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
 	         
 
 	  // }
@@ -429,7 +425,7 @@ static void receive_cmd_or_notice_handler(void)
           
             buzzer_sound();//buzzer_sound_fun();
             SendWifiData_Answer_Cmd(0x01,0x01);
-            vTaskDelay(pdMS_TO_TICKS(5));
+            vTaskDelay(pdMS_TO_TICKS(10));
             
            
            	gpro_t.gpower_on = power_on;
@@ -440,8 +436,8 @@ static void receive_cmd_or_notice_handler(void)
         else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
 
               buzzer_sound();
-			  SendWifiData_Answer_Cmd(0x01,0x02); //power off .
-              //vTaskDelay(pdMS_TO_TICKS(10)); 
+			        SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+              vTaskDelay(pdMS_TO_TICKS(10)); 
              
               freertos_set_prority();
              
@@ -458,15 +454,18 @@ static void receive_cmd_or_notice_handler(void)
 
      if(gl_tMsg.execuite_cmd_notice  == 0x01){
           buzzer_sound();
+          SendWifiData_Answer_Cmd(0x02,0x01); //
+          vTaskDelay(pdMS_TO_TICKS(10)); 
           gctl_t.gDry = 1;
-	      gpro_t.ptc_switch_flag =open;
+	      gpro_t.ptc_switch_flag++;
+		  gctl_t.app_timer_power_on_flag=0;
 
         
          if(gpro_t.stopTwoHours_flag==0){
          if(gpro_t.ptc_warning ==0 && gpro_t.fan_warning_flag ==0){ //PTC warning flag
               PTC_SetHigh();
-              gpro_t.ptc_switch_flag =open;
-		     gctl_t.gTimer_senddata_panel=7;
+              
+		      gctl_t.gTimer_senddata_panel=7;//at once run ptc function.
           }
       
          }
@@ -474,10 +473,13 @@ static void receive_cmd_or_notice_handler(void)
        else if(gl_tMsg.execuite_cmd_notice  == 0x0){
         buzzer_sound();
           gctl_t.gDry =0;
+          SendWifiData_Answer_Cmd(0x02,0x0); //
+          vTaskDelay(pdMS_TO_TICKS(10)); 
         
          PTC_SetLow();
-         gpro_t.ptc_switch_flag =close;
-         gctl_t.gTimer_senddata_panel=7;
+         gpro_t.ptc_switch_flag ++;
+         gctl_t.gTimer_senddata_panel=7; //at once run ptc function.
+		 gctl_t.app_timer_power_on_flag=0;
 
        }
 
@@ -487,19 +489,23 @@ static void receive_cmd_or_notice_handler(void)
 
         if(gl_tMsg.execuite_cmd_notice == 0x01){
            
-            buzzer_sound();
+          buzzer_sound();
+          SendWifiData_Answer_Cmd(0x03,0x01); //
+          vTaskDelay(pdMS_TO_TICKS(10)); 
            
            gctl_t.gPlasma = 1;
-           gpro_t.plasma_switch_flag =1;
+           gpro_t.plasma_switch_flag++;
           if(gpro_t.stopTwoHours_flag==0){
             PLASMA_SetHigh();
           }
         }
         else if(gl_tMsg.execuite_cmd_notice  == 0x0){
            buzzer_sound();
+          SendWifiData_Answer_Cmd(0x03,0x0); //
+          vTaskDelay(pdMS_TO_TICKS(10)); 
            
            gctl_t.gPlasma = 0;
-           gpro_t.plasma_switch_flag =2;
+           gpro_t.plasma_switch_flag++;
         
           PLASMA_SetLow();
 
@@ -514,13 +520,17 @@ static void receive_cmd_or_notice_handler(void)
         if(gl_tMsg.execuite_cmd_notice  == 0x01){  //open 
           
           gctl_t.gUlransonic =1;
-          gpro_t.ultrasonic_switch_flag =1;
+          gpro_t.ultrasonic_switch_flag++;
+          SendWifiData_Answer_Cmd(0x04,0x01); //
+          vTaskDelay(pdMS_TO_TICKS(10)); 
 
         }
         else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
 
           gctl_t.gUlransonic = 0;
-          gpro_t.ultrasonic_switch_flag =2;
+          gpro_t.ultrasonic_switch_flag++;
+          SendWifiData_Answer_Cmd(0x04,0x0); //
+          vTaskDelay(pdMS_TO_TICKS(10)); 
 
         }
 
@@ -562,6 +572,8 @@ static void receive_cmd_or_notice_handler(void)
 		
           gctl_t.gModel=2;
           gctl_t.mode_ai_switch_flag =1;
+          SendWifiData_Answer_Cmd(0x07,0x02); //
+          vTaskDelay(pdMS_TO_TICKS(10)); 
         
           
        }
@@ -571,6 +583,8 @@ static void receive_cmd_or_notice_handler(void)
          buzzer_sound();
          gctl_t.gModel=1;
 	     gctl_t.mode_ai_switch_flag =1;
+          SendWifiData_Answer_Cmd(0x07,0x01); //
+          vTaskDelay(pdMS_TO_TICKS(10)); 
 		 
        }
 
@@ -583,8 +597,8 @@ static void receive_cmd_or_notice_handler(void)
         
 
 		  gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
-          SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-		  vTaskDelay(pdMS_TO_TICKS(5));
+      SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+		  vTaskDelay(pdMS_TO_TICKS(10));
 		  
        break;
 
@@ -607,17 +621,17 @@ static void receive_cmd_or_notice_handler(void)
 
      
 
-     case 0x22: //PTC notice 
+     case 0x22: //PTC notice don't buzzer sound
 
       if(gl_tMsg.execuite_cmd_notice == 0x01){
         
 
         gctl_t.gDry = 1;
-		gpro_t.ptc_switch_flag = open;
+		gpro_t.ptc_switch_flag++;
    
         if(gpro_t.stopTwoHours_flag ==0){
               PTC_SetHigh();
-              gpro_t.ptc_switch_flag =open;
+              //gpro_t.ptc_switch_flag =open;
               gctl_t.gTimer_senddata_panel=7;
           }
           
@@ -626,36 +640,24 @@ static void receive_cmd_or_notice_handler(void)
         
          gctl_t.gDry =0;
          PTC_SetLow();
-          gpro_t.ptc_switch_flag =close;
+          gpro_t.ptc_switch_flag++;
           gctl_t.gTimer_senddata_panel=7;
       }
 
      break;
 
-     case 0x27:
+     case 0x27: //AI command without buzzer sound
 
       if(gl_tMsg.execuite_cmd_notice == 0x02){
 	 
-         gctl_t.gModel=2;
+      gctl_t.gModel=2;
 		  gctl_t.mode_ai_switch_flag =1;
-		 
-		 
-        
-          
-       }
-       else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
-
-	
-  
-         gctl_t.gModel=1;
-	     gctl_t.mode_ai_switch_flag =1; 
-		 
-		
-
-       }
-
-
-     break;
+		}
+    else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
+        gctl_t.gModel=1;
+	      gctl_t.mode_ai_switch_flag =1; 
+		 }
+    break;
      	}
 }
 /**********************************************************************

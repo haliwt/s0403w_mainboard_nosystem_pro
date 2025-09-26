@@ -1,7 +1,7 @@
 #include "bsp.h"
 
 
-void tim1_ultr_pwm_config(void)
+static void tim1_ultr_pwm_config(void)
 {
     LL_TIM_DisableCounter(TIM1);
 	LL_TIM_SetAutoReload(TIM1,39);//PWM = 1/(39+1)MHZ = 0.025MHZ = 25KHZ.
@@ -11,13 +11,28 @@ void tim1_ultr_pwm_config(void)
 
 }
 
-void tim1_stop_ultr_pmw_config(void)
+static void tim1_stop_ultr_pmw_config(void)
 {
   LL_TIM_DisableCounter(TIM1);
   LL_TIM_CC_DisableChannel(TIM1,LL_TIM_CHANNEL_CH1);
 
 
 }
+
+
+void ultrasonic_open(void)
+{
+
+	tim1_ultr_pwm_config();
+
+}
+void ultrasonic_close(void)
+{
+	tim1_stop_ultr_pmw_config();
+
+
+}
+
 
 
 

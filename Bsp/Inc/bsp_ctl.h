@@ -118,6 +118,7 @@ typedef struct _RUN_T{
     
 	  //ADC
 	  uint8_t ptc_warning;
+	  uint8_t fan_warning;
 
 
 	  

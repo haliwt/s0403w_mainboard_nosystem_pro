@@ -39,7 +39,7 @@ if( gctl_t.gDry==1){
 		
 		   if(wifi_link_net_state()==1){ 
 			   MqttData_Publish_SetPtc(0x01);
-			   vTaskDelay(pdMS_TO_TICKS(200));
+			   //vTaskDelay(pdMS_TO_TICKS(200));
 		   }
 		   
 	   
@@ -51,7 +51,7 @@ if( gctl_t.gDry==1){
 	   PTC_SetLow();
 	    if(wifi_link_net_state()==1){ 
 			   MqttData_Publish_SetPtc(0x0);
-			   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			  // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 		   }
 	   }
  }

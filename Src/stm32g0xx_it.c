@@ -201,11 +201,13 @@ void TIM17_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
+  volatile uint8_t data;
    static uint8_t rx_flag;
    if(LL_USART_IsActiveFlag_RXNE(USART1)){
    
       //LL_USART_ClearFlag_RXNE(USART1);
-      usart1_isr_callback_handler();
+      data = LL_USART_ReceiveData8(USART1);
+      usart1_isr_callback_handler(data);
 //	  rx_data = LL_USART_ReceiveData8(USART1);
 //	  
 //      // 存入缓冲区（简单环形缓冲）
@@ -241,12 +243,12 @@ void USART1_IRQHandler(void)
 
        LL_USART_ClearFlag_ORE(USART1);
    }
-//   if(LL_USART_IsActiveFlag_FE(USART1)){
-//       LL_USART_ClearFlag_FE(USART1);
-//   }
-//   if(LL_USART_IsActiveFlag_NE(USART1)){
-//      LL_USART_ClearFlag_NE(USART1);
-//   }
+//  if(LL_USART_IsActiveFlag_FE(USART1)){
+//      LL_USART_ClearFlag_FE(USART1);
+//  }
+//  if(LL_USART_IsActiveFlag_NE(USART1)){
+//     LL_USART_ClearFlag_NE(USART1);
+//  }
   /* USER CODE END USART1_IRQn 1 */
 }
 

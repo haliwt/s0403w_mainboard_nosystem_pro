@@ -28,15 +28,13 @@
 #include "bsp_delay.h"
 
 #include "bsp_cmd_link.h"
-//#include "bsp_sendack.h"
-#include "bsp_poweroff.h"
+
 #include "bsp_poweron.h"
 #include "bsp_time.h"
 #include "bsp_plasma.h"
 #include "bsp_netparse.h"
 #include "bsp_usart.h"
 #include "bsp_usart_wifi.h"
-#include "bsp_tim.h"
 #include "bsp_dma_usart.h"
 #include "bsp_flash.h"
 
@@ -59,8 +57,6 @@
 #endif
 #include "bsp_fan.h"
 #include "bsp_ultrasonic.h"
-
-#include "bsp_special_power.h"
 
 //wifi files
 #include "bsp_esp8266.h"

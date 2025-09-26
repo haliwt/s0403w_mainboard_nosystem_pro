@@ -1,6 +1,7 @@
 #include "bsp.h"
 
 
+static void power_off_stop_fun(void);
 
 /**********************************************************************
 	*
@@ -64,23 +65,21 @@ void power_on_handler(void)
 
 
   case 1:
-        
-    smartphone_timer_power_on_and_normal_handler();
+  	if(gctl_t.app_timer_power_on_flag > 1)gctl_t.app_timer_power_on_flag=0;
+    if(gctl_t.app_timer_power_on_flag ==1){
+     smartphone_timer_power_on_and_normal_handler();
+    }
+	else 
+		every_power_on_run();
 		 
 	 gpro_t.process_run_step= 2;
 	   
-  break;
+    break;
 	
 	
 	case 2:
-		if(gctl_t.app_timer_power_on_flag > 1)gctl_t.app_timer_power_on_flag=0;
-        every_power_on_run();
-	
-	 gpro_t.process_run_step= 3;
-	break;
-	
-	
-	case 3:
+		
+    case 3:
 	
          if(wifi_link_net_state() ==1 ){
     
@@ -109,13 +108,7 @@ void power_on_handler(void)
 
     case 5:
 		
-
-	     gpro_t.process_run_step=6 ;
-	break;
-
-
-
-  case 6:
+    case 6:
 
       if(wifi_link_net_state() ==1 && gpro_t.gTimer_update_tencet_dht11 >5){
 				gpro_t.gTimer_update_tencet_dht11=0;
@@ -163,7 +156,7 @@ void power_on_handler(void)
 
 	       SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
 		    vTaskDelay(pdMS_TO_TICKS(10));
-			printf("wifi is not !!!\r\n");
+			//printf("wifi is not !!!\r\n");
 		    
 
 	  }
@@ -226,7 +219,7 @@ void power_on_handler(void)
 void ActionEvent_Handler(void)
 {
 
-   static uint8_t ptc_default =1,plasma_default =1,ultrasonic_default =1;
+   static uint8_t ptc_default =0xff,plasma_default =0xff,ultrasonic_default =0xff;
    
    if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
@@ -265,7 +258,7 @@ void ActionEvent_Handler(void)
 			plasma_default = gpro_t.plasma_switch_flag;	
 		 if(wifi_link_net_state()==1){ 
 		   MqttData_Publish_SetPlasma(0x01);
-		   //vTaskDelay(pdMS_TO_TICKS(200));
+		 
 		 }
 		}
 	}
@@ -276,7 +269,7 @@ void ActionEvent_Handler(void)
 			plasma_default = gpro_t.plasma_switch_flag;
 		 if(wifi_link_net_state()==1){ 
 		   MqttData_Publish_SetPlasma(0);
-		  // vTaskDelay(pdMS_TO_TICKS(200));
+		
 		 }
 		}
 	}
@@ -289,7 +282,7 @@ void ActionEvent_Handler(void)
 	   ultrasonic_default = gpro_t.ultrasonic_switch_flag;
 		 if(wifi_link_net_state()==1){ 
 		   MqttData_Publish_SetUltrasonic(0x01);
-		   //vTaskDelay(pdMS_TO_TICKS(200));
+		
 		 }
 		}
 	}
@@ -299,7 +292,7 @@ void ActionEvent_Handler(void)
 			ultrasonic_default = gpro_t.ultrasonic_switch_flag;	
 			if(wifi_link_net_state()==1){ 
 			MqttData_Publish_SetUltrasonic(0);
-			//vTaskDelay(pdMS_TO_TICKS(200));
+		
 			}
 		}
 
@@ -350,12 +343,11 @@ void twoHours_afterWorks_Handler(void)
 	//driver bug
 	if(gctl_t.gUlransonic ==1){
 	
-	 
-//		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
+	  ultrasonic_open();//ultrasnoic ON 
 	
 	}
 	else{
-//	  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
+     ultrasonic_close();//ultrasnoic off
 		
 
 	}
@@ -380,11 +372,11 @@ void every_power_on_run(void)
       gctl_t.gTimer_fan_run_one_minute=0;
        gpro_t.process_run_step=0;
 
-	  gpro_t.ptc_switch_flag =1;
-	  gpro_t.ultrasonic_switch_flag =1;
-	  gpro_t.plasma_switch_flag =1;
+	  gpro_t.ptc_switch_flag ++;
+	  gpro_t.ultrasonic_switch_flag++;
+	  gpro_t.plasma_switch_flag++;
       PLASMA_SetHigh();
- //     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
+      ultrasonic_open();   //ultrasnoic ON 
       PTC_SetHigh();
 	  
 
@@ -442,7 +434,7 @@ void smartphone_timer_power_on_and_normal_handler(void)
 			}
 
 		     gctl_t.set_wind_speed_value =100;
-	
+	         
 		     MqttData_Publish_Update_Data();
 		    // vTaskDelay(pdMS_TO_TICKS(200));
 
@@ -467,7 +459,7 @@ void SetPowerOff_ForDoing(void)
 
     
 	PLASMA_SetLow(); //
-//	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+    ultrasonic_close();//ultrasnoic Off 
 	PTC_SetLow();
 	
 
@@ -475,7 +467,7 @@ void SetPowerOff_ForDoing(void)
 
 
 
-static void power_off_stop_fun(void);
+
 
 
 /**********************************************************************
@@ -493,7 +485,8 @@ void power_off_handler(void)
     switch(powerOffTunrOff_flag){
 
     case 1:
-
+		  SendWifiData_Answer_Cmd(0x01,0x02); //compatible older version 
+	      vTaskDelay(pdMS_TO_TICKS(10));
           gpro_t.gTimer_poweroff_fan=0;
           gctl_t.gTimer_fan_run_one_minute=0;
        
@@ -508,13 +501,14 @@ void power_off_handler(void)
 	    gpro_t.stopTwoHours_flag=0;
 
 		  gctl_t.ptc_warning =0;
-		 //gctl_t.fan_warning =0;
+		// gctl_t.fan_warning =0;
        
 		 gctl_t.gTimer_ptc_adc_times=0;
 		 gctl_t.gTimer_fan_adc_times=0;
          gpro_t.process_run_step=0;//gpro_t.process_run_step
           gctl_t.rx_set_temp_flag=0; 
          gctl_t.set_temperature_flag = 0; 
+		
 
           SetPowerOff_ForDoing();
 		  powerOffTunrOff_flag = 2;
@@ -526,7 +520,7 @@ void power_off_handler(void)
        if(wifi_link_net_state() == 1){
 
           MqttData_Publish_PowerOff_Ref(); 
-          vTaskDelay(pdMS_TO_TICKS(200)); //WT.EDTI 2024.11.19 
+          //vTaskDelay(pdMS_TO_TICKS(200)); //WT.EDTI 2024.11.19 
        }
          powerOffTunrOff_flag = 4;
        break;
@@ -536,7 +530,7 @@ void power_off_handler(void)
           if(gctl_t.ptc_warning == 1){
 		 	
 		  	Publish_Data_Warning(ptc_temp_warning,0);
-		  	vTaskDelay(pdMS_TO_TICKS(100));
+		  	//vTaskDelay(pdMS_TO_TICKS(100));
             
           }
            powerOffTunrOff_flag = 5;
@@ -545,7 +539,7 @@ void power_off_handler(void)
         case 5:
             if(gctl_t.ptc_warning == 1){
 			Publish_Data_Warning(fan_warning,0);
-			vTaskDelay(pdMS_TO_TICKS(100));
+			//vTaskDelay(pdMS_TO_TICKS(100));
 			
           }
         powerOffTunrOff_flag = 6;
@@ -599,7 +593,7 @@ static void power_off_stop_fun(void)
 {
       
       PLASMA_SetLow(); //
-     // HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+      ultrasonic_close();// HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
       PTC_SetLow();
       
 
@@ -609,13 +603,14 @@ static void power_off_stop_fun(void)
 void power_off_action_fun(void)
 {
     PLASMA_SetLow(); //
-   // HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
+    ultrasonic_open();//ultrasnoic Off 
     PTC_SetLow();
 
    
 
 
 }
+
 
 
 

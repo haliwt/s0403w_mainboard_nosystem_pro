@@ -122,7 +122,7 @@ void property_topic_publish(void)
     //at_send_data((uint8_t *)topic, size);
     //osDelay(300);
     USART2_DMA_Send((uint8_t *)topic, size);
-    vTaskDelay(pdMS_TO_TICKS(300));
+    vTaskDelay(pdMS_TO_TICKS(200));
 }
 /********************************************************************************
 	*
@@ -408,14 +408,14 @@ void MqttData_Publish_SetPtc(uint8_t dptc)
 
 }
 
-void MqttData_Publish_SetPlasma(uint8_t pla) //Êù?Ëè?
+void MqttData_Publish_SetPlasma(uint8_t pla) //ÔøΩ?ÔøΩ?
 {
    property_topic_publish();
    property_report_SetAnion(pla);
 
 }
 
-void MqttData_Publish_SetUltrasonic(uint8_t datsonic) //Ë∂ÖÂ£∞Ê≥?
+void MqttData_Publish_SetUltrasonic(uint8_t datsonic) //Ë∂ÖÂ£∞ÔøΩ?
 {
    property_topic_publish();
    property_report_SetSonic(datsonic);
