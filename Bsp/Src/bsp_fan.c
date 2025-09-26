@@ -9,7 +9,7 @@
 uint8_t fan_switch_gears_flag;
 
 static void tim16_stop_fan_pmw_config(void);
-static void SetLevel_Fan_PWMA(uint8_t levelval);
+//static void SetLevel_Fan_PWMA(uint8_t levelval);
 
 
 /******************************************************************************
@@ -92,7 +92,7 @@ void Fan_Two_Speed(void)
         fan_switch_gears_flag++;
          full_speed = fan_switch_gears_flag;  //full_speed =1,4,7,10
          #if  NEWPCB_FAN
-              SetLevel_Fan_PWMA(FAN_PWM_100);
+             SetLevel_Fan_PWMA(FAN_PWM_100);
 		 #endif 
     }
 
@@ -135,15 +135,15 @@ void Fan_RunSpeed_Fun(void)
 *
 *
 ********************************************************/
-static void SetLevel_Fan_PWMA(uint8_t levelval)
+void SetLevel_Fan_PWMA(uint8_t levelval)
 {
     
  //  MX_TIM16_Init();
  //  HAL_TIM_PWM_Start(&htim16,TIM_CHANNEL_1);
     LL_TIM_DisableCounter(TIM16);
 	LL_TIM_SetAutoReload(TIM16,39);//PWM = 1/(39+1)MHZ = 0.025MHZ = 25KHZ.
-	LL_TIM_OC_SetCompareCH4(TIM16,levelval); //pwm duty = 20/40 =50%
-	LL_TIM_CC_EnableChannel(TIM1,LL_TIM_CHANNEL_CH1);
+	LL_TIM_OC_SetCompareCH1(TIM16,levelval); //pwm duty = 20/40 =50%
+	LL_TIM_CC_EnableChannel(TIM16,LL_TIM_CHANNEL_CH1);
 	LL_TIM_EnableCounter(TIM16);
 	
 }
