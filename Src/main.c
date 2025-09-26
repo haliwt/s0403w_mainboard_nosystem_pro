@@ -96,7 +96,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
-   
+  
    bsp_init();
    //EEPROM_Write(0x0001,15);
    freeRTOS_Handler();

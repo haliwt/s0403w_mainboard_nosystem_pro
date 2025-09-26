@@ -63,6 +63,7 @@ uint8_t bcc_check(const unsigned char *data, int len)
    delay_init(64);
    DHT11_Init();//dht11_init();//sensor_dht11_init();//updateDht11_sensorData_toDisp();//dht11_init();
    wifi_init();
+	
 #if Enable_EventRecorder == 1  
 	/* 0…60‹10‡80†40†30…4EventRecorder0…50„40†70„90‡40‹0 */
 	EventRecorderInitialize(EventRecordAll, 1U);

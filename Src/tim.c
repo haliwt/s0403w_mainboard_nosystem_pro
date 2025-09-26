@@ -156,7 +156,8 @@ void MX_TIM16_Init(void)
   /* USER CODE END TIM16_Init 0 */
 
    /* USER CODE BEGIN TIM16_Init 0 */
-
+  // LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+  // LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM16);
   /* USER CODE END TIM16_Init 0 */
 
   LL_TIM_InitTypeDef TIM_InitStruct = {0};
@@ -181,7 +182,7 @@ void MX_TIM16_Init(void)
   TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM1;
   TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
   TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-  TIM_OC_InitStruct.CompareValue = 0;
+  TIM_OC_InitStruct.CompareValue = 39;
   TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
   TIM_OC_InitStruct.OCNPolarity = LL_TIM_OCPOLARITY_HIGH;
   TIM_OC_InitStruct.OCIdleState = LL_TIM_OCIDLESTATE_LOW;
@@ -208,7 +209,7 @@ void MX_TIM16_Init(void)
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;//NO;
   GPIO_InitStruct.Alternate = LL_GPIO_AF_5;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
