@@ -369,12 +369,21 @@ void usart1_protocol_state_machine(void)
           //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
             //gl_tMsg.copy_cmd_flag ++;
 
-      #if  0 //DEBUG_FLAG
+
+      #if  DEBUG_FLAG
 
         printf("cmd_notice = %02X\r\n",gl_tMsg.cmd_notice);
      //printf("rx_execuite = \r\n",gl_tMsg.execuite_cmd_notice);
 
       #endif
+
+     // #if DEBUG_FLAG
+
+       // printf("cmd_notice = %02X\r\n",gl_tMsg.cmd_notice);
+     // printf("rx_execuite = \r\n",gl_tMsg.execuite_cmd_notice);
+
+    //  #endif
+
 	       
 		receive_cmd_or_notice_handler();
 	    //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));  
@@ -436,7 +445,11 @@ static void receive_cmd_or_notice_handler(void)
         else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
 
               buzzer_sound();
+<<<<<<< HEAD
 			        SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+=======
+			  SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+>>>>>>> 28ab3de33e918dfa7a8623e43fc937804c6422d1
               vTaskDelay(pdMS_TO_TICKS(10)); 
              
               freertos_set_prority();
@@ -597,7 +610,11 @@ static void receive_cmd_or_notice_handler(void)
         
 
 		  gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
+<<<<<<< HEAD
       SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+=======
+          SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+>>>>>>> 28ab3de33e918dfa7a8623e43fc937804c6422d1
 		  vTaskDelay(pdMS_TO_TICKS(10));
 		  
        break;

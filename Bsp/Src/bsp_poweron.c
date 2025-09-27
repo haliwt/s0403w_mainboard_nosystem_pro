@@ -101,14 +101,13 @@ void power_on_handler(void)
 		  MqttData_Publish_Init();
 		 // vTaskDelay(pdMS_TO_TICKS(200));
      	}
-	  gpro_t.process_run_step= 5;
+	  gpro_t.process_run_step= 6;
 	 
 	 break;
 	     
-
-    case 5:
 		
     case 6:
+
 
       if(wifi_link_net_state() ==1 && gpro_t.gTimer_update_tencet_dht11 >5){
 				gpro_t.gTimer_update_tencet_dht11=0;
