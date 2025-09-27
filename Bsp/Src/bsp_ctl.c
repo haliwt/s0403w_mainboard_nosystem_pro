@@ -134,7 +134,7 @@ void SystemReset(void)
             vTaskDelay(pdMS_TO_TICKS(20));
 			gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
 			 gctl_t.gTimer_copy_cmd_counter=0;
-      }
+     }
     else{
       if(set_temp_first_closeptc  == 1 && gctl_t.ptc_on_off_flag ==0 ){
                
