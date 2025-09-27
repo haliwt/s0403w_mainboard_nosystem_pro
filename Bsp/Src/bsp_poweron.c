@@ -151,7 +151,7 @@ void power_on_handler(void)
          vTaskDelay(pdMS_TO_TICKS(10));
 	
 	  }
-      else if(net_t.wifi_link_net_success ==0 && gctl_t.gTimer_wifi_detected_counter >3 && gpro_t.wifi_led_fast_blink_flag==0){
+      else if(net_t.wifi_link_net_success ==0 && gctl_t.gTimer_wifi_detected_counter >1 && gpro_t.wifi_led_fast_blink_flag==0){
 	  	 gctl_t.gTimer_wifi_detected_counter=0;
 
 	       SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
@@ -183,6 +183,7 @@ void power_on_handler(void)
   case 9:
   	 
       // adc_detected_hundler();
+      
        if(wifi_link_net_state() ==1 && gpro_t.gTimer_publis_dht11_data >8){
         gpro_t.gTimer_publis_dht11_data=0;
 
@@ -196,13 +197,19 @@ void power_on_handler(void)
   break;
 
   case 10:
-     
-	  if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0){
+
+     if(gctl_t.set_temperature_flag > 1 || gctl_t.set_temperature_value > 40 ){
+	 	if(gctl_t.set_temperature_flag > 1)gctl_t.set_temperature_flag =0;
+		if(gctl_t.set_temperature_value > 40 && gctl_t.set_temperature_flag ==0)gctl_t.set_temperature_value =40;
+     }
+	 else if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0){
 		   gctl_t.gTimer_read_dht11_counter=0;
            set_temperature_compare_value_fun();
 	   
 	  }
 	   gpro_t.process_run_step= 6;	
+
+   break;
 
      default:
 		//gpro_t.process_run_step= 1;

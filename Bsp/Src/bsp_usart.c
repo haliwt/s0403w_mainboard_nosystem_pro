@@ -467,6 +467,7 @@ static void receive_cmd_or_notice_handler(void)
           buzzer_sound();
           SendWifiData_Answer_Cmd(0x02,0x01); //
           vTaskDelay(pdMS_TO_TICKS(10)); 
+		
           gctl_t.gDry = 1;
 	      gpro_t.ptc_switch_flag++;
 		  gctl_t.app_timer_power_on_flag=0;
@@ -638,8 +639,13 @@ static void receive_cmd_or_notice_handler(void)
      case 0x22: //PTC notice don't buzzer sound
 
       if(gl_tMsg.execuite_cmd_notice == 0x01){
-        
 
+	    if(net_t.wifi_link_net_success ==0 && gpro_t.wifi_led_fast_blink_flag==0){
+	  	     SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
+		    vTaskDelay(pdMS_TO_TICKS(5));
+			//printf("wifi is not !!!\r\n");
+		}
+        #if 0
         gctl_t.gDry = 1;
 		gpro_t.ptc_switch_flag++;
    
@@ -648,14 +654,21 @@ static void receive_cmd_or_notice_handler(void)
               //gpro_t.ptc_switch_flag =open;
               gctl_t.gTimer_senddata_panel=7;
           }
-          
+        #endif   
       }
       else if(gl_tMsg.execuite_cmd_notice == 0x0){
-        
+
+	   if(net_t.wifi_link_net_success ==0 && gpro_t.wifi_led_fast_blink_flag==0){
+	  	     SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
+		    vTaskDelay(pdMS_TO_TICKS(5));
+			//printf("wifi is not !!!\r\n");
+		}
+        #if 0
          gctl_t.gDry =0;
          PTC_SetLow();
           gpro_t.ptc_switch_flag++;
           gctl_t.gTimer_senddata_panel=7;
+		#endif 
       }
 
      break;

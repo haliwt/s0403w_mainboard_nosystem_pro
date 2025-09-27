@@ -8,7 +8,7 @@
 /***********************************************************************************************************
 											函数声明
 ***********************************************************************************************************/
-//static void vTaskWifiPro(void *pvParameters);
+static void vTaskWifiPro(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
 static void vTaskStart(void *pvParameters);
 static void AppTaskCreate (void);
@@ -21,7 +21,7 @@ static void AppTaskCreate (void);
 /***********************************************************************************************************
 											变量声明
 ***********************************************************************************************************/
-//static TaskHandle_t xHandleTaskWifiPro = NULL;
+static TaskHandle_t xHandleTaskWifiPro = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
 static TaskHandle_t xHandleTaskStart = NULL;
 
@@ -90,6 +90,29 @@ void freeRTOS_Handler(void)
 
 
 }
+/**
+ * @brief  :  
+ * @note    
+ * @param   None
+ * @retval  None
+ */
+static void vTaskWifiPro(void * pvParameters)
+{
+	while(1)
+	{
+
+         if(gpro_t.wifi_led_fast_blink_flag==0 ){
+             wifi_communication_tnecent_handler();//
+             getBeijingTime_cofirmLinkNetState_handler();
+             wifi_auto_detected_link_state();
+          }
+
+
+      vTaskDelay(pdMS_TO_TICKS(100));
+	}
+
+}
+
 /**
  * @brief  :  static void vTaskStart(void *pvParameters)�������ݴ����������ȼ�Ϊ�е�
  * @note    �����ڲ�ʹ�ö��н������ݣ����ȳ�ʼ������
@@ -187,11 +210,11 @@ static void vTaskStart(void *pvParameters)
 		  	 gpro_t.wifi_led_fast_blink_flag=0;
 			
 		  }
-		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
-             wifi_communication_tnecent_handler();//
-             getBeijingTime_cofirmLinkNetState_handler();
-             wifi_auto_detected_link_state();
-           }
+//		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
+//             wifi_communication_tnecent_handler();//
+//             getBeijingTime_cofirmLinkNetState_handler();
+//             wifi_auto_detected_link_state();
+//           }
 		  
 		
 		  vTaskDelay(pdMS_TO_TICKS(50));//�?1�?7?0
@@ -208,13 +231,21 @@ static void vTaskStart(void *pvParameters)
  */
 void AppTaskCreate (void)
 {
-    
- 
+
+  xTaskCreate( vTaskWifiPro,     		/* 任务函数  */
+                 "vTaskWifiPro",   		/* 任务�?1�?7?1�?1�?7?7    */
+                 128,            		/* 任务栈大小，单位word，也就是4字节 */
+                 NULL,           		/* 任务参数  */
+                 2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
+                 &xHandleTaskWifiPro);   /* 任务句柄  */
+
+
+
   xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
                  128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
-                 2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
+                 3,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskMsgPro);   /* 任务句柄  */
 
 
