@@ -17,9 +17,10 @@ void works_run_two_hours_state(void)
 {
    static uint8_t timer_fan_flag;//times_flag;
 
-   if(gpro_t.gTimer_check_twohours > 119){ //two works two hours stop flag is "1"
+   if(gpro_t.gTimer_check_twohours > 119 && gctl_t.gTimer_counter_twohours >119){ //two works two hours stop flag is "1"
       
 	   gpro_t.gTimer_check_twohours=0;
+	   gctl_t.gTimer_counter_twohours=0;
     PLASMA_SetLow(); //
     FAN_Stop();//WT.2025.07.31 HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
     
@@ -38,10 +39,11 @@ void works_run_two_hours_state(void)
     case 1: //don't run main board any action.
     
      #if TEST_TWO_HOURS_UNIT 
-	 if(gpro_t.gTimer_check_twohours > 2){ //10
+	 if(gpro_t.gTimer_check_twohours > 2 && gctl_t.gTimer_counter_twohours>2){ //10
            
            
 			gpro_t.gTimer_check_twohours =0;
+			gctl_t.gTimer_counter_twohours=0;
              gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
 	
              gpro_t.stopTwoHours_flag=0;
@@ -50,10 +52,11 @@ void works_run_two_hours_state(void)
       }
      #else 
 
-      if( gpro_t.gTimer_check_twohours > 10){ //10 minutes =600s
+      if( gpro_t.gTimer_check_twohours > 10 && gctl_t.gTimer_counter_twohours>10){ //10 minutes =600s
                
         
 		 gpro_t.gTimer_check_twohours=0;
+		 gctl_t.gTimer_counter_twohours=0;
          gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
       
          gpro_t.stopTwoHours_flag=0;

@@ -95,13 +95,10 @@ void tim17_isr_callback_handler(void)
         if(tm1>59){ //one minutes
 			tm1=0;
 			gpro_t.gTimer_check_twohours++;
+		    gctl_t.gTimer_counter_twohours++;
 
         }
 		
-		
-       
-
-
-      }
+	}
  }
  

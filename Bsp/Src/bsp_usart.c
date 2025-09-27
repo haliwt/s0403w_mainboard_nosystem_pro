@@ -445,11 +445,9 @@ static void receive_cmd_or_notice_handler(void)
         else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
 
               buzzer_sound();
-<<<<<<< HEAD
-			        SendWifiData_Answer_Cmd(0x01,0x02); //power off .
-=======
-			  SendWifiData_Answer_Cmd(0x01,0x02); //power off .
->>>>>>> 28ab3de33e918dfa7a8623e43fc937804c6422d1
+
+              SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+
               vTaskDelay(pdMS_TO_TICKS(10)); 
              
               freertos_set_prority();
@@ -610,11 +608,10 @@ static void receive_cmd_or_notice_handler(void)
         
 
 		  gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
-<<<<<<< HEAD
-      SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-=======
+
+
           SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
->>>>>>> 28ab3de33e918dfa7a8623e43fc937804c6422d1
+
 		  vTaskDelay(pdMS_TO_TICKS(10));
 		  
        break;

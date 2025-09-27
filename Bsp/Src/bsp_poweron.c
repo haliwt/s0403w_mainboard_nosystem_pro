@@ -54,6 +54,7 @@ void power_on_handler(void)
        
         /*this works two hours reference start -WT.EDIT 2025.08.11*/
 	    gpro_t.gTimer_check_twohours=0;
+		gctl_t.gTimer_counter_twohours=0;
     
 		 gpro_t.stopTwoHours_flag =0;
 		/*end */
@@ -165,11 +166,14 @@ void power_on_handler(void)
 
 
  case 8:
-     if(gpro_t.fan_warning_flag > 1 || gpro_t.ptc_warning  > 1){
+     if(gpro_t.fan_warning_flag > 1 || gpro_t.ptc_warning  > 1 || gpro_t.stopTwoHours_flag>1 || gctl_t.gDry >1){
         if(gpro_t.fan_warning_flag > 1 ) gpro_t.fan_warning_flag = 0; //strictly forbid 
 	    if(gpro_t.ptc_warning  > 1)gpro_t.ptc_warning = 0;
+		if(gpro_t.stopTwoHours_flag>1)gpro_t.stopTwoHours_flag=0;
+		if(gctl_t.gDry > 1) gctl_t.gDry =0;
 
      }
+	
 	 works_run_two_hours_state();
 
      gpro_t.process_run_step= 9;
@@ -193,7 +197,7 @@ void power_on_handler(void)
 
   case 10:
      
-	  if( gctl_t.gTimer_read_dht11_counter>2){
+	  if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0){
 		   gctl_t.gTimer_read_dht11_counter=0;
            set_temperature_compare_value_fun();
 	   

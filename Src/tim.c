@@ -228,7 +228,7 @@ void MX_TIM17_Init(void)
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM17);
 
   /* TIM17 interrupt Init */
-  NVIC_SetPriority(TIM17_IRQn, 3);
+  NVIC_SetPriority(TIM17_IRQn,1);//NVIC_SetPriority(TIM17_IRQn, 3);
   NVIC_EnableIRQ(TIM17_IRQn);
 
   /* USER CODE BEGIN TIM17_Init 1 */
@@ -243,6 +243,7 @@ void MX_TIM17_Init(void)
   LL_TIM_DisableARRPreload(TIM17);
   
   /* USER CODE BEGIN TIM17_Init 2 */
+  LL_TIM_EnableARRPreload(TIM17);  // ✅ 推荐启用预加载
   LL_TIM_EnableIT_UPDATE(TIM17);
   LL_TIM_EnableCounter(TIM17);
   LL_TIM_EnableAllOutputs(TIM17); //TM1/TIM17/TIM16_BDTR , "MOE"-main output enble

@@ -136,11 +136,8 @@ typedef struct _RUN_T{
 	 
 	 uint16_t gTimer_copy_cmd_counter;
 	 uint8_t gTimer_wifi_detected_counter;
-	
-
-
-    
-	uint32_t randomName[1];
+	 uint8_t gTimer_counter_twohours;
+	 uint32_t randomName[1];
 	
 
 }_run_t;
