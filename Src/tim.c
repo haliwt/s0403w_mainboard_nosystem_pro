@@ -245,7 +245,7 @@ void MX_TIM17_Init(void)
   /* USER CODE BEGIN TIM17_Init 2 */
   LL_TIM_EnableIT_UPDATE(TIM17);
   LL_TIM_EnableCounter(TIM17);
-  LL_TIM_EnableAllOutputs(TIM17);
+  LL_TIM_EnableAllOutputs(TIM17); //TM1/TIM17/TIM16_BDTR , "MOE"-main output enble
 
   /* USER CODE END TIM17_Init 2 */
 
