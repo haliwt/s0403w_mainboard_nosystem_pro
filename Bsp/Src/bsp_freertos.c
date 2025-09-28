@@ -124,7 +124,7 @@ static void vTaskMsgPro(void *pvParameters)
 {
   
 	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(10000); /* 1.?????-?????????50ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(9000); /* 1.?????-?????????50ms */
     uint32_t ulValue;
     
 	
@@ -198,6 +198,7 @@ static void vTaskStart(void *pvParameters)
 
             case power_off:
               gpro_t.process_run_step=0;
+			  counter_two_hours=0;
               power_off_handler();
              break;
           }
@@ -205,6 +206,7 @@ static void vTaskStart(void *pvParameters)
           if(gpro_t.process_run_step > 10){
 
 		      gpro_t.process_run_step=6;
+			  freertos_set_prority();
 
 		  }
           else if(gpro_t.wifi_led_fast_blink_flag > 1){

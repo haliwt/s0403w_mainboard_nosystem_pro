@@ -2,6 +2,7 @@
 
 volatile uint8_t stopHoursCounter;
 
+volatile uint8_t counter_two_hours;
 
 
 //void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
@@ -94,8 +95,9 @@ void tim17_isr_callback_handler(void)
 		gpro_t.gTimer_read_dth11_sensor ++;
         if(tm1>59){ //one minutes
 			tm1=0;
+			counter_two_hours ++ ;
 			gpro_t.gTimer_check_twohours++;
-		    gctl_t.gTimer_counter_twohours++;
+		    
 
         }
 		

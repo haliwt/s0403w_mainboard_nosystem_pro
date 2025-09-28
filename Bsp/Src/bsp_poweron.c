@@ -54,7 +54,7 @@ void power_on_handler(void)
        
         /*this works two hours reference start -WT.EDIT 2025.08.11*/
 	    gpro_t.gTimer_check_twohours=0;
-		gctl_t.gTimer_counter_twohours=0;
+	    counter_two_hours=0;
     
 		 gpro_t.stopTwoHours_flag =0;
 		/*end */
@@ -102,6 +102,8 @@ void power_on_handler(void)
 		  MqttData_Publish_Init();
 		 // vTaskDelay(pdMS_TO_TICKS(200));
      	}
+	  counter_two_hours=0;
+	  gpro_t.gTimer_check_twohours=0;
 	  gpro_t.process_run_step= 6;
 	 
 	 break;

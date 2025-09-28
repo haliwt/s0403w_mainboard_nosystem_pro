@@ -139,7 +139,7 @@ typedef struct PROCESS_T{
      uint8_t ptc_switch_flag;
 	 uint8_t ultrasonic_switch_flag;
 	 uint8_t plasma_switch_flag;
-     uint8_t process_run_step;
+    volatile uint8_t process_run_step;
   
    uint8_t wifi_led_fast_blink_flag;
    uint8_t get_beijing_time_success;
@@ -164,7 +164,7 @@ typedef struct PROCESS_T{
    uint8_t gTimer_update_tencet_dht11;
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
-   uint8_t gTimer_check_twohours ;
+   volatile uint8_t gTimer_check_twohours ;
   
 
 }process_t;

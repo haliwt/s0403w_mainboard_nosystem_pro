@@ -64,8 +64,8 @@ void MX_ADC1_Init(void)
 
   LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_3, LL_DMA_PRIORITY_LOW);
 
-  //LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_3,LL_DMA_MODE_CIRCULAR); //LL_DMA_MODE_NORMAL);
-  LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_3,LL_DMA_MODE_NORMAL);
+  LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_3,LL_DMA_MODE_CIRCULAR); 
+  //LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_3,LL_DMA_MODE_NORMAL);
 
   LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_3, LL_DMA_PERIPH_NOINCREMENT);
 
@@ -91,6 +91,7 @@ void MX_ADC1_Init(void)
   ADC_InitStruct.Resolution = LL_ADC_RESOLUTION_12B;
   ADC_InitStruct.DataAlignment = LL_ADC_DATA_ALIGN_RIGHT;
   ADC_InitStruct.LowPowerMode = LL_ADC_LP_MODE_NONE;
+//  ADC_InitStruct.SequencerLength = LL_ADC_REG_SEQ_SCAN_ENABLE_2RANKS; // 启用2个通道扫描
   LL_ADC_Init(ADC1, &ADC_InitStruct);
   LL_ADC_REG_SetSequencerConfigurable(ADC1, LL_ADC_REG_SEQ_CONFIGURABLE);
 
@@ -152,6 +153,8 @@ void MX_ADC1_Init(void)
   LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_1, LL_ADC_SAMPLINGTIME_COMMON_1);
 
   /* USER CODE END ADC1_Init 2 */
+
+  LL_ADC_Enable(ADC1);//WT.EDIT 2025.09.28
 
 }
 
