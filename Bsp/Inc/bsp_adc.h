@@ -26,6 +26,7 @@ void Get_Ptc_ADC_Fun(uint8_t channel,uint8_t times);
 
 void fan_warning_sound(void);
 
+void adc_detected_hundler(void);
 
 
 

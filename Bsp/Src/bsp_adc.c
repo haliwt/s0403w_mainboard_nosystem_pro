@@ -19,6 +19,27 @@ uint16_t ptc_detect_voltage;
 
 
 
+/**********************************************************************
+	*
+	*Functin Name: void adc_detected_hundler(void)
+	*Function :
+	*Input Ref:  key of value
+	*Return Ref: NO
+	*
+**********************************************************************/
+void adc_detected_hundler(void)
+{
+   
+    if(gctl_t.gTimer_fan_adc_times > 8 && gpro_t.stopTwoHours_flag ==0 && gpro_t.fan_warning_flag  == 0){ //detected 3 times is 60s 
+        gctl_t.gTimer_fan_adc_times =0;
+       // Get_Fan_ADC_Fun(ADC_CHANNEL_0,20);
+        
+    }
+	
+   fan_warning_sound();
+	
+
+}
 
 
 

@@ -82,40 +82,7 @@ uint8_t bcc_check(const unsigned char *data, int len)
     *
 **********************************************************************/
 
-/**********************************************************************
-	*
-	*Functin Name: void adc_detected_hundler(void)
-	*Function :
-	*Input Ref:  key of value
-	*Return Ref: NO
-	*
-**********************************************************************/
-void adc_detected_hundler(void)
-{
-   #if 0
-     if(gctl_t.gTimer_ptc_adc_times > 0 && gpro_t.stopTwoHours_flag==0){ //65s//3 minutes 120s
-        gctl_t.gTimer_ptc_adc_times=0;
-        
-       Get_Ptc_ADC_Fun(ADC_CHANNEL_1,10);
-       Get_Ntc_Resistance_Temperature_Handler(gpro_t.read_ptc_voltage); 
-	   SendWifiData_To_Data(0xBC,gpro_t.read_ntc_temperature_value);//sendData_Real_Temp(g_pro.read_ntc_temperature_value);
-			   
-	   osDelay(5);
-       NTC_temperatureValue_judeg();
-        
 
-    }
-   #endif 
-    if(gctl_t.gTimer_fan_adc_times > 8 && gpro_t.stopTwoHours_flag ==0 && gpro_t.fan_warning_flag  == 0){ //detected 3 times is 60s 
-        gctl_t.gTimer_fan_adc_times =0;
-       // Get_Fan_ADC_Fun(ADC_CHANNEL_0,20);
-        
-    }
-	
-   fan_warning_sound();
-	
-
-}
 
 /********************************************************************************
 	*

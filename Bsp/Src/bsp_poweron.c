@@ -143,16 +143,16 @@ void power_on_handler(void)
             Subscriber_Data_FromCloud_Handler();
     	  
 	    }
-		
-		 SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-         vTaskDelay(pdMS_TO_TICKS(10));
+		SendWifiData_To_Data(0x1F,0x01);
+		 //SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+         vTaskDelay(pdMS_TO_TICKS(5));
 	
 	  }
-      else if(net_t.wifi_link_net_success ==0 && gctl_t.gTimer_wifi_detected_counter >2 && gpro_t.wifi_led_fast_blink_flag==0){
+      else if(net_t.wifi_link_net_success ==0 && gctl_t.gTimer_wifi_detected_counter >1 && gpro_t.wifi_led_fast_blink_flag==0){
 	  	 gctl_t.gTimer_wifi_detected_counter=0;
 
-	       SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
-		    vTaskDelay(pdMS_TO_TICKS(10));
+	       SendWifiData_To_Data(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
+		   vTaskDelay(pdMS_TO_TICKS(5));
 			//printf("wifi is not !!!\r\n");
 		    
 
@@ -179,7 +179,7 @@ void power_on_handler(void)
 
   case 9:
   	 
-      // adc_detected_hundler();
+       adc_detected_hundler();
     
 
 	   if(wifi_link_net_state() ==1 && gpro_t.gTimer_update_tencet_dht11 >5){

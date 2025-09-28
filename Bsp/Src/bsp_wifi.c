@@ -73,7 +73,7 @@ void link_wifi_net_handler(void)
 
             case 1:
                // WIFI_IC_ENABLE();
-               //LL_USART_TransmitData8(USART2, "AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
+             
                at_send_data((const uint8_t *)"AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
                 vTaskDelay(pdMS_TO_TICKS(1000));
                 gctl_t.randomName[0]=HAL_GetUIDw0();

@@ -79,7 +79,7 @@ void SystemReset(void)
            
 			 
 	           SendData_Set_Command(0x02,0x00); //close ptc 
-	           vTaskDelay(pdMS_TO_TICKS(20));
+	           vTaskDelay(pdMS_TO_TICKS(5));
 			   gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
 			   gctl_t.gTimer_copy_cmd_counter=0;
   }
@@ -90,7 +90,7 @@ void SystemReset(void)
               PTC_SetHigh();
               gctl_t.gDry=1;//
 	          SendData_Set_Command(0x02,0x01); //open ptc 
-	          vTaskDelay(pdMS_TO_TICKS(10));
+	          vTaskDelay(pdMS_TO_TICKS(5));
 			  gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
 			  gctl_t.gTimer_copy_cmd_counter=0;
 			  gctl_t.rx_set_temp_flag=1;
@@ -131,7 +131,7 @@ void SystemReset(void)
             set_temp_first_closeptc  = 1 ;
                
             SendData_Set_Command(0x02,0x00); //close ptc 
-            vTaskDelay(pdMS_TO_TICKS(20));
+            vTaskDelay(pdMS_TO_TICKS(5));
 			gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
 			 gctl_t.gTimer_copy_cmd_counter=0;
      }
@@ -143,7 +143,7 @@ void SystemReset(void)
                   gctl_t.gDry=1;
                      
                   SendData_Set_Command(0x02,0x01); //open ptc  
-                 vTaskDelay(pdMS_TO_TICKS(20));
+                 vTaskDelay(pdMS_TO_TICKS(5));
 				  gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
 				   gctl_t.gTimer_copy_cmd_counter=0;
                 }
@@ -155,7 +155,7 @@ void SystemReset(void)
         PTC_SetHigh();
         gctl_t.gDry=1;
           
-        SendData_Set_Command(0x22,0x01); //open ptc  
+        SendData_Set_Command(0x02,0x01); //open ptc  
         vTaskDelay(pdMS_TO_TICKS(5));
 		gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
 		 gctl_t.gTimer_copy_cmd_counter=0;
