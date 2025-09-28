@@ -641,8 +641,8 @@ static void receive_cmd_or_notice_handler(void)
       if(gl_tMsg.execuite_cmd_notice == 0x01){
 
 	    if(net_t.wifi_link_net_success ==0 && gpro_t.wifi_led_fast_blink_flag==0){
-	  	     SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
-             vTaskDelay(pdMS_TO_TICKS(5));
+	  	   //  SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
+           //  vTaskDelay(pdMS_TO_TICKS(20));
 		}
         #if 0
         gctl_t.gDry = 1;
@@ -658,8 +658,8 @@ static void receive_cmd_or_notice_handler(void)
       else if(gl_tMsg.execuite_cmd_notice == 0x0){
 
 	   if(net_t.wifi_link_net_success ==0 && gpro_t.wifi_led_fast_blink_flag==0){
-	  	    SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
-             vTaskDelay(pdMS_TO_TICKS(5));
+	  	  //  SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
+           //  vTaskDelay(pdMS_TO_TICKS(20));
 			//printf("wifi is not !!!\r\n");
 		}
         #if 0
