@@ -1,7 +1,7 @@
 #include "bsp.h"
 #include "adc.h"
 
-#define SAMPLE_COUNT 5
+#define SAMPLE_COUNT 6
 
 //uint16_t mean_fan_buf[SAMPLE_COUNT];  // 存放5次采样值
 //uint8_t fan_counter = 0;              // 当前存储位置
@@ -28,6 +28,7 @@ static uint16_t ADC_FAN_ReadVoltage(void);
 static uint16_t ADC_PTC_ReadVoltage(void);
 static uint8_t ADC_StartConversion(void);
 static void ADC_GetValues(void);
+uint16_t mean_fan_buf[SAMPLE_COUNT];
 
 
 /**********************************************************************
@@ -43,16 +44,25 @@ void adc_detected_hundler(void)
    // static uint8_t switch_flag;
     if(gctl_t.gTimer_fan_adc_times > 2 && gpro_t.stopTwoHours_flag ==0 && gpro_t.fan_warning_flag==0){ //detected 3 times is 60s 
         gctl_t.gTimer_fan_adc_times =0;
-
+        Fan_Full_Speed();
 	   //switch_flag = switch_flag ^ 0x01;
-	   if(ADC_StartConversion()){
+	       if(ADC_StartConversion()){
 	   		ADC_GetValues();
-	   		vTaskDelay(pdMS_TO_TICKS(30));
-	   	}
+	   		
+	       	}
 
-	   if(fan_detect_voltage < 470){
+	   if(fan_detect_voltage < 460){
 
-	      gpro_t.fan_warning_flag=1;
+	      if(fan_detect_voltage > 370 && fan_detect_voltage < 400){
+
+
+		  }
+		  else{
+		      gpro_t.fan_warning_flag=1;
+			  gctl_t.ptc_on_off_flag = 1;
+		      gctl_t.gDry =0;
+			  PTC_SetLow();
+		  }
 
 	   }
     }
@@ -98,28 +108,29 @@ void ADC_GetValues(void)
 {
      static uint8_t fan_counter,ptc_counter;
 	 uint8_t i;
-	static  uint16_t mean_fan_buf[5];
+	
 	uint32_t sum =0;
-    //if(adc_conversion_complete) {
         
-       
-      // fan_detect_voltage =  compute_voltage(adc_buffer[0]) ;
-	    mean_fan_buf[fan_counter] = compute_voltage(adc_buffer[0]) ;
+   
+	   
+	   mean_fan_buf[fan_counter] = compute_voltage(adc_buffer[0]);//(adc_buffer[0] * 3300 )/4095;//compute_voltage(adc_buffer[0]) ;
+	   vTaskDelay(pdMS_TO_TICKS(10));
 	    fan_counter++;
-	    if(fan_counter >=5){
+	    if(fan_counter >=6){
 
-            for (i = 0; i < SAMPLE_COUNT; i++) {
+            for (i = 1; i < SAMPLE_COUNT; i++) {
                 sum += mean_fan_buf[i];
             }
 		   
 		  fan_detect_voltage = sum/5;
 		  fan_counter =0;
+	
 
 
 		}
 		
         //fan_detect_voltage = (adc_buffer[0] * 3300 )/4095; // PA0 - FAN
-       ptc_detect_voltage =  compute_voltage(adc_buffer[1]) ;
+      // ptc_detect_voltage =  compute_voltage(adc_buffer[1]) ;
        // ptc_detect_voltage = (adc_buffer[1] * 3300)/4095; // PA1 - PTC
       //  adc_conversion_complete = 0;
        // return 1;
@@ -185,6 +196,11 @@ void fan_warning_sound(void)
 {
    if(gpro_t.fan_warning_flag == 1 && gpro_t.gTimer_detect_fan_error > 5){
         gpro_t.gTimer_detect_fan_error =0;
+
+   
+		   gctl_t.ptc_on_off_flag = 1;
+		   gctl_t.gDry =0;
+		    PTC_SetLow();
 
 
            buzzer_sound();//Buzzer_KeySound();
