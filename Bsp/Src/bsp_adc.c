@@ -54,7 +54,7 @@ void adc_detected_hundler(void)
 	   if(fan_detect_voltage < 460){
 
 	      if(fan_detect_voltage > 370 && fan_detect_voltage < 400){
-
+ 
 
 		  }
 		  else{
