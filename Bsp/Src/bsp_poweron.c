@@ -196,12 +196,17 @@ void power_on_handler(void)
 
   case 10:
 
-     if(gctl_t.set_temperature_flag > 1 || gctl_t.set_temperature_value > 40 || gctl_t.ptc_on_off_flag > 1){
+     if(gctl_t.set_temperature_flag > 1 || gctl_t.set_temperature_value > 40 || gctl_t.ptc_on_off_flag > 1
+	 	  ||gctl_t.app_timer_power_on_flag > 1 || gctl_t.set_temp_first_closeptc > 1){
 	 	if(gctl_t.set_temperature_flag > 1)gctl_t.set_temperature_flag =0;
 		if(gctl_t.set_temperature_value > 40 && gctl_t.set_temperature_flag ==0)gctl_t.set_temperature_value =40;
         if(gctl_t.ptc_on_off_flag > 1)gctl_t.ptc_on_off_flag =0;
+		if(gctl_t.app_timer_power_on_flag > 1)gctl_t.app_timer_power_on_flag=0;
+		if( gctl_t.set_temp_first_closeptc > 1)  gctl_t.set_temp_first_closeptc =0;
 	 }
-	 else if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0){
+
+
+	 if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0){
 		   gctl_t.gTimer_read_dht11_counter=0;
            set_temperature_compare_value_fun();
 	   
@@ -517,6 +522,7 @@ void power_off_handler(void)
          gpro_t.process_run_step=0;//gpro_t.process_run_step
           gctl_t.rx_set_temp_flag=0; 
          gctl_t.set_temperature_flag = 0; 
+		 fan_detect_voltage=1000;
 		
 
           SetPowerOff_ForDoing();

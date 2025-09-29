@@ -90,8 +90,12 @@ void SysTick_Handler(void)
  */  
 void delay_init(uint16_t sysclk)
 {
-	g_fac_us = sysclk;  
-    SysTick->CTRL |= SysTick_CTRL_CLKSOURCE_Msk; // 确保使用 HCLK 作为时钟源
+	// 假设系统时钟 64 MHz
+    // 1 tick = 1 us → 需要 64 个时钟周期
+    LL_Init1msTick(64000000);   // 先初始化为 1ms 基准
+    SysTick->LOAD  = (64000000 / 1000000) - 1; // 64-1 = 63
+    SysTick->VAL   = 0;                         // 清零当前值
+    SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk;
 
 }
 
@@ -102,31 +106,25 @@ void delay_init(uint16_t sysclk)
  * @note      nus取值范围: 0 ~ (2^32 / fac_us) (fac_us一般等于系统主频, 自行套入计算)
  * @retval    无
  */
-void delay_us(uint32_t nus)
+void delay_us(uint32_t us)
 {
-    uint32_t ticks = nus * g_fac_us;
-    uint32_t told, tnow, tcnt = 0;
-    uint32_t reload = SysTick->LOAD;
+   static  uint32_t SystemCoreClock= 64000000;
 
-    vTaskSuspendAll();  // 锁定任务调度器（不影响中断）
+   uint32_t ticks = us * (SystemCoreClock / 1000000); // 需要的时钟数
+    uint32_t start = SysTick->VAL;  //current value register 现在的记录数据值
+    uint32_t load  = SysTick->LOAD; //最大值
+    uint32_t elapsed = 0;
+    uint32_t now;
 
-    told = SysTick->VAL;
-    while (1)
+    while (elapsed < ticks)
     {
-        tnow = SysTick->VAL;
-        if (tnow != told)
-        {
-            if (tnow < told)
-                tcnt += told - tnow; // 正常递减
-            else
-                tcnt += reload - tnow + told; // 发生重装载
-
-            told = tnow;
-            if (tcnt >= ticks) break;
-        }
+        now = SysTick->VAL;
+        if (start >= now)  // 没有溢出,到计时
+            elapsed += start - now;
+        else               // 发生溢出
+            elapsed += start + (load + 1) - now;
+        start = now;
     }
-
-    xTaskResumeAll();   // 恢复任务调度器
 
 }
 
@@ -137,31 +135,40 @@ void delay_us(uint32_t nus)
  */
 void delay_ms(uint16_t nms)
 {
-    
-#if SYS_SUPPORT_OS  /* 如果需要支持OS, 则根据情况调用os延时以释放CPU */
-    if (delay_osrunning && delay_osintnesting == 0)     /* 如果OS已经在跑了,并且不是在中断里面(中断里面不能任务调度) */
-    {
-        if (nms >= g_fac_ms)                            /* 延时的时间大于OS的最少时间周期 */
-        {
-            delay_ostimedly(nms / g_fac_ms);            /* OS延时 */
-        }
-
-        nms %= g_fac_ms;                                /* OS已经无法提供这么小的延时了,采用普通方式延时 */
-    }
-#endif
-
-    delay_us((uint32_t)(nms * 1000));                   /* 普通方式延时 */
+       delay_us((uint32_t)(nms * 1000));                   /* 普通方式延时 */
 }
 #if 0
 /**
- * @brief       HAL库内部函数用到的延时
- * @note        HAL库的延时默认用Systick，如果我们没有开Systick的中断会导致调用这个延时后无法退出
+ * @brief       LL 使用TIM2 定时器作为us级延时.
+ * @note        LL库的,TIM2 是32位定时器
  * @param       Delay : 要延时的毫秒数
  * @retval      None
  */
-void HAL_Delay(uint32_t Delay)
+#include "stm32g0xx_ll_tim.h"
+#include "stm32g0xx_ll_bus.h"
+
+void TIM2_Init(void)
 {
-     delay_ms(Delay);
+    // 使能 TIM2 时钟
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
+
+    // 假设系统时钟 64 MHz
+    // 预分频器设为 64-1 = 63 → 定时器计数频率 = 1 MHz (1 tick = 1 us)
+    LL_TIM_SetPrescaler(TIM2, 64 - 1);
+
+    // 自动重装载寄存器设为最大值
+    LL_TIM_SetAutoReload(TIM2, 0xFFFFFFFF);
+
+    // 启动计数器
+    LL_TIM_EnableCounter(TIM2);
 }
+
+void delay_us(uint32_t us)
+{
+    uint32_t start = LL_TIM_GetCounter(TIM2);
+    while ((LL_TIM_GetCounter(TIM2) - start) < us);
+}
+
+
 #endif
 

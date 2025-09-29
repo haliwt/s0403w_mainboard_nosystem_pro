@@ -1,6 +1,11 @@
 #include "bsp.h"
 #include "adc.h"
 
+#define SAMPLE_COUNT 5
+
+//uint16_t mean_fan_buf[SAMPLE_COUNT];  // 存放5次采样值
+//uint8_t fan_counter = 0;              // 当前存储位置
+//uint8_t sample_ready = 0;             // 标记是否采满5次
 
 
 // ADC相关变量定义
@@ -14,7 +19,7 @@ volatile uint8_t adc_conversion_complete = 0;
 
 
 
-uint16_t fan_detect_voltage;
+uint16_t fan_detect_voltage = 1000;
 uint16_t ptc_detect_voltage;
 
 
@@ -36,17 +41,22 @@ static void ADC_GetValues(void);
 void adc_detected_hundler(void)
 {
    // static uint8_t switch_flag;
-    if(gctl_t.gTimer_fan_adc_times > 3 && gpro_t.stopTwoHours_flag ==0){ //detected 3 times is 60s 
+    if(gctl_t.gTimer_fan_adc_times > 2 && gpro_t.stopTwoHours_flag ==0 && gpro_t.fan_warning_flag==0){ //detected 3 times is 60s 
         gctl_t.gTimer_fan_adc_times =0;
 
 	   //switch_flag = switch_flag ^ 0x01;
 	   if(ADC_StartConversion()){
-	   ADC_GetValues();
-	   vTaskDelay(pdMS_TO_TICKS(200));
+	   		ADC_GetValues();
+	   		vTaskDelay(pdMS_TO_TICKS(30));
 	   	}
-        
+
+	   if(fan_detect_voltage < 470){
+
+	      gpro_t.fan_warning_flag=1;
+
+	   }
     }
-	
+   
    fan_warning_sound();
 	
 
@@ -86,9 +96,31 @@ static uint8_t ADC_StartConversion(void)
 // 获取ADC转换结果
 void ADC_GetValues(void)
 {
+     static uint8_t fan_counter,ptc_counter;
+	 uint8_t i;
+	static  uint16_t mean_fan_buf[5];
+	uint32_t sum =0;
     //if(adc_conversion_complete) {
-        fan_detect_voltage = (adc_buffer[0] * 3300 )/4095; // PA0 - FAN
-        ptc_detect_voltage = (adc_buffer[1] * 3300)/4095; // PA1 - PTC
+        
+       
+      // fan_detect_voltage =  compute_voltage(adc_buffer[0]) ;
+	    mean_fan_buf[fan_counter] = compute_voltage(adc_buffer[0]) ;
+	    fan_counter++;
+	    if(fan_counter >=5){
+
+            for (i = 0; i < SAMPLE_COUNT; i++) {
+                sum += mean_fan_buf[i];
+            }
+		   
+		  fan_detect_voltage = sum/5;
+		  fan_counter =0;
+
+
+		}
+		
+        //fan_detect_voltage = (adc_buffer[0] * 3300 )/4095; // PA0 - FAN
+       ptc_detect_voltage =  compute_voltage(adc_buffer[1]) ;
+       // ptc_detect_voltage = (adc_buffer[1] * 3300)/4095; // PA1 - PTC
       //  adc_conversion_complete = 0;
        // return 1;
     //}
@@ -151,23 +183,23 @@ static uint16_t ADC_PTC_ReadVoltage(void)
 
 void fan_warning_sound(void)
 {
-   if(gpro_t.fan_warning_flag == 1 && gpro_t.gTimer_detect_fan_error > 9){
+   if(gpro_t.fan_warning_flag == 1 && gpro_t.gTimer_detect_fan_error > 5){
         gpro_t.gTimer_detect_fan_error =0;
 
 
            buzzer_sound();//Buzzer_KeySound();
-		   osDelay(100);
+		   vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);
 		   buzzer_sound();//Buzzer_KeySound();
-		   osDelay(100);
+		   vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);
 		   buzzer_sound();//Buzzer_KeySound();
-			osDelay(100);
+			vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);
 		   buzzer_sound();//Buzzer_KeySound();
-		   osDelay(100);
+		   vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);
 		   buzzer_sound();//Buzzer_KeySound();
-		   osDelay(100);
+		   vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);
           
            SendWifiData_To_Cmd(0x09, 0x01);
-
+           vTaskDelay(pdMS_TO_TICKS(10));
 	       if(wifi_link_net_state()==1){
 
                MqttData_Publis_SetFan(0);

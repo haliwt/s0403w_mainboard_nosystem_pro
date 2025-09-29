@@ -9,6 +9,7 @@
 #define  FAN_OLDER_VERSION     0 //WT.EDIT 2025.02.20 fan works current is 500mA.
 
 
+extern uint16_t fan_detect_voltage;
 
 
 typedef enum{

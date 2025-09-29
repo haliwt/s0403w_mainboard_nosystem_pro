@@ -74,77 +74,80 @@ typedef enum{
 typedef struct _RUN_T{
     
 	
-   volatile  uint8_t gDht11_humidity ;
-	volatile uint8_t gDht11_temperature;
-    volatile uint8_t set_temperature_flag;
+    uint8_t gDht11_humidity ;
+ uint8_t gDht11_temperature;
+    uint8_t set_temperature_flag;
    
-   volatile uint8_t app_timer_power_on_flag ;
+   uint8_t app_timer_power_on_flag ;
 
-   volatile uint8_t response_wifi_signal_label;
-  volatile uint8_t ptc_on_off_flag ;
-  volatile uint8_t set_temp_first_closeptc ;
+   uint8_t response_wifi_signal_label;
+  uint8_t ptc_on_off_flag ;
+   uint8_t set_temp_first_closeptc ;
 
  //fan:
     
-	volatile uint8_t  gFan;
+	 uint8_t  gFan;
     //ptc:
    
-   volatile   uint8_t  gDry;
+     uint8_t  gDry;
 
-	volatile  uint8_t  gUlransonic;
-	volatile  uint8_t  gModel;
-	volatile  uint8_t gPlasma;
+	  uint8_t  gUlransonic;
+  uint8_t  gModel;
+	  uint8_t gPlasma;
 
-	volatile  uint8_t  mode_ai_switch_flag;
+  uint8_t  mode_ai_switch_flag;
     
 
 	 
 	  //wifi link ref
-	volatile  uint8_t first_link_tencent_cloud_flag ;
+  uint8_t first_link_tencent_cloud_flag ;
 	
 
 	  
-	  volatile uint8_t  set_temperature_value;
+	   uint8_t  set_temperature_value;
 
 
-	volatile  uint8_t  set_wind_speed_value;
-	volatile  uint8_t auto_link_cloud_flag;
-	 volatile uint8_t reconnect_tencent_cloud_flag;
-	volatile  uint8_t rx_set_temp_flag;
+	  uint8_t  set_wind_speed_value;
+	  uint8_t auto_link_cloud_flag;
+	  uint8_t reconnect_tencent_cloud_flag;
+	  uint8_t rx_set_temp_flag;
 	
-	volatile uint8_t  wind_speed_decade;
-	volatile  uint8_t  wind_speed_unit;
-   volatile   uint8_t wifi_config_net_lable;
+ uint8_t  wind_speed_decade;
+  uint8_t  wind_speed_unit;
+     uint8_t wifi_config_net_lable;
     
 	  //ADC
-	volatile  uint8_t ptc_warning;
-	volatile  uint8_t fan_warning;
+	  uint8_t ptc_warning;
+	  uint8_t fan_warning;
 
 
 	  
       //timer ref 
-	volatile  uint8_t gTimer_fan_adc_times;
-	volatile  uint8_t gTimer_ptc_adc_times;
+	  uint8_t gTimer_fan_adc_times;
+	  uint8_t gTimer_ptc_adc_times;
    
 	
 
-	volatile uint8_t gTimer_senddata_panel;
+	 uint8_t gTimer_senddata_panel;
 	
-	volatile uint8_t gTimer_fan_run_one_minute;
-   volatile  uint8_t gTimer_read_dht11_counter;
-	volatile uint8_t gTimer_linkTencentCounter;
+	 uint8_t gTimer_fan_run_one_minute;
+     uint8_t gTimer_read_dht11_counter;
+	 uint8_t gTimer_linkTencentCounter;
 	 
-	volatile uint16_t gTimer_copy_cmd_counter;
-	volatile uint8_t gTimer_wifi_detected_counter;
+	 uint16_t gTimer_copy_cmd_counter;
+	 uint8_t gTimer_wifi_detected_counter;
 	
-	volatile uint32_t randomName[1];
+	 uint32_t randomName[1];
 	
 
 }_run_t;
 
+extern _run_t gctl_t; 
+
+
 //#define CProcessInit(me_) ((me_)->cmdCtr__ =0,(me_)->state__ = IDLE)
 extern uint8_t ReceiveBuffer[1];
-extern _run_t gctl_t; 
+
 
 extern uint8_t powerOffFanRun_flag ;
 
