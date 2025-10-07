@@ -1,55 +1,46 @@
 #include "bsp.h"
 
-volatile uint8_t stopHoursCounter;
-
 volatile uint8_t counter_two_hours;
 
 
-//void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-//{
-//   uint32_t temp;
-//	if(huart->Instance==USART2){
-
-//		if(__HAL_UART_GET_FLAG(&huart2,UART_FLAG_ORE)!=RESET){
-
-//             __HAL_UART_CLEAR_OREFLAG(&huart2);
-//		
-//			UART_Start_Receive_IT(&huart2,wifi_rx_inputBuf,1);
-
-//		}
-//		__HAL_UNLOCK(&huart2);
-//		   
-//       
-//          temp = USART2->RDR;
-//		UART_Start_Receive_IT(&huart2,wifi_rx_inputBuf,1);
+static void tim17_isr_callback_handler(void);
 
 
-//	}
-//	if(huart->Instance==USART1){
-//	
-//		if(__HAL_UART_GET_FLAG(&huart1,UART_FLAG_ORE)!=RESET){
+// 定义 TIM17 回调函数类型
+typedef void (*Tim17Callback)(void);
 
-//		__HAL_UART_CLEAR_OREFLAG(&huart1);
-//		UART_Start_Receive_IT(&huart1,inputBuf,1);
+static Tim17Callback tim17_cb = NULL;   // 保存回调函数指针
 
-//		}
-//		__HAL_UNLOCK(&huart1);
-//		//  temp = USART1 ->ISR;
-//		temp = USART1->RDR;
-//		UART_Start_Receive_IT(&huart1,inputBuf,1);
-//	
-//		}
-//}
+// 注册回调函数
+void tim17_register_callback(Tim17Callback cb) 
+{
+    tim17_cb = cb;
+}
+
+// ISR 调用时触发
+void tim17_invoke_callback(void) 
+{
+    if (tim17_cb) {
+        tim17_cb();   // 调用用户注册的回调
+    }
+}
+
+// 注册回调函数
+void callback_register_fun(void)
+{
+  tim17_register_callback(tim17_isr_callback_handler);
+
+}
+
 /********************************************************************************
 	**
 	*Function Name:void tim17_isr_callback_handler(void)
-	*Function : TIM17 interruput ISR 
+	*Function : // 业务逻辑函数（回调实现）
 	*Input Ref: 
 	*Return Ref:NO
 	*
 *******************************************************************************/
-void tim17_isr_callback_handler(void)
-
+static void tim17_isr_callback_handler(void)
 {
    static  uint16_t tm0;
    static uint8_t tm1;
@@ -103,4 +94,9 @@ void tim17_isr_callback_handler(void)
 		
 	}
  }
+
+
+
+
+
  

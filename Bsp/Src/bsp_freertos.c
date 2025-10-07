@@ -184,8 +184,14 @@ static void vTaskStart(void *pvParameters)
             link_wifi_to_tencent_handler(gpro_t.wifi_led_fast_blink_flag); //detected ADC of value 
 
 		    ai_mode_display_fun();
+
+			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   
-		    if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
+            if(gpro_t.answer_buzzer_flag > 1){
+				gpro_t.answer_buzzer_flag =0;
+            }
+			else if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
+				gpro_t.answer_buzzer_flag =0;
 
 				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 				vTaskDelay(pdMS_TO_TICKS(10));
@@ -196,7 +202,7 @@ static void vTaskStart(void *pvParameters)
 		  
           break;
 
-            case power_off:
+          case power_off:
               gpro_t.process_run_step=0;
 			  counter_two_hours=0;
               power_off_handler();

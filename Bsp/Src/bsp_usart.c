@@ -370,7 +370,8 @@ void usart1_protocol_state_machine(void)
             //gl_tMsg.copy_cmd_flag ++;
 
 
-      #if  DEBUG_FLAG
+      #if  DEBU
+	  G_FLAG
 
         printf("cmd_notice = %02X\r\n",gl_tMsg.cmd_notice);
      //printf("rx_execuite = \r\n",gl_tMsg.execuite_cmd_notice);
@@ -461,7 +462,7 @@ static void receive_cmd_or_notice_handler(void)
 
      break;
 
-     case ptc_on_off: //PTC?????????
+     case ptc_on_off: //PTC key of command .
 
      if(gl_tMsg.execuite_cmd_notice  == 0x01){
           buzzer_sound();

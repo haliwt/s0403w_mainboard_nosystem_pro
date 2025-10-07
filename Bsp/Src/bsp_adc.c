@@ -41,7 +41,7 @@ uint16_t mean_fan_buf[SAMPLE_COUNT];
 **********************************************************************/
 void adc_detected_hundler(void)
 {
-   // static uint8_t switch_flag;
+    static uint8_t counter_error;
     if(gctl_t.gTimer_fan_adc_times > 2 && gpro_t.stopTwoHours_flag ==0 && gpro_t.fan_warning_flag==0){ //detected 3 times is 60s 
         gctl_t.gTimer_fan_adc_times =0;
         Fan_Full_Speed();
@@ -58,11 +58,18 @@ void adc_detected_hundler(void)
 
 		  }
 		  else{
-		      gpro_t.fan_warning_flag=1;
-			  gctl_t.ptc_on_off_flag = 1;
-		      gctl_t.gDry =0;
-			  PTC_SetLow();
+		  	  counter_error ++;
+			  if(counter_error > 2){
+			      gpro_t.fan_warning_flag=1;
+				  gctl_t.ptc_on_off_flag = 1;
+			      gctl_t.gDry =0;
+				  PTC_SetLow();
+			  }
 		  }
+
+	   }
+	   else{
+	      counter_error=0;
 
 	   }
     }

@@ -6,8 +6,6 @@
 #define BUZZER_GPIO     GPIOB
 
 
-
-
 void buzzer_sound(void);
 
 void tim3_buzzer_sound_config(void);

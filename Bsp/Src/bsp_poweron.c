@@ -240,7 +240,8 @@ void ActionEvent_Handler(void)
 		
 		PTC_SetHigh();
 		if(ptc_default!=gpro_t.ptc_switch_flag){
-		ptc_default = gpro_t.ptc_switch_flag;
+		   gpro_t.ptc_switch_flag++;
+		   ptc_default = gpro_t.ptc_switch_flag;
 		if(wifi_link_net_state()==1){ 
 			MqttData_Publish_SetPtc(0x01);
 			//vTaskDelay(pdMS_TO_TICKS(200));
@@ -255,6 +256,7 @@ void ActionEvent_Handler(void)
 	
 		PTC_SetLow();
 		if(ptc_default!=gpro_t.ptc_switch_flag){
+			 gpro_t.ptc_switch_flag++;
 			ptc_default = gpro_t.ptc_switch_flag;
 			if(wifi_link_net_state()==1){ 
 				MqttData_Publish_SetPtc(0x0);
@@ -269,6 +271,7 @@ void ActionEvent_Handler(void)
 		
 	     PLASMA_SetHigh();
 		 if(plasma_default!=gpro_t.plasma_switch_flag){
+		 	gpro_t.plasma_switch_flag++;
 			plasma_default = gpro_t.plasma_switch_flag;	
 		 if(wifi_link_net_state()==1){ 
 		   MqttData_Publish_SetPlasma(0x01);
@@ -280,6 +283,7 @@ void ActionEvent_Handler(void)
 
 		PLASMA_SetLow();
 		 if(plasma_default!=gpro_t.plasma_switch_flag){
+		 	gpro_t.plasma_switch_flag++;
 			plasma_default = gpro_t.plasma_switch_flag;
 		 if(wifi_link_net_state()==1){ 
 		   MqttData_Publish_SetPlasma(0);
@@ -293,6 +297,7 @@ void ActionEvent_Handler(void)
 	 
 	//	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
 	 if(ultrasonic_default!=gpro_t.ultrasonic_switch_flag){
+	 	gpro_t.ultrasonic_switch_flag++;
 	   ultrasonic_default = gpro_t.ultrasonic_switch_flag;
 		 if(wifi_link_net_state()==1){ 
 		   MqttData_Publish_SetUltrasonic(0x01);
@@ -303,6 +308,7 @@ void ActionEvent_Handler(void)
 	else{
 //	  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
 		if(ultrasonic_default!=gpro_t.ultrasonic_switch_flag){
+			gpro_t.ultrasonic_switch_flag++;
 			ultrasonic_default = gpro_t.ultrasonic_switch_flag;	
 			if(wifi_link_net_state()==1){ 
 			MqttData_Publish_SetUltrasonic(0);
