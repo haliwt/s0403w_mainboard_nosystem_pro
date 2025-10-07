@@ -65,6 +65,8 @@ uint8_t bcc_check(const unsigned char *data, int len)
    wifi_init();
    // 注册回调函数
    callback_register_fun();//tim17_register_callback(tim17_isr_callback_handler);
+   callback_register_usart1_rx();
+   callback_register_usart2_rx();
 	
 #if Enable_EventRecorder == 1  
 	/* 0…60‹10‡80†40†30…4EventRecorder0…50„40†70„90‡40‹0 */

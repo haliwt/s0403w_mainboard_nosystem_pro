@@ -1,7 +1,40 @@
 #include "bsp.h"
 
+static void usart2_isr_callback_handler(uint8_t data);
 
-void usart2_isr_callback_handler(uint8_t data)
+
+typedef void (*Usart2RxCallback)(uint8_t data);
+
+static Usart2RxCallback usart2_rx_cb = NULL;
+
+//
+void usart2_register_rx_callback(Usart2RxCallback cb)
+{
+   usart2_rx_cb = cb;
+
+}
+
+
+void usart2_rx_callback_invoke(uint8_t data)
+{
+    if(usart2_rx_cb !=NULL){
+
+         usart2_rx_cb(data);
+	}
+
+
+}
+
+void callback_register_usart2_rx(void)
+{
+
+	usart2_register_rx_callback(usart2_isr_callback_handler);
+
+
+}
+
+
+static void usart2_isr_callback_handler(uint8_t data)
 {
 
      wifi_rx_inputBuf[0] =data;

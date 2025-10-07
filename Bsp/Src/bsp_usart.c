@@ -14,10 +14,46 @@
 
 #define UART1_RX_BUF_SIZE 20
 
+typedef void (*Usart1RxCallback)(uint8_t data);
+
+static Usart1RxCallback usart1_rx_cb = NULL;  //定义一个全局静态函数指针
+
+static void usart1_isr_callback_handler(uint8_t data);
+
+
+//提供注册接口
+void usart1_register_rx_callback(Usart1RxCallback cb)
+{
+   usart1_rx_cb = cb;
+
+}
+
+void usart1_invoke_callback(uint8_t data)
+{
+   if(usart1_rx_cb !=NULL){
+
+       usart1_rx_cb(data);
+   }
+
+
+}
+
+
+void callback_register_usart1_rx(void)
+{
+
+   usart1_register_rx_callback(usart1_isr_callback_handler);
+
+}
+
+
+
 volatile uint8_t uart1_rx_buf[UART1_RX_BUF_SIZE];
 volatile uint8_t uart1_rx_head = 0;
 volatile uint8_t uart1_rx_tail = 0;
 volatile uint8_t rx_state;
+
+
 
 typedef enum ack_sig{
 
@@ -128,7 +164,7 @@ volatile uint8_t rx_data_counter=0;
 	*Return Ref:NO
 	*
 *******************************************************************************/
-void usart1_isr_callback_handler(uint8_t data)
+static void usart1_isr_callback_handler(uint8_t data)
 {
        
 	    
@@ -290,15 +326,8 @@ void usart1_isr_callback_handler(uint8_t data)
 			gl_tMsg.usData[1]=0;
 	         gl_tMsg.usData[6]=0;
 			 freertos_decoder_isr_handler();
-			
+			//usart1_protocol_state_machine();
 
-	       // }
-//			else{
-//			 rx_data_counter=0;
-//		     rx_state = 0;
-//		      memcpy(gl_tMsg.desData,gl_tMsg.usData,gl_tMsg.total_data_length);
-//
-//			}
 
 
 		  break;

@@ -9,12 +9,13 @@ static void tim17_isr_callback_handler(void);
 // 定义 TIM17 回调函数类型
 typedef void (*Tim17Callback)(void);
 
+// 保存回调函数指针的全局变量
 static Tim17Callback tim17_cb = NULL;   // 保存回调函数指针
 
 // 注册回调函数
 void tim17_register_callback(Tim17Callback cb) 
 {
-    tim17_cb = cb;
+    tim17_cb = cb;  // 把传进来的函数指针保存到全局变量
 }
 
 // ISR 调用时触发
