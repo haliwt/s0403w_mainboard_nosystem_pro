@@ -116,9 +116,9 @@ void wifi_communication_tnecent_handler(void)
     *Return Ref:NO
     *
 **********************************************************************/
-void link_wifi_to_tencent_handler(uint8_t data)
+void link_wifi_to_tencent_handler(void)
 {
-    if(data == 1){//if(gpro_t.wifi_led_fast_blink_flag==1){
+    if(gpro_t.wifi_led_fast_blink_flag == 1){//if(gpro_t.wifi_led_fast_blink_flag==1){
         if(gctl_t.gTimer_linkTencentCounter  > 119){
 
            gpro_t.wifi_led_fast_blink_flag =0;//gpro_t.wifi_led_fast_blink_flag =0;
@@ -139,6 +139,7 @@ void link_wifi_to_tencent_handler(uint8_t data)
         
  
     }
+
    
 
 }

@@ -181,7 +181,7 @@ static void vTaskStart(void *pvParameters)
             case power_on:
             power_on_handler();
            
-            link_wifi_to_tencent_handler(gpro_t.wifi_led_fast_blink_flag); //detected ADC of value 
+            link_wifi_to_tencent_handler(); //detected ADC of value 
 
 		    ai_mode_display_fun();
 

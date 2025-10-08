@@ -175,7 +175,7 @@ void bsp_init(void);
 
 uint8_t bcc_check(const unsigned char *data, int len) ;
 
-void link_wifi_to_tencent_handler(uint8_t data);
+void link_wifi_to_tencent_handler(void);
 
 void wifi_communication_tnecent_handler(void);
 

@@ -579,7 +579,7 @@ static void receive_cmd_or_notice_handler(void)
 
      break;
 
-      case 0x05: // link wifi command
+      case  wifi_link: // link wifi command
 
        if(gl_tMsg.execuite_cmd_notice == 0x01){  // link wifi 
         
@@ -602,7 +602,7 @@ static void receive_cmd_or_notice_handler(void)
 
      break;
 
-     case 0x06: //buzzer sound command 
+     case buzzer_sound_s: //buzzer sound command 
 
           buzzer_sound();
 		  //vTaskDelay(pdMS_TO_TICKS(5));
