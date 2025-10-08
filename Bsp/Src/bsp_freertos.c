@@ -185,6 +185,8 @@ static void vTaskStart(void *pvParameters)
 
 		    ai_mode_display_fun();
 
+			display_ptc_icon();
+
 			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   
             if(gpro_t.answer_buzzer_flag > 1){

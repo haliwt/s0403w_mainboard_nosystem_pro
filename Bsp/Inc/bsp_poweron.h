@@ -17,7 +17,7 @@ void ActionEvent_Handler(void);
 
 void every_power_on_run(void);
 
-void twoHours_afterWorks_Handler(void);
+
 
 void power_off_handler(void);
 
@@ -33,18 +33,7 @@ void SetPowerOff_ForDoing(void);
 void ActionEvent_Handler(void);
 
 
-void twoHours_afterWorks_Handler(void);
-
-
-
-
-    
-
-
-
-
-
-
+void display_ptc_icon(void);
 
 
 #endif 

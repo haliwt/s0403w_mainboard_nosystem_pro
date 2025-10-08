@@ -2,7 +2,7 @@
 
 
 static void power_off_stop_fun(void);
-
+void every_power_on_run(void);
 /**********************************************************************
 	*
 	*Functin Name: 
@@ -239,6 +239,8 @@ void ActionEvent_Handler(void)
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 		
 		PTC_SetHigh();
+		SendData_Set_Command(0x02,0x01); //close ptc 
+	    vTaskDelay(pdMS_TO_TICKS(5));
 		if(ptc_default!=gpro_t.ptc_switch_flag){
 		   gpro_t.ptc_switch_flag++;
 		   ptc_default = gpro_t.ptc_switch_flag;
@@ -255,6 +257,8 @@ void ActionEvent_Handler(void)
 		gctl_t.gDry =0;
 	
 		PTC_SetLow();
+	     SendData_Set_Command(0x02,0x00); //close ptc 
+	    vTaskDelay(pdMS_TO_TICKS(5));
 		if(ptc_default!=gpro_t.ptc_switch_flag){
 			 gpro_t.ptc_switch_flag++;
 			ptc_default = gpro_t.ptc_switch_flag;
@@ -324,84 +328,32 @@ void ActionEvent_Handler(void)
 
 /************************************************************************************
 ************************************************************************************/
-void twoHours_afterWorks_Handler(void)
+void display_ptc_icon(void)
 
 {
 
-  // static uint8_t ptc_default =1,plasma_default =1,ultrasonic_default =1;
-   
+  if(gctl_t.gTimer_ptc_adc_times > 1){
+   gctl_t.gTimer_ptc_adc_times=0;
    if( gctl_t.gDry==1){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning != 1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 		
 		   
-			PTC_SetHigh();
+			 SendData_Set_Command(0x02,0x01); //close ptc 
+	           vTaskDelay(pdMS_TO_TICKS(5));
 		
 		
-		}
+	  }
 	}
 	else{
 		gctl_t.gDry =0;
 	
-		PTC_SetLow();
+		 SendData_Set_Command(0x02,0x00); //close ptc 
+	     vTaskDelay(pdMS_TO_TICKS(5));
 		
    }
-   
+  }
 
-   //plasma
-    if(gctl_t.gPlasma == 1){
-		
-	     PLASMA_SetHigh();
-		
-	}
-	else{
-
-		PLASMA_SetLow();
-		
-	}
-
-	
-	//driver bug
-	if(gctl_t.gUlransonic ==1){
-	
-	  ultrasonic_open();//ultrasnoic ON 
-	
-	}
-	else{
-     ultrasonic_close();//ultrasnoic off
-		
-
-	}
-
-	Fan_RunSpeed_Fun();
-		
- }
-
-void every_power_on_run(void)
-{
-
-   Fan_Full_Speed();//WT.EDIT 2025.01.03//Fan_RunSpeed_Fun();//FAN_CCW_RUN();
-   if(gctl_t.app_timer_power_on_flag==0){
-     
-     // gctl_t.gModel=1;
-      gctl_t.gFan = 1;
-      gctl_t.gDry = 1;
-	 
-      //g_dry_open_flag =1;
-      gctl_t.gPlasma =1;       //"é„1¤7?é‘„1¤7?"
-      gctl_t.gUlransonic = 1; // "æ¤¹è¾«æ«„1¤7"
-      gctl_t.gTimer_fan_run_one_minute=0;
-       gpro_t.process_run_step=0;
-
-	  gpro_t.ptc_switch_flag ++;
-	  gpro_t.ultrasonic_switch_flag++;
-	  gpro_t.plasma_switch_flag++;
-      PLASMA_SetHigh();
-      ultrasonic_open();   //ultrasnoic ON 
-      PTC_SetHigh();
-	  
-
-    }
-    gctl_t.gModel=1;
+  
 }
 
 void smartphone_timer_power_on_and_normal_handler(void)
@@ -632,6 +584,32 @@ void power_off_action_fun(void)
 
 }
 
+void every_power_on_run(void)
+{
 
+   Fan_Full_Speed();//WT.EDIT 2025.01.03//Fan_RunSpeed_Fun();//FAN_CCW_RUN();
+   if(gctl_t.app_timer_power_on_flag==0){
+     
+     // gctl_t.gModel=1;
+      gctl_t.gFan = 1;
+      gctl_t.gDry = 1;
+	 
+      //g_dry_open_flag =1;
+      gctl_t.gPlasma =1;       //"é„1¤7?é‘„1¤7?"
+      gctl_t.gUlransonic = 1; // "æ¤¹è¾«æ«„1¤7"
+      gctl_t.gTimer_fan_run_one_minute=0;
+       gpro_t.process_run_step=0;
+
+	  gpro_t.ptc_switch_flag ++;
+	  gpro_t.ultrasonic_switch_flag++;
+	  gpro_t.plasma_switch_flag++;
+      PLASMA_SetHigh();
+      ultrasonic_open();   //ultrasnoic ON 
+      PTC_SetHigh();
+	  
+
+    }
+    gctl_t.gModel=1;
+}
 
 
