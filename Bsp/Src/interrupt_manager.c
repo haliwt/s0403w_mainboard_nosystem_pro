@@ -57,7 +57,7 @@ static void tim17_isr_callback_handler(void)
        
 
 	   gctl_t.gTimer_fan_adc_times++;
-	   gctl_t.gTimer_ptc_adc_times++;
+	  // gctl_t.gTimer_ptc_adc_times++;
 	   gctl_t.gTimer_read_dht11_counter++;
 
 	

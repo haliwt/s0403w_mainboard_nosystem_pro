@@ -610,7 +610,7 @@ static void receive_cmd_or_notice_handler(void)
 
 	 case 0x07: //AI command
 	  if(gl_tMsg.execuite_cmd_notice == 0x02){
-	       buzzer_sound();
+	     //  buzzer_sound();
 		
           gctl_t.gModel=2;
           gctl_t.mode_ai_switch_flag =1;
@@ -622,7 +622,7 @@ static void receive_cmd_or_notice_handler(void)
        else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
        
 	
-         buzzer_sound();
+      //   buzzer_sound();
          gctl_t.gModel=1;
 	     gctl_t.mode_ai_switch_flag =1;
           SendWifiData_Answer_Cmd(0x07,0x01); //
@@ -667,38 +667,10 @@ static void receive_cmd_or_notice_handler(void)
      
 
      case 0x22: //PTC notice don't buzzer sound
-
-      if(gl_tMsg.execuite_cmd_notice == 0x01){
-
-	    if(net_t.wifi_link_net_success ==0 && gpro_t.wifi_led_fast_blink_flag==0){
-	  	   //  SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
-           //  vTaskDelay(pdMS_TO_TICKS(20));
-		}
-        #if 0
-        gctl_t.gDry = 1;
-		gpro_t.ptc_switch_flag++;
-   
-        if(gpro_t.stopTwoHours_flag ==0){
-              PTC_SetHigh();
-              //gpro_t.ptc_switch_flag =open;
-              gctl_t.gTimer_senddata_panel=7;
-          }
-        #endif   
-      }
-      else if(gl_tMsg.execuite_cmd_notice == 0x0){
-
-	   if(net_t.wifi_link_net_success ==0 && gpro_t.wifi_led_fast_blink_flag==0){
-	  	  //  SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
-           //  vTaskDelay(pdMS_TO_TICKS(20));
-			//printf("wifi is not !!!\r\n");
-		}
-        #if 0
-         gctl_t.gDry =0;
-         PTC_SetLow();
-          gpro_t.ptc_switch_flag++;
-          gctl_t.gTimer_senddata_panel=7;
-		#endif 
-      }
+      
+     // display_ptc_icon();
+	 // SendWifiData_To_Data(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
+	  //vTaskDelay(pdMS_TO_TICKS(5));
 
      break;
 

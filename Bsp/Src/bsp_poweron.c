@@ -14,7 +14,6 @@ void every_power_on_run(void);
 void power_on_handler(void)
 {
 
-  // static uint8_t send_dht11;
     switch(gpro_t.process_run_step){
 
 	case 0: //1
@@ -146,19 +145,17 @@ void power_on_handler(void)
     	  
 	    }
 		SendWifiData_To_Data(0x1F,0x01);
-		 //SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
          vTaskDelay(pdMS_TO_TICKS(5));
 	
 	  }
       else if(net_t.wifi_link_net_success ==0 && gctl_t.gTimer_wifi_detected_counter >1 && gpro_t.wifi_led_fast_blink_flag==0){
 	  	 gctl_t.gTimer_wifi_detected_counter=0;
 
+	   
 	       SendWifiData_To_Data(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
 		   vTaskDelay(pdMS_TO_TICKS(5));
-			//printf("wifi is not !!!\r\n");
-		    
-
-	  }
+		
+		  }
       
 	 gpro_t.process_run_step=8 ;
  break; 
@@ -329,20 +326,14 @@ void ActionEvent_Handler(void)
 /************************************************************************************
 ************************************************************************************/
 void display_ptc_icon(void)
-
 {
 
-  if(gctl_t.gTimer_ptc_adc_times > 1){
-   gctl_t.gTimer_ptc_adc_times=0;
    if( gctl_t.gDry==1){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning != 1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 		
-		   
-			 SendData_Set_Command(0x02,0x01); //close ptc 
-	           vTaskDelay(pdMS_TO_TICKS(5));
-		
-		
-	  }
+		   SendData_Set_Command(0x02,0x01); //close ptc 
+	       vTaskDelay(pdMS_TO_TICKS(5));
+		}
 	}
 	else{
 		gctl_t.gDry =0;
@@ -352,9 +343,6 @@ void display_ptc_icon(void)
 		
    }
   }
-
-  
-}
 
 void smartphone_timer_power_on_and_normal_handler(void)
 {

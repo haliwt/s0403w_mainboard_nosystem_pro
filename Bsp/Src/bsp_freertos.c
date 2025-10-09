@@ -185,7 +185,7 @@ static void vTaskStart(void *pvParameters)
 
 		    ai_mode_display_fun();
 
-			display_ptc_icon();
+			
 
 			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   
@@ -198,11 +198,9 @@ static void vTaskStart(void *pvParameters)
 				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 				vTaskDelay(pdMS_TO_TICKS(10));
 		   	}
-
-	
+		  break;
 
 		  
-          break;
 
           case power_off:
               gpro_t.process_run_step=0;

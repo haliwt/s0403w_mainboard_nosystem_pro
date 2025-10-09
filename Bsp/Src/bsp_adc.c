@@ -59,7 +59,7 @@ void adc_detected_hundler(void)
 		  }
 		  else{
 		  	  counter_error ++;
-			  if(counter_error > 2){
+			  if(counter_error > 4){
 			      gpro_t.fan_warning_flag=1;
 				  gctl_t.ptc_on_off_flag = 1;
 			      gctl_t.gDry =0;
