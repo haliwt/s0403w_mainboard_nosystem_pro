@@ -9,7 +9,7 @@ _run_t gctl_t;
 
 uint8_t powerOffFanRun_flag ;
 
-uint8_t powerOffTunrOff_flag;
+
 
 uint8_t set_temp_first_closeptc  ;
 
@@ -77,7 +77,7 @@ void SystemReset(void)
 				  gctl_t.set_temp_first_closeptc =1;
 			  }
            
-			 
+			   
 	           SendData_Set_Command(0x02,0x00); //close ptc 
 	           vTaskDelay(pdMS_TO_TICKS(5));
 			   if(net_t.wifi_link_net_success ==1){

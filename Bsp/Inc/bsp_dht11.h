@@ -50,6 +50,7 @@ void updateDht11_sensorData_toDisp(void);
 
 void Update_Dht11_Totencent_Value(void);    
                             
+void read_sensorData(void);
 
 #endif 
 

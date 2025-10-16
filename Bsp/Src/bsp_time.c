@@ -5,6 +5,7 @@ uint8_t  beijing_step;
 uint8_t real_hours,real_minutes,real_seconds;
 
 uint8_t auto_link_net_flag;
+uint8_t timer_fan_flag;//times_flag;
 /**********************************************************************
     *
     *Functin Name: void works_run_two_hours_state(void)
@@ -15,17 +16,15 @@ uint8_t auto_link_net_flag;
 ************************************************************************/
 void works_run_two_hours_state(void)
 {
-   static uint8_t timer_fan_flag;//times_flag;
+  // static uint8_t timer_fan_flag;//times_flag;
 
    if(counter_two_hours> 119 ){ //two works two hours stop flag is "1"
       counter_two_hours=0;
 	   gpro_t.gTimer_check_twohours=0;
 	 
-    PLASMA_SetLow(); //
-    FAN_Stop();//WT.2025.07.31 HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic Off 
-    
-	PTC_SetLow();
-	 gpro_t.fan_run_initial_times =0;
+      PLASMA_SetLow(); //
+      PTC_SetLow();
+	  ultrasonic_close();
      gctl_t.gTimer_fan_run_one_minute=0;
      gpro_t.stopTwoHours_flag = 1;
      timer_fan_flag=1;
@@ -62,31 +61,35 @@ void works_run_two_hours_state(void)
          gpro_t.stopTwoHours_flag=0;
          ActionEvent_Handler();
 		 
-		
-                
-      }
+	  }
+	  else 	if(timer_fan_flag > 1){
+          FAN_Stop();
+		 PLASMA_SetLow(); //
+         PTC_SetLow();
+		 ultrasonic_close();
+
+	  }
 
 
       #endif 
 
 	 if(timer_fan_flag ==1){
 
-	      if(gctl_t.gTimer_fan_run_one_minute < 60){
+
+		  if(gctl_t.gTimer_fan_run_one_minute < 61){
 	  
 	           fan_run_fun();//SetLevel_Fan_PWMA(10);//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
 	      }       
-
-	       if(gctl_t.gTimer_fan_run_one_minute > 59){
+          else if(gctl_t.gTimer_fan_run_one_minute > 59){
 	           
-			   gctl_t.gTimer_fan_run_one_minute=0;
+			 timer_fan_flag++;
+             FAN_Stop();
 			
-			  timer_fan_flag=0;
-      
-			   FAN_Stop();
-			   gpro_t.fan_run_initial_times =0;
 	       }
 
 	  }
+	 
+
 
     
     break;

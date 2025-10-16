@@ -483,7 +483,7 @@ static void receive_cmd_or_notice_handler(void)
               freertos_set_prority();
              
               
-             powerOffTunrOff_flag=1;
+             gpro_t.power_off_run_step=1;
              gpro_t.gpower_on = power_off;
 			 
 			

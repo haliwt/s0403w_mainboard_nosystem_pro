@@ -79,6 +79,7 @@
 #define WIFI_RX_NUMBERS         1
 
 
+
 #define  USE_FreeRTOS      1
 
 
@@ -123,7 +124,8 @@ typedef struct PROCESS_T{
    uint8_t disp_rx_cmd_done_flag;
    uint8_t  wifi_rx_data_array[150];
    uint8_t wifi_rx_data_counter;
-   uint8_t fan_run_initial_times;
+   uint8_t power_off_run_step;
+  
    uint8_t copy_cmd_notice_buff[10];
 
 

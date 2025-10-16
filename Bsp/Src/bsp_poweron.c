@@ -20,7 +20,7 @@ void power_on_handler(void)
 
           /*power on initial reference---start */
          gctl_t.gTimer_senddata_panel=0; //main board function run action.
-         gpro_t.fan_run_initial_times = 0; //WT.EDIT 2025.07.31
+     
          gctl_t.set_temperature_value=40; //power on default set temperature value is 40 degree,don't compare
          gctl_t.gTimer_ptc_adc_times=0;
 		 gctl_t.gTimer_fan_adc_times=0;
@@ -46,7 +46,7 @@ void power_on_handler(void)
        
 	
         /*POWER OFF REF-start */
-        powerOffTunrOff_flag = 1;
+        gpro_t.power_off_run_step = 1;
         powerOffFanRun_flag =1;
         /*end*/
 		
@@ -59,7 +59,7 @@ void power_on_handler(void)
 		/*end */
        
      
-         updateDht11_sensorData_toDisp();
+         read_sensorData();//updateDht11_sensorData_toDisp();
 		 gpro_t.process_run_step= 1;
 	break; 
 
@@ -71,6 +71,8 @@ void power_on_handler(void)
     }
 	else 
 		every_power_on_run();
+
+	read_sensorData();
 		 
 	 gpro_t.process_run_step= 2;
 	   
@@ -90,6 +92,7 @@ void power_on_handler(void)
 			 //vTaskDelay(pdMS_TO_TICKS(200));
 		
 		 }
+	  read_sensorData();
 	
       gpro_t.process_run_step= 4;
 	break;
@@ -295,8 +298,7 @@ void ActionEvent_Handler(void)
 	//driver bug
 	if(gctl_t.gUlransonic ==1){
 	
-	 
-	//	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);//ultrasnoic ON 
+	
 	 if(ultrasonic_default!=gpro_t.ultrasonic_switch_flag){
 	 	gpro_t.ultrasonic_switch_flag++;
 	   ultrasonic_default = gpro_t.ultrasonic_switch_flag;
@@ -307,7 +309,6 @@ void ActionEvent_Handler(void)
 		}
 	}
 	else{
-//	  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);//ultrasnoic off
 		if(ultrasonic_default!=gpro_t.ultrasonic_switch_flag){
 			gpro_t.ultrasonic_switch_flag++;
 			ultrasonic_default = gpro_t.ultrasonic_switch_flag;	
@@ -318,8 +319,9 @@ void ActionEvent_Handler(void)
 		}
 
 	}
-
-	Fan_RunSpeed_Fun();
+   
+	 Fan_RunSpeed_Fun();
+    
 		
  }
 
@@ -442,7 +444,7 @@ void power_off_handler(void)
 {
 
    // static uint8_t fan_run_one_minute_flag;
-    switch(powerOffTunrOff_flag){
+    switch(gpro_t.power_off_run_step){
 
     case 1:
 		  SendWifiData_Answer_Cmd(0x01,0x02); //compatible older version 
@@ -472,7 +474,7 @@ void power_off_handler(void)
 		
 
           SetPowerOff_ForDoing();
-		  powerOffTunrOff_flag = 2;
+		  gpro_t.power_off_run_step = 2;
        
       break;
 
@@ -483,7 +485,7 @@ void power_off_handler(void)
           MqttData_Publish_PowerOff_Ref(); 
           //vTaskDelay(pdMS_TO_TICKS(200)); //WT.EDTI 2024.11.19 
        }
-         powerOffTunrOff_flag = 4;
+         gpro_t.power_off_run_step = 4;
        break;
 
        case 4:
@@ -494,7 +496,7 @@ void power_off_handler(void)
 		  	//vTaskDelay(pdMS_TO_TICKS(100));
             
           }
-           powerOffTunrOff_flag = 5;
+           gpro_t.power_off_run_step = 5;
         break;
 
         case 5:
@@ -503,7 +505,7 @@ void power_off_handler(void)
 			//vTaskDelay(pdMS_TO_TICKS(100));
 			
           }
-        powerOffTunrOff_flag = 6;
+        gpro_t.power_off_run_step = 6;
       break;
 
 
@@ -515,7 +517,7 @@ void power_off_handler(void)
 			Fan_One_Power_Off_Speed();
                   
         }       
-        else if(gpro_t.gTimer_poweroff_fan > 59   ){ //WT.EDTI 2024.11.19
+        else if(gpro_t.gTimer_poweroff_fan > 59 ){ //WT.EDTI 2024.11.19
 		   
 			       powerOffFanRun_flag=2;
 				   FAN_Stop();
@@ -533,6 +535,14 @@ void power_off_handler(void)
         gpro_t.stopTwoHours_flag =0;
        
         power_off_stop_fun();
+
+	   if(gpro_t.gTimer_update_todisplay > 3){
+			gpro_t.gTimer_update_todisplay=0;
+
+			read_sensorData();
+	
+		}
+		
 
      break;
 

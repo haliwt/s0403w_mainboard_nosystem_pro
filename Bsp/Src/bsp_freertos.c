@@ -179,6 +179,7 @@ static void vTaskStart(void *pvParameters)
           switch(gpro_t.gpower_on){ 
 
             case power_on:
+			gpro_t.power_off_run_step=0;
             power_on_handler();
            
             link_wifi_to_tencent_handler(); //detected ADC of value 
@@ -205,7 +206,7 @@ static void vTaskStart(void *pvParameters)
           case power_off:
               gpro_t.process_run_step=0;
 			  counter_two_hours=0;
-              power_off_handler();
+		     power_off_handler();
              break;
           }
 

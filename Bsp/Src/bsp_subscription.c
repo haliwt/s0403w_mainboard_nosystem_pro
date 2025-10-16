@@ -550,7 +550,7 @@ void Json_Parse_Command_Fun(void)
 			gctl_t.ptc_warning =0;
 			
 	        gpro_t.fan_warning_flag =0;
-	        powerOffTunrOff_flag=1;
+	        gpro_t.power_off_run_step=1;
 	        powerOffFanRun_flag = 1;
 	
 			gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
@@ -573,7 +573,7 @@ void Json_Parse_Command_Fun(void)
 			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
 
             gpro_t.gpower_on = power_off;
-            powerOffTunrOff_flag=1; //WT.EDIT 2025.01.04
+            gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
             gpro_t.send_ack_cmd = 1; //ack_app_power_off;
             gpro_t.gTimer_again_send_power_on_off=0;
@@ -806,7 +806,7 @@ void Json_Parse_Command_Fun(void)
 		   if(strstr((char *)TCMQTTRCVPUB,"open\":1")){
 		   
 			  gctl_t.app_timer_power_on_flag = 1;
-              powerOffTunrOff_flag=1; // app power on 
+              gpro_t.power_off_run_step=1; // app power on 
               powerOffFanRun_flag = 1;
 		
 			   MqttData_Publish_SetOpen(1);  
@@ -836,7 +836,7 @@ void Json_Parse_Command_Fun(void)
 			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
 
             gpro_t.gpower_on = power_off;
-            powerOffTunrOff_flag=1; //WT.EDIT 2025.01.04
+            gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
             gpro_t.send_ack_cmd = 1; //ack_app_power_off;
             gpro_t.gTimer_again_send_power_on_off=0;

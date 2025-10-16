@@ -51,7 +51,7 @@ void adc_detected_hundler(void)
 	   		
 	       	}
 
-	   if(fan_detect_voltage < 460){
+	   if(fan_detect_voltage < 420){
 
 	      if(fan_detect_voltage > 370 && fan_detect_voltage < 400){
  
@@ -59,7 +59,7 @@ void adc_detected_hundler(void)
 		  }
 		  else{
 		  	  counter_error ++;
-			  if(counter_error > 4){
+			  if(counter_error > 5){
 			      gpro_t.fan_warning_flag=1;
 				  gctl_t.ptc_on_off_flag = 1;
 			      gctl_t.gDry =0;
@@ -113,7 +113,9 @@ static uint8_t ADC_StartConversion(void)
 // 获取ADC转换结果
 void ADC_GetValues(void)
 {
-     static uint8_t fan_counter,ptc_counter;
+
+   #if 0
+	 static uint8_t fan_counter,ptc_counter;
 	 uint8_t i;
 	
 	uint32_t sum =0;
@@ -135,6 +137,10 @@ void ADC_GetValues(void)
 
 
 		}
+	#else 
+
+		fan_detect_voltage=	(adc_buffer[0] * 3300 )/4095;
+	#endif 
 		
         //fan_detect_voltage = (adc_buffer[0] * 3300 )/4095; // PA0 - FAN
       // ptc_detect_voltage =  compute_voltage(adc_buffer[1]) ;

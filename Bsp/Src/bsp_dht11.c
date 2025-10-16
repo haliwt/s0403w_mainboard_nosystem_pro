@@ -183,7 +183,13 @@ uint8_t DHT11_Read_TempAndHumidity(DHT11_Data_TypeDef *DHT11_Data)
 		return ERROR;
 }
 
-
+/**
+*@breif :
+*@note:
+*@param:
+*@return:
+*
+*/
 void static Dht11_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth11)
 {
    
@@ -213,7 +219,13 @@ void static Dht11_Read_TempHumidity_Handler(DHT11_Data_TypeDef * pdth11)
 	
 
 }
-
+/**
+*@breif :
+*@note:
+*@param:
+*@return:
+*
+*/
 void updateDht11_sensorData_toDisp(void)
 {
 	
@@ -221,15 +233,30 @@ void updateDht11_sensorData_toDisp(void)
 	    sendData_Real_TimeHum(gctl_t.gDht11_humidity ,gctl_t.gDht11_temperature);
 		vTaskDelay(pdMS_TO_TICKS(10));
 	
-
-     //dht11_read_data(&gctl_t.gDht11_temperature, &gctl_t.gDht11_humidity);
-//sendData_Real_TimeHum(gctl_t.gDht11_humidity ,gctl_t.gDht11_temperature);
-	 //osDelay(20);
-
+}
+/**
+*@breif :
+*@note:
+*@param:
+*@return:
+*
+*/
+void read_sensorData(void)
+{
+	
+	    Dht11_Read_TempHumidity_Handler(&DHT11);
+	    sendData_Real_TimeHum(gctl_t.gDht11_humidity ,gctl_t.gDht11_temperature);
+		vTaskDelay(pdMS_TO_TICKS(10));
+	
 }
 
-
-
+/**
+*@breif :
+*@note:
+*@param:
+*@return:
+*
+*/
 void Update_Dht11_Totencent_Value(void)
 {
 
