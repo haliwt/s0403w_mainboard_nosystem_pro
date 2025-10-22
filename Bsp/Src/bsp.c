@@ -60,6 +60,7 @@ uint8_t bcc_check(const unsigned char *data, int len)
 **************************************************************************************/
   void bsp_init(void)
   {
+   
    delay_init(64);
    DHT11_Init();//dht11_init();//sensor_dht11_init();//updateDht11_sensorData_toDisp();//dht11_init();
    wifi_init();
