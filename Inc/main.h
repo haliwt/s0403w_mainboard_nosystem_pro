@@ -50,7 +50,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-#define NEWPCB_FAN       1
+#define NEWPCB_FAN       0
 
 /* USER CODE END ET */
 
@@ -82,16 +82,29 @@ void Error_Handler(void);
 #define WIFI_RX_GPIO_Port     GPIOA
 
 //GPIO 
-#define PLASMA_Pin            LL_GPIO_PIN_4
-#define PLASMA_GPIO_Port        GPIOA
 
-#define FAN_CW_Pin            LL_GPIO_PIN_5
+
+#define OLDER_PCB 1
+
+#if OLDER_PCB
+
+
+#define PLASMA_Pin            LL_GPIO_PIN_5
+#define PLASMA_GPIO_Port      GPIOA
+
+
+
+
+
+#define FAN_CW_Pin            LL_GPIO_PIN_7 //COM 
 #define FAN_CW_GPIO_Port        GPIOA
 
 
 
-#define FAN_CCW_Pin               LL_GPIO_PIN_7
-#define FAN_CCW_GPIO_Port           GPIOA
+#define FAN_CCW_Pin               LL_GPIO_PIN_6 //RUN
+#define FAN_CCW_GPIO_Port         GPIOA
+
+#endif 
 
 #define RELAY_Pin           			LL_GPIO_PIN_0
 #define RELAY_GPIO_Port 				GPIOB

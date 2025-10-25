@@ -21,6 +21,7 @@ volatile uint8_t adc_conversion_complete = 0;
 
 uint16_t fan_detect_voltage = 1000;
 uint16_t ptc_detect_voltage;
+uint8_t counter_error;
 
 
 static uint16_t compute_voltage(uint16_t raw_value) ;
@@ -41,7 +42,7 @@ uint16_t mean_fan_buf[SAMPLE_COUNT];
 **********************************************************************/
 void adc_detected_hundler(void)
 {
-    static uint8_t counter_error;
+   // static uint8_t counter_error;
     if(gctl_t.gTimer_fan_adc_times > 4 && gpro_t.stopTwoHours_flag ==0 && gpro_t.fan_warning_flag==0){ //detected 3 times is 60s 
         gctl_t.gTimer_fan_adc_times =0;
         Fan_Full_Speed();
@@ -51,7 +52,7 @@ void adc_detected_hundler(void)
 	   		
 	       	}
 
-	   if(fan_detect_voltage < 420){
+	   if(fan_detect_voltage < 460){//legacy version 420
 
 	      if(fan_detect_voltage > 370 && fan_detect_voltage < 400){
  
@@ -59,6 +60,10 @@ void adc_detected_hundler(void)
 		  }
 		  else{
 		  	  counter_error ++;
+			  #if DEBUG_FLAG 
+  				printf("counter_error = %d\r\n",counter_error);
+
+			  #endif 
 			  if(counter_error > 5){
 			      gpro_t.fan_warning_flag=1;
 				  gctl_t.ptc_on_off_flag = 1;
