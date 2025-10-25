@@ -9,8 +9,8 @@
 // ??????????????????????? works_run_two_hours_state()
 typedef enum {
     TWOH_STATE_RUNNING,
-    TWOH_STATE_FAN_COOLING,
-    TWOH_STATE_PAUSED
+    TWOH_STATE_FAN_COOLING =1,
+    TWOH_STATE_PAUSED=2
 } TwoHoursState_t;
 
 //static TwoHoursState_t two_hours_state = TWOH_STATE_RUNNING;
@@ -29,100 +29,6 @@ uint8_t timer_fan_flag;//times_flag;
     *Return Ref: NO
     *
 ************************************************************************/
-#if 0
-void works_run_two_hours_state(void)
-{
-  // static uint8_t timer_fan_flag;//times_flag;
-
-   if(counter_two_hours> 119 ){ //two works two hours stop flag is "1"
-      counter_two_hours=0;
-	   gpro_t.gTimer_check_twohours=0;
-	 
-      PLASMA_SetLow(); //
-      PTC_SetLow();
-	  ultrasonic_close();
-     gctl_t.gTimer_fan_run_one_minute=0;
-     gpro_t.stopTwoHours_flag = 1;
-     timer_fan_flag=1;
-
-
-    }
-
-  
-    switch(gpro_t.stopTwoHours_flag){
-
-    case 1: //don't run main board any action.
-    
-     #if TEST_TWO_HOURS_UNIT 
-	 if( counter_two_hours > 2 ){ //10
-           
-            counter_two_hours=0;
-			gpro_t.gTimer_check_twohours =0;
-		
-             gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
-	
-             gpro_t.stopTwoHours_flag=0;
-             ActionEvent_Handler();
-            
-      }
-     #else 
-
-      if( counter_two_hours > 10 ){ //10 minutes =600s
-               
-          counter_two_hours=0;
-		 gpro_t.gTimer_check_twohours=0;
-	
-         gctl_t.gTimer_fan_adc_times =0; //ADC be detected must be run 60s,after be detected ADC
-      
-         gpro_t.stopTwoHours_flag=0;
-         ActionEvent_Handler();
-		 
-	  }
-	  else 	if(timer_fan_flag > 1){
-          FAN_Stop();
-		 PLASMA_SetLow(); //
-         PTC_SetLow();
-		 ultrasonic_close();
-
-	  }
-
-
-      #endif 
-
-	 if(timer_fan_flag ==1){
-
-
-		  if(gctl_t.gTimer_fan_run_one_minute < 61){
-	  
-	           fan_run_fun();//SetLevel_Fan_PWMA(10);//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
-	      }       
-          else if(gctl_t.gTimer_fan_run_one_minute > 59){
-	           
-			 timer_fan_flag++;
-             FAN_Stop();
-			
-	       }
-
-	  }
-	 
-
-
-    
-    break;
-
-    case 0:
-        if(gctl_t.gTimer_senddata_panel >6 ){ //300ms
-             gctl_t.gTimer_senddata_panel=0;
-            
-              ActionEvent_Handler();
-
-
-		}
-      break;
-   }
-}
-#endif 
-
 void works_run_two_hours_state(void)
 {
    switch(gpro_t.two_hours_state){

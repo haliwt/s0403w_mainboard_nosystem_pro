@@ -637,13 +637,14 @@ void Json_Parse_Command_Fun(void)
 	  	
 	  	break;
 
-	  case ANION_OFF_ITEM: //"�?�?" //5
+	  case ANION_OFF_ITEM: //plasma //5
 	  	if(gpro_t.gpower_on ==power_on){
 			
             MqttData_Publish_SetPlasma(0);
 
              gctl_t.gPlasma=0;
 			gctl_t.gTimer_senddata_panel=8;
+			plasma_off();//WT.EDIT 
 			SendWifiData_To_Cmd(0x03,0x0);
 	  	   vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
 	  	}
@@ -659,7 +660,11 @@ void Json_Parse_Command_Fun(void)
 		
               gctl_t.gPlasma=1;
               gctl_t.gTimer_senddata_panel=8;
-			
+			  if(gpro_t.two_hours_state ==0){//WT.EDIT 2025.10.25
+			       plasma_on();
+
+			   }
+			  
 			SendWifiData_To_Cmd(0x03,0x01);
 	  	   vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
 	  	}
@@ -676,7 +681,7 @@ void Json_Parse_Command_Fun(void)
 			
               gctl_t.gUlransonic=0;
              gctl_t.gTimer_senddata_panel=8; 
-	
+	         ultrasonic_close();//WT.EDIT 2025.10.25
 			SendWifiData_To_Cmd(0x04,0x0);
 			vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
         }
@@ -693,8 +698,9 @@ void Json_Parse_Command_Fun(void)
          
                 gctl_t.gUlransonic=1;
                 gctl_t.gTimer_senddata_panel=8;
-        
-		
+            if(gpro_t.two_hours_state ==0){//WT.EDIT 2025.10.25
+		       ultrasonic_open();//WT.EDIT 2025.10.25
+            }
 			SendWifiData_To_Cmd(0x04,0x01);
 			vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
         }
