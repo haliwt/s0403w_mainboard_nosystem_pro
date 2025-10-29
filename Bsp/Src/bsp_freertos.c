@@ -54,33 +54,9 @@ void freeRTOS_Handler(void)
 
 
 }
-#if 0
 /**
- * @brief  :  
+ * @brief  :  static void vTaskStart(void *pvParameters
  * @note    
- * @param   None
- * @retval  None
- */
-static void vTaskWifiPro(void * pvParameters)
-{
-	while(1)
-	{
-
-         if(gpro_t.wifi_led_fast_blink_flag==0 ){
-             wifi_communication_tnecent_handler();//
-             getBeijingTime_cofirmLinkNetState_handler();
-             wifi_auto_detected_link_state();
-          }
-
-
-      vTaskDelay(pdMS_TO_TICKS(100));
-	}
-
-}
-#endif 
-/**
- * @brief  :  static void vTaskStart(void *pvParameters)�������ݴ����������ȼ�Ϊ�е�
- * @note    �����ڲ�ʹ�ö��н������ݣ����ȳ�ʼ������
  * @param   None
  * @retval  None
  */
@@ -156,9 +132,10 @@ static void vTaskStart(void *pvParameters)
 			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   
 
-			if(gpro_t.answer_buzzer_flag > 1 || gpro_t.two_hours_state > 2 ){
+			if(gpro_t.answer_buzzer_flag > 1 || gpro_t.two_hours_state > 2 || gpro_t.stopTwoHours_flag > 1){
 				if(gpro_t.answer_buzzer_flag == 1)gpro_t.answer_buzzer_flag =0;
 				if(gpro_t.two_hours_state >2)gpro_t.two_hours_state=0; //WT.EDIT 2025.10.28
+				if(gpro_t.stopTwoHours_flag > 1)gpro_t.stopTwoHours_flag=0;//WT.EDIT 2025.10.29
 				
             }
 			else if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
@@ -210,16 +187,7 @@ static void vTaskStart(void *pvParameters)
 void AppTaskCreate (void)
 {
 
-//  xTaskCreate( vTaskWifiPro,     		/* 任务函数  */
-//                 "vTaskWifiPro",   		/* 任务�?1�?7?1�?1�?7?7    */
-//                 128,            		/* 任务栈大小，单位word，也就是4字节 */
-//                 NULL,           		/* 任务参数  */
-//                 2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
-//                 &xHandleTaskWifiPro);   /* 任务句柄  */
-
-
-
-  xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
+	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
                  128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */

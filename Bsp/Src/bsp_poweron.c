@@ -206,7 +206,7 @@ void power_on_handler(void)
 	 }
 
 
-	 if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0){
+	 if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0 && gpro_t.two_hours_state==0){
 		   gctl_t.gTimer_read_dht11_counter=0;
            set_temperature_compare_value_fun();
 	   

@@ -65,6 +65,11 @@ void SystemReset(void)
 ************************************************************************/
  void set_temperature_compare_value_fun(void)
 {
+
+   if(gpro_t.stopTwoHours_flag ==1) return ;
+
+
+
    switch(gctl_t.set_temperature_flag){
 
     case 1:
