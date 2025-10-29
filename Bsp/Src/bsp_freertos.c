@@ -26,50 +26,14 @@ static TaskHandle_t xHandleTaskMsgPro = NULL;
 static TaskHandle_t xHandleTaskStart = NULL;
 
 
-#if 0
-//LED�?1�?7�?1�?7�?0�?8�?1�?7�?1�?7�?1�?7�?1�?71
-void LED_Thread1(void const * argument)
-{
 
-  /* USER CODE BEGIN 5 */
-  (void) argument;
-  /* Infinite loop */
-  for (;;)
-  {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);//PB4�?1�?7�?1�?7�?1�?7�?1�?7�?1�?7
-  osDelay(100);//�?1�?7�?0�?9�?1�?7100ms
- 
-  }
-  /* USER CODE END 5 */ 
-}
-
-//LED�?1�?7�?1�?7�?0�?8�?1�?7�?1�?7�?1�?7�?1�?72
-void LED_Thread2(void const * argument)
-{
-  /* USER CODE BEGIN LED_Thread2 */
-  (void) argument;
-  /* Infinite loop */
-  for (;;)
-  {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);//PB4�?1�?7�?1�?7�?1�?7�?1�?7�?1�?7
-  osDelay(250);//�?1�?7�?0�?9�?1�?7250ms
-  }
-  /* USER CODE END LED_Thread2 */
-}
-#endif
 
 #define LOWEST_PRIORITY   1  // ???????
 #define HIGHEST_PRIORITY  2
 
 
-//uint8_t rx_data_counter,rx_end_flag;
-//
-//uint8_t notify_counter;
-//
-//uint8_t wifi_counter;
-//uint8_t state;
 uint8_t power_on_sound_flag ;
-uint8_t xTaskDecoder_flag;
+
 /**********************************************************************************************************
 *
 *	Function Name:void freeRTOS_Handler(void)
@@ -138,7 +102,7 @@ static void vTaskMsgPro(void *pvParameters)
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
                   // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
-                 xTaskDecoder_flag ++;
+             
 				 usart1_protocol_state_machine();
 				 	//vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
 	       			///taskYIELD();  // ??????
@@ -191,8 +155,11 @@ static void vTaskStart(void *pvParameters)
 
 			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   
-            if(gpro_t.answer_buzzer_flag > 1){
-				gpro_t.answer_buzzer_flag =0;
+
+			if(gpro_t.answer_buzzer_flag > 1 || gpro_t.two_hours_state > 2 ){
+				if(gpro_t.answer_buzzer_flag == 1)gpro_t.answer_buzzer_flag =0;
+				if(gpro_t.two_hours_state >2)gpro_t.two_hours_state=0; //WT.EDIT 2025.10.28
+				
             }
 			else if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
 				gpro_t.answer_buzzer_flag =0;

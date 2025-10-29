@@ -1,10 +1,7 @@
-/* USER CODE BEGIN Header */
+/* Recoder software of data */
 /***************************************************************************//**
-  �ļ�: main.c
-  ����: Zhengyu https://gzwelink.taobao.com
-  �汾: V1.0.0
-  ʱ��: 20200401
-	ƽ̨:MINI-G030C8T6
+ * data:2025.10.29 modify be testing .
+	
 
 *******************************************************************************/
 /* USER CODE END Header */

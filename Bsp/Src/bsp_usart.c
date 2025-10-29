@@ -399,13 +399,7 @@ void usart1_protocol_state_machine(void)
             //gl_tMsg.copy_cmd_flag ++;
 
 
-      #if  DEBU
-	  G_FLAG
-
-        printf("cmd_notice = %02X\r\n",gl_tMsg.cmd_notice);
-     //printf("rx_execuite = \r\n",gl_tMsg.execuite_cmd_notice);
-
-      #endif
+ 
 
      // #if DEBUG_FLAG
 

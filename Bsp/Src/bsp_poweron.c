@@ -216,7 +216,7 @@ void power_on_handler(void)
    break;
 
      default:
-		//gpro_t.process_run_step= 1;
+	
 		break;
   }
 }
@@ -253,8 +253,8 @@ void ActionEvent_Handler(void)
 		
 	  }
 	}
-	else{
-		gctl_t.gDry =0;
+	else if(gctl_t.gDry ==0){
+		
 	
 		PTC_SetLow();
 	     SendData_Set_Command(0x02,0x00); //close ptc 
