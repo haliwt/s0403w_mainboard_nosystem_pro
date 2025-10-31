@@ -52,8 +52,8 @@ void power_on_handler(void)
 		
        
         /*this works two hours reference start -WT.EDIT 2025.08.11*/
-	    gpro_t.gTimer_check_twohours=0;
-	    counter_two_hours=0;
+
+
         gpro_t.two_hours_state = 0;
 		 gpro_t.stopTwoHours_flag =0;
 		/*end */
@@ -104,8 +104,9 @@ void power_on_handler(void)
 		  MqttData_Publish_Init();
 		 // vTaskDelay(pdMS_TO_TICKS(200));
      	}
-	  counter_two_hours=0;
-	  gpro_t.gTimer_check_twohours=0;
+
+      counter_two_hours = 0;
+      gpro_t.gTimer_check_twohours = 0;
 	  gpro_t.process_run_step= 6;
 	 
 	 break;
@@ -151,14 +152,7 @@ void power_on_handler(void)
          vTaskDelay(pdMS_TO_TICKS(5));
 	
 	  }
-      else if(net_t.wifi_link_net_success ==0 && gctl_t.gTimer_wifi_detected_counter >1 && gpro_t.wifi_led_fast_blink_flag==0){
-	  	 gctl_t.gTimer_wifi_detected_counter=0;
-
-	   
-	       SendWifiData_To_Data(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
-		   vTaskDelay(pdMS_TO_TICKS(5));
-		
-		  }
+   
       
 	 gpro_t.process_run_step=8 ;
  break; 
@@ -172,8 +166,13 @@ void power_on_handler(void)
 		if(gctl_t.gDry > 1) gctl_t.gDry =0;
 
      }
-	
-	 works_run_two_hours_state();
+	 if(gpro_t.soft_version==1){
+	     works_run_two_hours_state();
+	 }
+	 else{
+	    older_works_run_two_hours_state();
+
+	 }
 
      gpro_t.process_run_step= 9;
   break;
@@ -206,11 +205,13 @@ void power_on_handler(void)
 	 }
 
 
-	 if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0 && gpro_t.two_hours_state==0){
-		   gctl_t.gTimer_read_dht11_counter=0;
-           set_temperature_compare_value_fun();
-	   
-	  }
+     if(gpro_t.soft_version ==1){
+		 if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0 && gpro_t.two_hours_state==0){
+			   gctl_t.gTimer_read_dht11_counter=0;
+	           set_temperature_compare_value_fun();
+		   
+		  }
+     }
 	   gpro_t.process_run_step= 6;	
 
    break;
@@ -234,6 +235,8 @@ void ActionEvent_Handler(void)
 {
 
    static uint8_t ptc_default =0xff,plasma_default =0xff,ultrasonic_default =0xff;
+
+   if(gpro_t.stopTwoHours_flag ==1) return ; //WT.EDIT 2025.10.29
    
    if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
@@ -471,6 +474,9 @@ void power_off_handler(void)
           gctl_t.rx_set_temp_flag=0; 
          gctl_t.set_temperature_flag = 0; 
 		 fan_detect_voltage=1000;
+
+		   counter_two_hours = 0;
+           gpro_t.gTimer_check_twohours = 0;
 		
 
           SetPowerOff_ForDoing();

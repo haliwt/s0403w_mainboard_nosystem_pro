@@ -150,7 +150,7 @@ static void vTaskStart(void *pvParameters)
 
           case power_off:
               gpro_t.process_run_step=0;
-			  counter_two_hours=0;
+	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
 		     power_off_handler();
              break;
           }

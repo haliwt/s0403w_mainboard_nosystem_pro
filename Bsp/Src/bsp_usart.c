@@ -511,7 +511,7 @@ static void receive_cmd_or_notice_handler(void)
           gctl_t.gDry =0;
           SendWifiData_Answer_Cmd(0x02,0x0); //
           vTaskDelay(pdMS_TO_TICKS(10)); 
-        
+         
          PTC_SetLow();
          gpro_t.ptc_switch_flag ++;
          gctl_t.gTimer_senddata_panel=7; //at once run ptc function.
@@ -642,45 +642,123 @@ static void receive_cmd_or_notice_handler(void)
        break;
 
 
-      case 0x1A: //receive from display board set temperature value .
-       gctl_t.set_temperature_flag = 1; 
-     
-       gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
-	   gctl_t.ptc_on_off_flag =0;
-	   gctl_t.set_temp_first_closeptc=0;
-	   gctl_t.rx_set_temp_flag =0;
-       set_temperature_compare_value_fun();
-       if(wifi_link_net_state()==1){
-            MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-		         // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
-        }
+	  case 0x1A: //receive from display board set temperature value .
+
+	   if(gpro_t.soft_version ==1){
+	       gctl_t.set_temperature_flag = 1; 
+	     
+	       gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
+		   gctl_t.ptc_on_off_flag =0;
+		   gctl_t.set_temp_first_closeptc=0;
+		   gctl_t.rx_set_temp_flag =0;
+		   
+		  set_temperature_compare_value_fun();
+		   
+	       if(wifi_link_net_state()==1){
+	            MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
+			         // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+	        }
+	   }
+	   else{
+	      gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
+
+	      if(wifi_link_net_state()==1){
+	            MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
+			         // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+	        }
+
+
+	   }
 
         
       break;
 
+	  
+	 case 0x1C: //display board to send time of value for two hours stop have a rest.
+				//no sound is notice
+			   if(gl_tMsg.rx_data[0]== 0x78){ //2 hours 
+	 
+				  gpro_t.stopTwoHours_flag = 1;
+				  #if DEBUG_FLAG
+
+				  printf("rx_stopTwo_Hours_flag = 1 !!!!\r\n");
+
+				  #endif 
+			 
+			   }
+			   else if(gl_tMsg.rx_data[0]== 0x0A){ //10mintues
+	 
+				 gpro_t.stopTwoHours_flag =0;
+				 gpro_t.two_hours_state= 0;
+			      #if DEBUG_FLAG
+
+				  printf("rx_stopTwo_Hours_flag = 0 @@@@@\r\n");
+
+				  #endif 
+				 ActionEvent_Handler();
+				 
+			  }
+	 
+	 break;
+
      
 
      case 0x22: //PTC notice don't buzzer sound
-      
-     // display_ptc_icon();
-	 // SendWifiData_To_Data(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x0); //link wifi order 1 --link wifi net is success.
-	  //vTaskDelay(pdMS_TO_TICKS(5));
+        if(gl_tMsg.execuite_cmd_notice== 0x01){
+        
 
+        gctl_t.gDry = 1;
+		gpro_t.ptc_switch_flag ++;
+   
+        if(gpro_t.stopTwoHours_flag ==0){
+              PTC_SetHigh();
+              gpro_t.ptc_switch_flag =open;
+              gctl_t.gTimer_senddata_panel=7;
+          }
+          
+      }
+      else if(gl_tMsg.execuite_cmd_notice== 0x0){
+        
+          gctl_t.gDry =0;
+          PTC_SetLow();
+          gpro_t.ptc_switch_flag++;
+          gctl_t.gTimer_senddata_panel=7;
+      }
+   
      break;
 
      case 0x27: //AI command without buzzer sound
 
-      if(gl_tMsg.execuite_cmd_notice == 0x02){
+    if(gl_tMsg.execuite_cmd_notice == 0x02){
 	 
-      gctl_t.gModel=2;
+          gctl_t.gModel=2;
 		  gctl_t.mode_ai_switch_flag =1;
-		}
+	}
     else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
         gctl_t.gModel=1;
-	      gctl_t.mode_ai_switch_flag =1; 
-		 }
+	    gctl_t.mode_ai_switch_flag =1; 
+	}
     break;
-     	}
+
+     case 0xF0: //software version difference older and new sotfware 
+      
+            gpro_t.soft_version = gl_tMsg.rx_data[0];
+	 
+				
+			#if DEBUG_FLAG
+
+			  printf("gpro_t.soft_version = %d\r\n",gpro_t.soft_version);
+
+			#endif 
+			 
+		
+
+	 break;
+
+	
+    }
+
+	
 }
 /**********************************************************************
 	*

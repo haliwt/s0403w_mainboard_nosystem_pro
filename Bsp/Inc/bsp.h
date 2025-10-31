@@ -67,7 +67,7 @@
 #include "bsp_subscription.h"
 
 
-#define Enable_EventRecorder  0
+#define Enable_EventRecorder  1
 
 #define DEBUG_FLAG        Enable_EventRecorder //(Enable_EventRecorder? 1:0)
 
@@ -145,6 +145,7 @@ typedef struct PROCESS_T{
    uint8_t link_net_step;
    uint8_t ptc_warning ;
    uint8_t fan_warning_flag;
+   uint8_t soft_version;
 
    
    uint8_t disp_works_hours ;    
@@ -163,7 +164,8 @@ typedef struct PROCESS_T{
    uint8_t gTimer_update_tencet_dht11;
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
-   volatile uint8_t gTimer_check_twohours ;
+   uint16_t gTimer_check_twohours;
+
   
 
 }process_t;

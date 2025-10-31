@@ -2,9 +2,12 @@
 
 
 // ????????
-#define TWOH_RUN_DURATION_MIN   119 //(2U * 60U * 60U)  // 2 hours
+#define TWOH_RUN_DURATION_MIN   7200 //(2U * 60U * 60U)  // 2 hours
 #define TWOH_FAN_DURATION_SEC   (60U)             // fan run 1 minute
 #define TWOH_PAUSE_DURATION_SEC (10U * 60U)       // rest 10 minutes
+
+uint16_t counter_two_hours;
+
 
 // ??????????????????????? works_run_two_hours_state()
 typedef enum {
@@ -32,15 +35,13 @@ void works_run_two_hours_state(void)
    switch(gpro_t.two_hours_state){
 
     case TWOH_STATE_RUNNING:
-        if(counter_two_hours > TWOH_RUN_DURATION_MIN){ // 119 seconds = 2 hours
-            counter_two_hours = 0;
-            gpro_t.gTimer_check_twohours = 0;
+        if(gpro_t.stopTwoHours_flag == 1){ // 119 seconds = 2 hours
             //close main board fun
             PLASMA_SetLow(); // 
             PTC_SetLow();
             ultrasonic_close();
             gctl_t.gTimer_fan_run_one_minute = 0;
-            gpro_t.stopTwoHours_flag = 1;
+         
             gpro_t.two_hours_state = TWOH_STATE_FAN_COOLING; // Transition to FAN_COOLING state
             #if DEBUG_FLAG
 
@@ -64,8 +65,7 @@ void works_run_two_hours_state(void)
              PTC_SetLow();
             ultrasonic_close();
         } else {
-            counter_two_hours=0;
-			gpro_t.gTimer_check_twohours = 0;
+    
             FAN_Stop();
             gpro_t.two_hours_state = TWOH_STATE_PAUSED; // Transition to PAUSED state
            #if DEBUG_FLAG
@@ -78,29 +78,20 @@ void works_run_two_hours_state(void)
         break;
 
     case TWOH_STATE_PAUSED:
-    //??(??)10??
-        if(counter_two_hours > 10){ // 10  minutes = 600 seconds
-            counter_two_hours = 0;
-            gpro_t.gTimer_check_twohours = 0;
-            gctl_t.gTimer_fan_adc_times = 0; // ADC be detected must be run 60s,after be detected ADC
-            gpro_t.stopTwoHours_flag = 0;
-            gpro_t.two_hours_state = TWOH_STATE_RUNNING; // Transition back to RUNNING state
-            gpro_t.ptc_switch_flag++;
-            ActionEvent_Handler();
+
+            FAN_Stop();
+            PLASMA_SetLow(); //
+            PTC_SetLow();
+            ultrasonic_close();
+			gpro_t.ptc_switch_flag++;
+
 			#if DEBUG_FLAG
 
 		     printf("two hours state is over\r\n");
 			 printf("gpro_t.stopTwoHours_flag = 0 \r\n");
 
 		   #endif 
-        }
-        else{
-
-            FAN_Stop();
-            PLASMA_SetLow(); //
-            PTC_SetLow();
-            ultrasonic_close();
-        }
+        
         break;
 
         default:
@@ -111,7 +102,72 @@ void works_run_two_hours_state(void)
 
   
 }
+/**********************************************************************
+    *
+    *Functin Name: void older_works_run_two_hours_state(void)
+    *Function :  
+    *Input Ref: NO
+    *Return Ref: NO
+    *
+************************************************************************/
+void older_works_run_two_hours_state(void)
+{
+	switch(gpro_t.two_hours_state){
 
+    case TWOH_STATE_RUNNING:
+        if(counter_two_hours > TWOH_RUN_DURATION_MIN){ // 119 seconds = 2 hours
+            counter_two_hours = 0;
+            gpro_t.gTimer_check_twohours = 0;
+
+            PLASMA_SetLow(); //
+            PTC_SetLow();
+            ultrasonic_close();
+            gctl_t.gTimer_fan_run_one_minute = 0;
+            gpro_t.stopTwoHours_flag = 1;
+            gpro_t.two_hours_state = TWOH_STATE_FAN_COOLING; // Transition to FAN_COOLING state
+        }
+		else if(gctl_t.gTimer_senddata_panel >6 &&  gpro_t.stopTwoHours_flag ==0){ //300ms
+            gctl_t.gTimer_senddata_panel=0;
+            
+            ActionEvent_Handler();
+        }
+        break;
+
+    case TWOH_STATE_FAN_COOLING:
+        if(gctl_t.gTimer_fan_run_one_minute < 61){
+            fan_run_fun(); // SetLevel_Fan_PWMA(10);//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
+        } else {
+            FAN_Stop();
+            gpro_t.two_hours_state = TWOH_STATE_PAUSED; // Transition to PAUSED state
+        }
+        break;
+
+    case TWOH_STATE_PAUSED:
+    //??(??)10??
+        if(counter_two_hours > 660){ // 10  minutes = 600 seconds
+            counter_two_hours = 0;
+            gpro_t.gTimer_check_twohours = 0;
+            gctl_t.gTimer_fan_adc_times = 0; // ADC be detected must be run 60s,after be detected ADC
+            gpro_t.stopTwoHours_flag = 0;
+            gpro_t.two_hours_state = TWOH_STATE_RUNNING; // Transition back to RUNNING state
+            ActionEvent_Handler();
+        }
+        else{
+
+            FAN_Stop();
+            PLASMA_SetLow(); //
+            PTC_SetLow();
+            ultrasonic_close();
+        }
+        break;
+
+    default:
+        gpro_t.two_hours_state = TWOH_STATE_RUNNING; // Reset to RUNNING state on unexpected value
+        break;
+
+  }
+
+}
 
 /********************************************************************************
 	*
