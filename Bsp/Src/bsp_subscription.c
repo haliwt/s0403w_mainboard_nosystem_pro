@@ -753,7 +753,7 @@ void Json_Parse_Command_Fun(void)
 		
 			SendWifiData_To_Data(0x3A, gctl_t.set_temperature_value); //smart phone set temperature value .
 			vTaskDelay(pdMS_TO_TICKS(10));//osDelay(10);//HAL_Delay(10);
-			if(gpro_t.soft_version ==1)set_temperature_compare_value_fun();
+			//if(gpro_t.soft_version ==1)set_temperature_compare_value_fun();
 			gctl_t.set_temp_first_closeptc = 0;
 			gctl_t.rx_set_temp_flag =0;
 			 gctl_t.app_timer_power_on_flag = 0;

@@ -205,13 +205,13 @@ void power_on_handler(void)
 	 }
 
 
-     if(gpro_t.soft_version ==1){
-		 if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0 && gpro_t.two_hours_state==0){
-			   gctl_t.gTimer_read_dht11_counter=0;
-	           set_temperature_compare_value_fun();
+//     if(gpro_t.soft_version ==1){
+//		 if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0 && gpro_t.two_hours_state==0){
+//			   gctl_t.gTimer_read_dht11_counter=0;
+//	           set_temperature_compare_value_fun();
 		   
-		  }
-     }
+//		  }
+//     }
 	   gpro_t.process_run_step= 6;	
 
    break;
@@ -242,8 +242,8 @@ void ActionEvent_Handler(void)
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 		
 		PTC_SetHigh();
-		SendData_Set_Command(0x02,0x01); //close ptc 
-	    vTaskDelay(pdMS_TO_TICKS(5));
+		//SendData_Set_Command(0x02,0x01); //close ptc 
+	    //vTaskDelay(pdMS_TO_TICKS(5));
 		if(ptc_default!=gpro_t.ptc_switch_flag){
 		   gpro_t.ptc_switch_flag++;
 		   ptc_default = gpro_t.ptc_switch_flag;
@@ -260,8 +260,8 @@ void ActionEvent_Handler(void)
 		
 	
 		PTC_SetLow();
-	     SendData_Set_Command(0x02,0x00); //close ptc 
-	    vTaskDelay(pdMS_TO_TICKS(5));
+	    // SendData_Set_Command(0x02,0x00); //close ptc 
+	    //vTaskDelay(pdMS_TO_TICKS(5));
 		if(ptc_default!=gpro_t.ptc_switch_flag){
 			 gpro_t.ptc_switch_flag++;
 			ptc_default = gpro_t.ptc_switch_flag;
