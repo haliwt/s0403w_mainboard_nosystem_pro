@@ -64,7 +64,7 @@ static void vTaskMsgPro(void *pvParameters)
 {
   
 	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(9000); /* 1.?????-?????????50ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 1.?????-?????????50ms */
     uint32_t ulValue;
     
 	

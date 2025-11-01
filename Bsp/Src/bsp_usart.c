@@ -729,15 +729,15 @@ static void receive_cmd_or_notice_handler(void)
 
      case 0x27: //AI command without buzzer sound
 
-    if(gl_tMsg.execuite_cmd_notice == 0x02){
-	 
-          gctl_t.gModel=2;
-		  gctl_t.mode_ai_switch_flag =1;
-	}
-    else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
-        gctl_t.gModel=1;
-	    gctl_t.mode_ai_switch_flag =1; 
-	}
+	    if(gl_tMsg.execuite_cmd_notice == 0x02){
+		 
+	          gctl_t.gModel=2;
+			  gctl_t.mode_ai_switch_flag =1;
+		}
+	    else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
+	        gctl_t.gModel=1;
+		    gctl_t.mode_ai_switch_flag =1; 
+		}
     break;
 
      case 0xF0: //software version difference older and new sotfware 
