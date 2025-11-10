@@ -80,9 +80,9 @@ static void vTaskMsgPro(void *pvParameters)
                   // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
              
 				 usart1_protocol_state_machine();
-				 	//vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
-	       			///taskYIELD();  // ??????
-	    			//vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
+				 vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
+	       		taskYIELD();  // ??????
+	    		vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
 
                   
              }

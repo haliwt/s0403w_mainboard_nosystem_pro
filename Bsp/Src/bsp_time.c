@@ -64,6 +64,7 @@ void works_run_two_hours_state(void)
              PLASMA_SetLow(); // 
              PTC_SetLow();
             ultrasonic_close();
+			counter_two_hours =0;//WT.EDIT 2025.11.05
         } else {
     
             FAN_Stop();
@@ -71,6 +72,7 @@ void works_run_two_hours_state(void)
            #if DEBUG_FLAG
              gpro_t.stopTwoHours_flag = 1;
 		     printf("two hours state fan one minutes \r\n");
+						counter_two_hours =0;//WT.EDIT 2025.11.05
 
 		   #endif 
         }
@@ -84,6 +86,7 @@ void works_run_two_hours_state(void)
             PTC_SetLow();
             ultrasonic_close();
 			gpro_t.ptc_switch_flag++;
+			counter_two_hours =0;//WT.EDIT 2025.11.05
 
 			#if DEBUG_FLAG
 

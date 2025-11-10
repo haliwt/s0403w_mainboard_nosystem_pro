@@ -67,7 +67,7 @@
 #include "bsp_subscription.h"
 
 
-#define Enable_EventRecorder  1
+#define Enable_EventRecorder  0
 
 #define DEBUG_FLAG        Enable_EventRecorder //(Enable_EventRecorder? 1:0)
 

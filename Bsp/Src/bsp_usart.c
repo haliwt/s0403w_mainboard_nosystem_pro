@@ -712,9 +712,13 @@ static void receive_cmd_or_notice_handler(void)
    
         if(gpro_t.stopTwoHours_flag ==0){
               PTC_SetHigh();
-              gpro_t.ptc_switch_flag =open;
-              gctl_t.gTimer_senddata_panel=7;
+            
           }
+			#if DEBUG_FLAG
+
+			  printf("gctl_t.gDry = %d\r\n",gctl_t.gDry);
+
+			#endif 
           
       }
       else if(gl_tMsg.execuite_cmd_notice== 0x0){
@@ -722,7 +726,14 @@ static void receive_cmd_or_notice_handler(void)
           gctl_t.gDry =0;
           PTC_SetLow();
           gpro_t.ptc_switch_flag++;
-          gctl_t.gTimer_senddata_panel=7;
+         
+		  	
+			#if DEBUG_FLAG
+
+			  printf("gctl_t.gDry = %d\r\n",gctl_t.gDry);
+
+			#endif 
+			 
       }
    
      break;
@@ -747,7 +758,7 @@ static void receive_cmd_or_notice_handler(void)
 				
 			#if DEBUG_FLAG
 
-			  printf("gpro_t.soft_version = %d\r\n",gpro_t.soft_version);
+			 // printf("gpro_t.soft_version = %d\r\n",gpro_t.soft_version);
 
 			#endif 
 			 
