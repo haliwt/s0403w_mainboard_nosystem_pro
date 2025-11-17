@@ -555,7 +555,7 @@ void Json_Parse_Command_Fun(void)
 	
 			gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
 			gpro_t.send_ack_cmd = 1; //ack_app_power_on;
-	        gpro_t.gTimer_again_send_power_on_off=0;
+	        gpro_t.gTimer_timer_start_counter=0;
 		    SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
 			vTaskDelay(pdMS_TO_TICKS(10));//osDelay(5);//HAL_Delay(5);
 	       
@@ -576,8 +576,7 @@ void Json_Parse_Command_Fun(void)
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
             gpro_t.send_ack_cmd = 1; //ack_app_power_off;
-            gpro_t.gTimer_again_send_power_on_off=0;
-	
+             gpro_t.gTimer_timer_start_counter=0;
             SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
 			osDelay(10);//HAL_Delay(5);
           
@@ -600,9 +599,10 @@ void Json_Parse_Command_Fun(void)
 		  gctl_t.set_temp_first_closeptc =0;
 		  gctl_t.rx_set_temp_flag =0;
 
-         // set_temperature_compare_value_fun();
-		 SendWifiData_To_Cmd(0x02,0x01);
-		 vTaskDelay(pdMS_TO_TICKS(5));//HAL_Delay(5);
+
+            SendWifiData_To_Cmd(0x02,0x01);
+		    vTaskDelay(pdMS_TO_TICKS(5));//HAL_Delay(5);
+         
 		
          }
          }
@@ -637,14 +637,13 @@ void Json_Parse_Command_Fun(void)
 	  	
 	  	break;
 
-	  case ANION_OFF_ITEM: //plasma //5
+	  case ANION_OFF_ITEM: //"�?�?" //5
 	  	if(gpro_t.gpower_on ==power_on){
 			
             MqttData_Publish_SetPlasma(0);
 
              gctl_t.gPlasma=0;
 			gctl_t.gTimer_senddata_panel=8;
-			plasma_off();//WT.EDIT 
 			SendWifiData_To_Cmd(0x03,0x0);
 	  	   vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
 	  	}
@@ -660,11 +659,7 @@ void Json_Parse_Command_Fun(void)
 		
               gctl_t.gPlasma=1;
               gctl_t.gTimer_senddata_panel=8;
-			  if(gpro_t.two_hours_state ==0){//WT.EDIT 2025.10.25
-			       plasma_on();
-
-			   }
-			  
+			
 			SendWifiData_To_Cmd(0x03,0x01);
 	  	   vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
 	  	}
@@ -681,7 +676,7 @@ void Json_Parse_Command_Fun(void)
 			
               gctl_t.gUlransonic=0;
              gctl_t.gTimer_senddata_panel=8; 
-	         ultrasonic_close();//WT.EDIT 2025.10.25
+	
 			SendWifiData_To_Cmd(0x04,0x0);
 			vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
         }
@@ -698,9 +693,8 @@ void Json_Parse_Command_Fun(void)
          
                 gctl_t.gUlransonic=1;
                 gctl_t.gTimer_senddata_panel=8;
-            if(gpro_t.two_hours_state ==0){//WT.EDIT 2025.10.25
-		       ultrasonic_open();//WT.EDIT 2025.10.25
-            }
+        
+		
 			SendWifiData_To_Cmd(0x04,0x01);
 			vTaskDelay(pdMS_TO_TICKS(10));//HAL_Delay(5);
         }
@@ -758,7 +752,7 @@ void Json_Parse_Command_Fun(void)
 		
 			SendWifiData_To_Data(0x3A, gctl_t.set_temperature_value); //smart phone set temperature value .
 			vTaskDelay(pdMS_TO_TICKS(10));//osDelay(10);//HAL_Delay(10);
-			set_temperature_compare_value_fun();
+			//if(gpro_t.soft_version ==1)set_temperature_compare_value_fun();
 			gctl_t.set_temp_first_closeptc = 0;
 			gctl_t.rx_set_temp_flag =0;
 			 gctl_t.app_timer_power_on_flag = 0;
@@ -828,7 +822,7 @@ void Json_Parse_Command_Fun(void)
 			   buzzer_temp_on=0;
    
                gpro_t.send_ack_cmd = 1; //ack_app_timer_power_on;
-               gpro_t.gTimer_again_send_power_on_off=0;
+               gpro_t.gTimer_timer_start_counter=0;
 		         
 
 				
@@ -845,7 +839,7 @@ void Json_Parse_Command_Fun(void)
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
             gpro_t.send_ack_cmd = 1; //ack_app_power_off;
-            gpro_t.gTimer_again_send_power_on_off=0;
+             gpro_t.gTimer_timer_start_counter=0;
 	
             SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
 			osDelay(20);//HAL_Delay(5);

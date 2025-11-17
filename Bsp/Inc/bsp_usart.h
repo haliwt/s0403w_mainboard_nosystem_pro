@@ -5,9 +5,8 @@
 
 typedef enum{
 
-   COPY_NULL,
+   COPY_OK,
    COPY_NG,
-   COPY_OK
 
 }copy_cmd_t;
 

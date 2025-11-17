@@ -1,6 +1,6 @@
 #include "bsp.h"
 
-volatile uint8_t counter_two_hours;
+
 
 
 static void tim17_isr_callback_handler(void);
@@ -44,14 +44,15 @@ void callback_register_fun(void)
 static void tim17_isr_callback_handler(void)
 {
    static  uint16_t tm0;
-   static uint8_t tm1;
+  
 
     tm0 ++ ;
        gctl_t.gTimer_copy_cmd_counter++;
      
 	 if(tm0 > 999){//10ms *100 = 1000ms =1s
         tm0 =0;
-        tm1++;
+		gpro_t.gTimer_twohours_seconds_counter++;
+
         gpro_t.gTimer_link_net_timer_time++;
 	    gctl_t.gTimer_senddata_panel++;
        
@@ -78,20 +79,25 @@ static void tim17_isr_callback_handler(void)
 
        gpro_t.gTimer_publis_dht11_data++ ;
        gpro_t.gTimer_detect_fan_error++;
-       gpro_t.gTimer_again_send_power_on_off++;
+       gpro_t.gTimer_timer_start_counter++;
 	   gpro_t.gTimer_power_on_auto_link++;
 	   gpro_t.gTimer_update_todisplay++;
 	   gpro_t.gTimer_update_tencet_dht11++;
 
 	    gpro_t.gTimer_poweroff_fan++;
 		gpro_t.gTimer_read_dth11_sensor ++;
-        if(tm1>59){ //one minutes
-			tm1=0;
-			counter_two_hours ++ ;
-			gpro_t.gTimer_check_twohours++;
+		if(gpro_t.gTimer_twohours_seconds_counter > 59){//one mintues
+		 gpro_t.gTimer_twohours_seconds_counter=0;
+		  counter_two_hours++;
+		  gpro_t.gTimer_check_twohours++;
+
+		}
+   
+	
+	
 		    
 
-        }
+        
 		
 	}
  }

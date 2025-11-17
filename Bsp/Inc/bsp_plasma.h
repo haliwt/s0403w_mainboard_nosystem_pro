@@ -9,10 +9,6 @@
 
 void plasma_fun(uint8_t sel);
 
-void plasma_on(void);
-
-void plasma_off(void);
-
 
 #endif 
 

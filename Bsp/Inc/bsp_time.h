@@ -5,6 +5,11 @@
 //void works_times_handler(void);
 #define  TEST_TWO_HOURS_UNIT     0
 
+extern uint8_t counter_two_hours;
+
+
+void older_works_run_two_hours_state(void);
+
 
 void works_run_two_hours_state(void);
 

@@ -30,7 +30,7 @@ void MX_USART1_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART1_Init 0 */
-  //display board communication 
+  //display board communication USART1 
   /* USER CODE END USART1_Init 0 */
 
   LL_USART_InitTypeDef USART_InitStruct = {0};

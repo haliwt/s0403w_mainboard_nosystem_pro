@@ -92,14 +92,8 @@ void Error_Handler(void);
 #define PLASMA_Pin            LL_GPIO_PIN_5
 #define PLASMA_GPIO_Port      GPIOA
 
-
-
-
-
 #define FAN_CW_Pin            LL_GPIO_PIN_7 //COM 
 #define FAN_CW_GPIO_Port        GPIOA
-
-
 
 #define FAN_CCW_Pin               LL_GPIO_PIN_6 //RUN
 #define FAN_CCW_GPIO_Port         GPIOA

@@ -251,16 +251,20 @@ void USART1_IRQHandler(void)
 
   
   /* USER CODE BEGIN USART1_IRQn 1 */
-	if(LL_USART_IsActiveFlag_ORE(USART1)){
+//  if(LL_USART_IsActiveFlag_ORE(USART1)){
 
-       LL_USART_ClearFlag_ORE(USART1);
-   }
+//       LL_USART_ClearFlag_ORE(USART1);
+//   }
 //  if(LL_USART_IsActiveFlag_FE(USART1)){
 //      LL_USART_ClearFlag_FE(USART1);
 //  }
 //  if(LL_USART_IsActiveFlag_NE(USART1)){
 //     LL_USART_ClearFlag_NE(USART1);
 //  }
+//  if(LL_USART_IsActiveFlag_PE(USART1)){
+//     LL_USART_ClearFlag_PE(USART1);
+//  }
+//  
   /* USER CODE END USART1_IRQn 1 */
 }
 
@@ -288,12 +292,13 @@ void USART2_IRQHandler(void)
 
        LL_USART_ClearFlag_ORE(USART2);
    }
-//   if(LL_USART_IsActiveFlag_FE(USART2)){
-//       LL_USART_ClearFlag_FE(USART2);
-//   }
-//   if(LL_USART_IsActiveFlag_NE(USART2)){
-//      LL_USART_ClearFlag_NE(USART2);
-//   }
+   if(LL_USART_IsActiveFlag_FE(USART2)){
+       LL_USART_ClearFlag_FE(USART2);
+   }
+   if(LL_USART_IsActiveFlag_NE(USART2)){
+      LL_USART_ClearFlag_NE(USART2);
+   }
+  
 
   /* USER CODE END USART2_IRQn 1 */
 }

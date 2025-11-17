@@ -154,7 +154,7 @@ extern uint8_t powerOffFanRun_flag ;
 
 
 
-void copy_cmd_notice_hanlder(void);
+//void copy_cmd_notice_hanlder(void);
 
 
 //void main_function_detected_handler(uint8_t cmd);

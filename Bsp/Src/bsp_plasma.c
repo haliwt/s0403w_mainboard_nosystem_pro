@@ -5,29 +5,14 @@
 void plasma_fun(uint8_t sel)
 {
      if(sel ==0){
-         PLASMA_SetLow();
+        PLASMA_SetHigh();
 
      }
      else{
 
-        PLASMA_SetHigh();
+        PLASMA_SetLow();
      }
 
 }
-
-
-void plasma_on(void)
-{
-	PLASMA_SetHigh();
-
-}
-
-void plasma_off(void)
-{
-	PLASMA_SetLow();
-
-
-}
-
 
 
