@@ -127,7 +127,7 @@ static void vTaskStart(void *pvParameters)
 
 		    ai_mode_display_fun();
 
-			
+			//ack_handler();
 
 			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   

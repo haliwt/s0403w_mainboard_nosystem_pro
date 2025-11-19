@@ -1,29 +1,7 @@
 #include "bsp.h"
 
+uint8_t ptc_recoder_flag ;
 
-void Dry_Function(uint8_t id)
-{
- 
-  switch(id){
-
-   case 1:
-
-      if(gctl_t.ptc_warning ==0){
-  
-          PTC_SetHigh();
-           
-        }
-         
-      break;
-    
-      case 0 :
-       
-            PTC_SetLow();
-    
-      }
-             
-      
-}
 
 
 
@@ -31,7 +9,7 @@ void Dry_Function(uint8_t id)
 
 void ptc_update_wifi_data(void)
 {
-if( gctl_t.gDry==1){
+ if(ptc_recoder_flag ==1){//if( gctl_t.gDry==1){
    if(gpro_t.fan_warning_flag ==0 && gpro_t.ptc_warning ==0 &&	gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 	   
 		
@@ -45,7 +23,7 @@ if( gctl_t.gDry==1){
 	   
 	   }
    }
-   else{
+   else if(ptc_recoder_flag ==0){
 	   gctl_t.gDry =0;
 
 	   PTC_SetLow();

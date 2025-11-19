@@ -67,7 +67,7 @@
 #include "bsp_subscription.h"
 
 
-#define Enable_EventRecorder  0
+#define Enable_EventRecorder  1
 
 #define DEBUG_FLAG        Enable_EventRecorder //(Enable_EventRecorder? 1:0)
 
@@ -123,6 +123,10 @@ typedef struct PROCESS_T{
    uint8_t power_off_run_step;
   
    uint8_t copy_cmd_notice_buff[10];
+   //copy command 
+   uint8_t power_onoff_cp_counter;
+   uint8_t ptc_onoff_cp_counter;
+   uint8_t two_hours_cp_counter;
 
 
    uint8_t get_beijing_flag;
@@ -151,20 +155,22 @@ typedef struct PROCESS_T{
    uint8_t disp_works_hours ;    
    uint8_t disp_works_minutes ;
    uint8_t gTimer_works_time_seconds ;
-
+   //timer time
    uint8_t gTimer_power_on_first_link_tencent;
    uint8_t gTimer_get_data_from_tencent_data;
    uint8_t gTimer_link_net_timer_time;
    uint8_t gTimer_dc_power_on_auto_link_net;
    uint8_t gTimer_publis_dht11_data;
    uint8_t gTimer_detect_fan_error;
-   uint8_t gTimer_again_send_power_on_off;
+
    uint8_t  gTimer_power_on_auto_link;
    uint8_t gTimer_update_todisplay;
    uint8_t gTimer_update_tencet_dht11;
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
-   uint16_t gTimer_check_twohours;
+   uint8_t gTimer_timer_start_counter;
+   uint8_t gTimer_check_twohours;
+   uint8_t gTimer_twohours_seconds_counter;
 
   
 

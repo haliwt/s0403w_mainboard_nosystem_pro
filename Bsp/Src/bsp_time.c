@@ -2,14 +2,14 @@
 
 
 // ????????
-#define TWOH_RUN_DURATION_MIN   7200 //(2U * 60U * 60U)  // 2 hours
+#define TWOH_RUN_DURATION_MIN   119 //(2U * 60U * 60U)  // 2 hours
 #define TWOH_FAN_DURATION_SEC   (60U)             // fan run 1 minute
-#define TWOH_PAUSE_DURATION_SEC (10U * 60U)       // rest 10 minutes
+#define TWOH_PAUSE_DURATION_SEC 10       // rest 10 minutes
 
-uint16_t counter_two_hours;
+uint8_t counter_two_hours;
 
 
-// ??????????????????????? works_run_two_hours_state()
+// ??????????????????????? new_works_run_two_hours_state()
 typedef enum {
     TWOH_STATE_RUNNING,
     TWOH_STATE_FAN_COOLING,
@@ -22,15 +22,17 @@ uint8_t real_hours,real_minutes,real_seconds;
 
 uint8_t auto_link_net_flag;
 uint8_t timer_fan_flag;//times_flag;
+uint8_t twoHours_stop_flag;
+
 /**********************************************************************
     *
-    *Functin Name: void works_run_two_hours_state(void)
+    *Functin Name: void new_works_run_two_hours_state(void)
     *Function :  
     *Input Ref: NO
     *Return Ref: NO
     *
 ************************************************************************/
-void works_run_two_hours_state(void)
+void new_works_run_two_hours_state(void)
 {
    switch(gpro_t.two_hours_state){
 
@@ -65,14 +67,20 @@ void works_run_two_hours_state(void)
              PTC_SetLow();
             ultrasonic_close();
 			counter_two_hours =0;//WT.EDIT 2025.11.05
-        } else {
+			gpro_t.gTimer_check_twohours =0;
+			gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
+        } 
+		else {
     
             FAN_Stop();
             gpro_t.two_hours_state = TWOH_STATE_PAUSED; // Transition to PAUSED state
+            counter_two_hours =0;//WT.EDIT 2025.11.05
+			gpro_t.gTimer_check_twohours = 0;
+			gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
            #if DEBUG_FLAG
-             gpro_t.stopTwoHours_flag = 1;
+            
 		     printf("two hours state fan one minutes \r\n");
-						counter_two_hours =0;//WT.EDIT 2025.11.05
+	
 
 		   #endif 
         }
@@ -87,7 +95,9 @@ void works_run_two_hours_state(void)
             ultrasonic_close();
 			gpro_t.ptc_switch_flag++;
 			counter_two_hours =0;//WT.EDIT 2025.11.05
-
+			gpro_t.gTimer_check_twohours = 0;
+			gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
+            gpro_t.two_hours_state = TWOH_STATE_RUNNING;
 			#if DEBUG_FLAG
 
 		     printf("two hours state is over\r\n");
@@ -98,7 +108,7 @@ void works_run_two_hours_state(void)
         break;
 
         default:
-           	gpro_t.two_hours_state = TWOH_STATE_RUNNING;
+           	
         break;
 
   }
@@ -115,12 +125,21 @@ void works_run_two_hours_state(void)
 ************************************************************************/
 void older_works_run_two_hours_state(void)
 {
+  // static uint8_t twoHours_stop_flag;
+   if(gpro_t.two_hours_state >TWOH_STATE_PAUSED){
+       if(twoHours_stop_flag==0)gpro_t.two_hours_state = TWOH_STATE_RUNNING;
+       else if(twoHours_stop_flag==1 || twoHours_stop_flag==2)gpro_t.two_hours_state = TWOH_STATE_FAN_COOLING;
+	   else if(twoHours_stop_flag==3)gpro_t.two_hours_state = TWOH_STATE_PAUSED;
+   }
+
 	switch(gpro_t.two_hours_state){
 
     case TWOH_STATE_RUNNING:
         if(counter_two_hours > TWOH_RUN_DURATION_MIN){ // 119 seconds = 2 hours
             counter_two_hours = 0;
             gpro_t.gTimer_check_twohours = 0;
+		    gpro_t.gTimer_twohours_seconds_counter = 0; 
+			twoHours_stop_flag=0;
 
             PLASMA_SetLow(); //
             PTC_SetLow();
@@ -138,8 +157,10 @@ void older_works_run_two_hours_state(void)
 
     case TWOH_STATE_FAN_COOLING:
         if(gctl_t.gTimer_fan_run_one_minute < 61){
+			twoHours_stop_flag=1;
             fan_run_fun(); // SetLevel_Fan_PWMA(10);//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
         } else {
+			twoHours_stop_flag=2;
             FAN_Stop();
             gpro_t.two_hours_state = TWOH_STATE_PAUSED; // Transition to PAUSED state
         }
@@ -147,16 +168,18 @@ void older_works_run_two_hours_state(void)
 
     case TWOH_STATE_PAUSED:
     //??(??)10??
-        if(counter_two_hours > 660){ // 10  minutes = 600 seconds
+        if(counter_two_hours > TWOH_PAUSE_DURATION_SEC){ // 10  minutes = 600 seconds
             counter_two_hours = 0;
+			twoHours_stop_flag=0;
             gpro_t.gTimer_check_twohours = 0;
             gctl_t.gTimer_fan_adc_times = 0; // ADC be detected must be run 60s,after be detected ADC
             gpro_t.stopTwoHours_flag = 0;
             gpro_t.two_hours_state = TWOH_STATE_RUNNING; // Transition back to RUNNING state
+            gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
             ActionEvent_Handler();
         }
         else{
-
+            twoHours_stop_flag=3;
             FAN_Stop();
             PLASMA_SetLow(); //
             PTC_SetLow();
@@ -164,8 +187,8 @@ void older_works_run_two_hours_state(void)
         }
         break;
 
-    default:
-        gpro_t.two_hours_state = TWOH_STATE_RUNNING; // Reset to RUNNING state on unexpected value
+       default:
+       
         break;
 
   }
@@ -257,7 +280,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
                gpro_t.get_beijing_flag = 10;
                net_t.linking_tencent_cloud_doing  =1; //receive from tencent command state .
                gpro_t.send_ack_cmd = 1; //ack_wifi_on;
-               gpro_t.gTimer_again_send_power_on_off=0;
+                gpro_t.gTimer_timer_start_counter=0;
              }
 	
        }

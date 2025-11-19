@@ -77,6 +77,7 @@ void SystemReset(void)
 
               PTC_SetLow();
               gctl_t.gDry=0;
+	          ptc_recoder_flag = 0; //WT.EDIT 2025.11.17
 		      if(gctl_t.rx_set_temp_flag ==1){
 				  gctl_t.rx_set_temp_flag++;
 				  gctl_t.set_temp_first_closeptc =1;
@@ -89,7 +90,6 @@ void SystemReset(void)
                   MqttData_Publish_SetPtc(0);
                    
 			   }
-			   gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
 			   gctl_t.gTimer_copy_cmd_counter=0;
   }
   else{
@@ -98,9 +98,10 @@ void SystemReset(void)
 	          
               PTC_SetHigh();
               gctl_t.gDry=1;//
+               ptc_recoder_flag = 1; //WT.EDIT 2025.11.17
 	          SendData_Set_Command(0x02,0x01); //open ptc 
 	          vTaskDelay(pdMS_TO_TICKS(5));
-			  gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
+			  
 			  gctl_t.gTimer_copy_cmd_counter=0;
 			  gctl_t.rx_set_temp_flag=1;
 			   if(net_t.wifi_link_net_success ==1){
@@ -118,9 +119,10 @@ void SystemReset(void)
                 
 				PTC_SetHigh();
                 gctl_t.gDry=1;//
+                ptc_recoder_flag = 1; //WT.EDIT 2025.11.17
 	            SendData_Set_Command(0x02,0x01); //open ptc 
 	            vTaskDelay(pdMS_TO_TICKS(10));
-				gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
+				
 				 gctl_t.gTimer_copy_cmd_counter=0;
 				 if(net_t.wifi_link_net_success ==1){
 
@@ -145,11 +147,12 @@ void SystemReset(void)
     
             PTC_SetLow();
             gctl_t.gDry=0;
+	        ptc_recoder_flag = 0; //WT.EDIT 2025.11.17
             set_temp_first_closeptc  = 1 ;
                
             SendData_Set_Command(0x02,0x00); //close ptc 
             vTaskDelay(pdMS_TO_TICKS(5));
-			gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
+		
 			 gctl_t.gTimer_copy_cmd_counter=0;
 			  if(net_t.wifi_link_net_success ==1){
                  MqttData_Publish_SetPtc(0);
@@ -162,10 +165,10 @@ void SystemReset(void)
               if(gctl_t.gDht11_temperature < 38){
                  PTC_SetHigh();
                   gctl_t.gDry=1;
-                     
+                  ptc_recoder_flag = 1; //WT.EDIT 2025.11.17  
                   SendData_Set_Command(0x02,0x01); //open ptc  
                  vTaskDelay(pdMS_TO_TICKS(5));
-				  gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
+		
 				   gctl_t.gTimer_copy_cmd_counter=0;
 				   if(net_t.wifi_link_net_success ==1){
 
@@ -179,10 +182,11 @@ void SystemReset(void)
 
         PTC_SetHigh();
         gctl_t.gDry=1;
+	    ptc_recoder_flag = 1; //WT.EDIT 2025.11.17
           
         SendData_Set_Command(0x02,0x01); //open ptc  
         vTaskDelay(pdMS_TO_TICKS(5));
-		gpro_t.copy_cmd_notice_buff[2]=COPY_NULL;
+		
 		 gctl_t.gTimer_copy_cmd_counter=0;
 		 if(net_t.wifi_link_net_success ==1){
               MqttData_Publish_SetPtc(1);
@@ -206,30 +210,30 @@ void SystemReset(void)
     *Return Ref: NO
     *
 ************************************************************************/
-void copy_cmd_notice_hanlder(void)
-{
+//void copy_cmd_notice_hanlder(void)
+//{
  
-    if(gctl_t.gTimer_copy_cmd_counter > 399 && (gpro_t.copy_cmd_notice_buff[2]==COPY_NG || gpro_t.copy_cmd_notice_buff[2]==COPY_NULL)){
-	     gctl_t.gTimer_copy_cmd_counter =0;
+//    if(gctl_t.gTimer_copy_cmd_counter > 399 && (gpro_t.copy_cmd_notice_buff[2]==COPY_NG || gpro_t.copy_cmd_notice_buff[2]==COPY_NULL)){
+//	     gctl_t.gTimer_copy_cmd_counter =0;
 
-	if(gpro_t.copy_cmd_notice_buff[2]==COPY_NG || gpro_t.copy_cmd_notice_buff[2]==COPY_NULL){//ptc open or close copy cmd
+//	if(gpro_t.copy_cmd_notice_buff[2]==COPY_NG || gpro_t.copy_cmd_notice_buff[2]==COPY_NULL){//ptc open or close copy cmd
 
-         if( gctl_t.gDry==0){
-           SendData_Set_Command(0x02,0x00); //close ptc 
-            osDelay(5);
+//         if( gctl_t.gDry==0){
+//           SendData_Set_Command(0x02,0x00); //close ptc 
+//            osDelay(5);
 
-		 }
-		 else{
-           SendData_Set_Command(0x02,0x01); //close ptc 
-            osDelay(5);
-		 }
-	}
+//		 }
+//		 else{
+//           SendData_Set_Command(0x02,0x01); //close ptc 
+//            osDelay(5);
+//		 }
+//	}
 
-    }
+//    }
 
 
 
-}
+//}
 
 void ai_mode_display_fun(void)
 {

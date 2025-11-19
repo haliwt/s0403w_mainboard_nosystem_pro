@@ -33,7 +33,7 @@ void SetPowerOff_ForDoing(void);
 void ActionEvent_Handler(void);
 
 
-void display_ptc_icon(void);
+
 
 
 #endif 

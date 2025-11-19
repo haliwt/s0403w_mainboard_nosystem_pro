@@ -392,40 +392,15 @@ void usart1_protocol_state_machine(void)
 
    
    if(gl_tMsg.copy_cmd_flag == 0){
-    
-     // gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
-	 // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
-          //  memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
-            //gl_tMsg.copy_cmd_flag ++;
-
-
  
-
-     // #if DEBUG_FLAG
-
-       // printf("cmd_notice = %02X\r\n",gl_tMsg.cmd_notice);
-     // printf("rx_execuite = \r\n",gl_tMsg.execuite_cmd_notice);
-
-    //  #endif
-
-	       
-		receive_cmd_or_notice_handler();
-	    //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));  
-
-		//}
+	  receive_cmd_or_notice_handler();
+	   
 
    }
    else {
 
-       // gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, gl_tMsg.total_data_length);
-       // if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
-          // memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
-           
-			parse_recieve_copy_data_handler();
-	   //memset(gl_tMsg.usData,0,(gl_tMsg.total_data_length+1));
-	         
-
-	  // }
+     parse_recieve_copy_data_handler();
+	
     }
 
 
@@ -442,7 +417,7 @@ void usart1_protocol_state_machine(void)
 static void receive_cmd_or_notice_handler(void)
 {
 
- 
+   static uint8_t wifi_link_counter;
    	switch(gl_tMsg.cmd_notice){
 
    
@@ -454,33 +429,56 @@ static void receive_cmd_or_notice_handler(void)
 
      case power_on_off: 
 
+         
         if(gl_tMsg.execuite_cmd_notice  == 0x01){ //open
-          
-            buzzer_sound();//buzzer_sound_fun();
-            SendWifiData_Answer_Cmd(0x01,0x01);
-            vTaskDelay(pdMS_TO_TICKS(10));
-            
-           
-           	gpro_t.gpower_on = power_on;
-           
+
+		  
+			if(gpro_t.power_onoff_cp_counter == 0){ //recoder power on times .
+				gpro_t.power_onoff_cp_counter ++ ;
+	            buzzer_sound();//buzzer_sound_fun();
+	            SendWifiData_Answer_Cmd(0x01,0x01);
+	            vTaskDelay(pdMS_TO_TICKS(10));
+	            wifi_link_counter=0;
+	            gpro_t.process_run_step=0;
+	           	gpro_t.gpower_on = power_on;
+
+			}
+			else if(gpro_t.power_onoff_cp_counter==1){
+				gpro_t.gpower_on = power_on;
+	            SendWifiData_Answer_Cmd(0x01,0x01);
+		        vTaskDelay(pdMS_TO_TICKS(10));
+
+			}
   
 
         }
         else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
+
+		     if(gpro_t.power_onoff_cp_counter > 0){
+			 	
+			  gpro_t.power_onoff_cp_counter=0;
 
               buzzer_sound();
 
               SendWifiData_Answer_Cmd(0x01,0x02); //power off .
 
               vTaskDelay(pdMS_TO_TICKS(10)); 
-             
+              wifi_link_counter=0;
               freertos_set_prority();
              
               
              gpro_t.power_off_run_step=1;
              gpro_t.gpower_on = power_off;
 			 
-			
+		     }
+			 else if(gpro_t.power_onoff_cp_counter==0){
+			      SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+			      vTaskDelay(pdMS_TO_TICKS(10)); 
+			       freertos_set_prority();
+                   gpro_t.gpower_on = power_off;
+
+
+			 }
         }
 
      break;
@@ -488,11 +486,15 @@ static void receive_cmd_or_notice_handler(void)
      case ptc_on_off: //PTC key of command .
 
      if(gl_tMsg.execuite_cmd_notice  == 0x01){
+
+	     if(gpro_t.ptc_onoff_cp_counter==0){
+		  	gpro_t.ptc_onoff_cp_counter++;
           buzzer_sound();
           SendWifiData_Answer_Cmd(0x02,0x01); //
           vTaskDelay(pdMS_TO_TICKS(10)); 
 		
           gctl_t.gDry = 1;
+		  ptc_recoder_flag = 1;
 	      gpro_t.ptc_switch_flag++;
 		  gctl_t.app_timer_power_on_flag=0;
 
@@ -505,10 +507,14 @@ static void receive_cmd_or_notice_handler(void)
           }
       
          }
+	      }
        }
        else if(gl_tMsg.execuite_cmd_notice  == 0x0){
-        buzzer_sound();
+	   	if(gpro_t.ptc_onoff_cp_counter==1){
+			gpro_t.ptc_onoff_cp_counter=0;
+          buzzer_sound();
           gctl_t.gDry =0;
+		  ptc_recoder_flag = 0;
           SendWifiData_Answer_Cmd(0x02,0x0); //
           vTaskDelay(pdMS_TO_TICKS(10)); 
          
@@ -517,6 +523,7 @@ static void receive_cmd_or_notice_handler(void)
          gctl_t.gTimer_senddata_panel=7; //at once run ptc function.
 		 gctl_t.app_timer_power_on_flag=0;
 
+       }
        }
 
      break;
@@ -577,7 +584,8 @@ static void receive_cmd_or_notice_handler(void)
 
        if(gl_tMsg.execuite_cmd_notice == 0x01){  // link wifi 
         
-         
+          if(wifi_link_counter==0){
+		  	wifi_link_counter++;
           gpro_t.link_net_step =0;
 	      net_t.wifi_link_net_success=0;
           gpro_t.wifi_led_fast_blink_flag =1;
@@ -588,8 +596,12 @@ static void receive_cmd_or_notice_handler(void)
           SendWifiData_Answer_Cmd(0x05,0x01); //WT.EDIT 2024.12.28
           vTaskDelay(pdMS_TO_TICKS(10));
 
+          }
+
         }
-        else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //don't link wifi 
+        else if(wifi_link_counter == 0x01){ //don't link wifi 
+		      SendWifiData_Answer_Cmd(0x05,0x01); //WT.EDIT 2024.12.28
+			  vTaskDelay(pdMS_TO_TICKS(10));
 
         }
 
@@ -645,14 +657,14 @@ static void receive_cmd_or_notice_handler(void)
 	  case 0x1A: //receive from display board set temperature value .
 
 	   if(gpro_t.soft_version ==1){
-	       gctl_t.set_temperature_flag = 1; 
+	      // gctl_t.set_temperature_flag = 1; 
 	     
 	       gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
 		   gctl_t.ptc_on_off_flag =0;
 		   gctl_t.set_temp_first_closeptc=0;
 		   gctl_t.rx_set_temp_flag =0;
 		   
-		 // set_temperature_compare_value_fun();
+	
 		   
 	       if(wifi_link_net_state()==1){
 	            MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
@@ -676,26 +688,36 @@ static void receive_cmd_or_notice_handler(void)
 	  
 	 case 0x1C: //display board to send time of value for two hours stop have a rest.
 				//no sound is notice
-			   if(gl_tMsg.rx_data[0]== 0x78){ //2 hours 
+			   if(gl_tMsg.rx_data[0]== 0x78 &&  gpro_t.soft_version ==1){ //2 hours 
 	 
-				  gpro_t.stopTwoHours_flag = 1;
+                  gpro_t.stopTwoHours_flag = 1;
+				  SendWifiData_Answer_Cmd(0x1C,0x01); //WT.EDIT 2025.07.28
+                  vTaskDelay(pdMS_TO_TICKS(10));
+				  
 				  #if DEBUG_FLAG
 
 				  printf("rx_stopTwo_Hours_flag = 1 !!!!\r\n");
 
 				  #endif 
+
+                 
 			 
 			   }
-			   else if(gl_tMsg.rx_data[0]== 0x0A){ //10mintues
-	 
+			   else if(gl_tMsg.rx_data[0]== 0x0A && gpro_t.soft_version ==1){ //10mintues
+
+			 
 				 gpro_t.stopTwoHours_flag =0;
 				 gpro_t.two_hours_state= 0;
+			     SendWifiData_Answer_Cmd(0x1C,0x0); //WT.EDIT 2025.07.28
+                 vTaskDelay(pdMS_TO_TICKS(10));
 			      #if DEBUG_FLAG
 
 				  printf("rx_stopTwo_Hours_flag = 0 @@@@@\r\n");
 
 				  #endif 
 				 ActionEvent_Handler();
+			     
+				
 				 
 			  }
 	 
@@ -708,7 +730,12 @@ static void receive_cmd_or_notice_handler(void)
         
 
         gctl_t.gDry = 1;
+		ptc_recoder_flag =1 ;//WT.EDIT 2025.11.17
 		gpro_t.ptc_switch_flag ++;
+		if(gpro_t.soft_version ==1){
+		 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
+         vTaskDelay(pdMS_TO_TICKS(5));
+		}
    
         if(gpro_t.stopTwoHours_flag ==0){
               PTC_SetHigh();
@@ -716,7 +743,7 @@ static void receive_cmd_or_notice_handler(void)
           }
 			#if DEBUG_FLAG
 
-			  printf("gctl_t.gDry = %d\r\n",gctl_t.gDry);
+			  printf("disp_gctl_t.gDry = %d\r\n",gctl_t.gDry);
 
 			#endif 
           
@@ -724,13 +751,19 @@ static void receive_cmd_or_notice_handler(void)
       else if(gl_tMsg.execuite_cmd_notice== 0x0){
         
           gctl_t.gDry =0;
+		  ptc_recoder_flag =0 ;
           PTC_SetLow();
           gpro_t.ptc_switch_flag++;
+		  if(gpro_t.soft_version==1){
+		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
+            vTaskDelay(pdMS_TO_TICKS(5));
+
+		  	}
          
 		  	
 			#if DEBUG_FLAG
 
-			  printf("gctl_t.gDry = %d\r\n",gctl_t.gDry);
+			  printf("disp_gctl_t.gDry = %d\r\n",gctl_t.gDry);
 
 			#endif 
 			 
@@ -773,7 +806,7 @@ static void receive_cmd_or_notice_handler(void)
 }
 /**********************************************************************
 	*
-	*Function Name:void parse_recieve_copy_data_handler(void)
+	*Function Name:static void parse_recieve_copy_data_handler(void)
 	*Function: display board send to mainboard answer signal
 	*Input Ref:NO
 	*Return Ref:NO
@@ -790,13 +823,17 @@ static void parse_recieve_copy_data_handler(void)
     
         break;
     
-        case 0x10: //power on or off notice .
+        case 0x10: //power on or off notice .--older version 
             
           if(gl_tMsg.execuite_cmd_notice == 0x01){
-		  	 if(gpro_t.gpower_on == power_on)
+		  	 if(gpro_t.gpower_on == power_on){
                gpro_t.copy_cmd_notice_buff[1] =COPY_OK;
-			 else 
+		  	 }
+			 else{ 
              	gpro_t.copy_cmd_notice_buff[1] =COPY_NG;
+				gpro_t.gTimer_timer_start_counter = 0;//start_timer(0);
+
+			 }
             
           }
           else if(gl_tMsg.execuite_cmd_notice == 0){
@@ -804,7 +841,7 @@ static void parse_recieve_copy_data_handler(void)
                 gpro_t.copy_cmd_notice_buff[1] =COPY_OK;
 			 else 
              	 gpro_t.copy_cmd_notice_buff[1] =COPY_NG;
-             
+                 gpro_t.gTimer_timer_start_counter = 0;//start_timer(0);
           }
                     
          
@@ -815,19 +852,22 @@ static void parse_recieve_copy_data_handler(void)
           
           if(gl_tMsg.execuite_cmd_notice == 0x01){
 
-		     if(gctl_t.gDry ==1)
+		     if(ptc_recoder_flag ==1)//if(gctl_t.gDry ==1)
                gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
-			else
+			else if(ptc_recoder_flag ==0){
 			  gpro_t.copy_cmd_notice_buff[2] =COPY_NG;
-            
+			  gpro_t.gTimer_timer_start_counter = 0;
+			}
             
           }
           else if(gl_tMsg.execuite_cmd_notice == 0){
-             if(gctl_t.gDry ==0)
-               gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
-			else
+            if(ptc_recoder_flag ==0){//if(gctl_t.gDry ==0){
+                gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
+            }
+			else if(ptc_recoder_flag == 1){
 			  gpro_t.copy_cmd_notice_buff[2] =COPY_NG;
-             
+			  gpro_t.gTimer_timer_start_counter = 0;
+			 }
           }
     
     
@@ -860,5 +900,15 @@ static void parse_recieve_copy_data_handler(void)
  
 
 }
+
+/**********************************************************************
+	*
+	*Function Name:static void parse_recieve_copy_data_handler(void)
+	*Function: display board send to mainboard answer signal
+	*Input Ref:NO
+	*Return Ref:NO
+	*
+**********************************************************************/
+
 
 

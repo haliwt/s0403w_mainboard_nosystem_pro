@@ -5,13 +5,13 @@
 //void works_times_handler(void);
 #define  TEST_TWO_HOURS_UNIT     0
 
-extern uint16_t counter_two_hours;
+extern uint8_t counter_two_hours;
 
 
 void older_works_run_two_hours_state(void);
 
 
-void works_run_two_hours_state(void);
+void new_works_run_two_hours_state(void);
 
 
 void getBeijingTime_cofirmLinkNetState_handler(void);
