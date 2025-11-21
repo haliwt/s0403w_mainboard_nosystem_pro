@@ -81,9 +81,6 @@ void Error_Handler(void);
 #define WIFI_RX_Pin           LL_GPIO_PIN_3
 #define WIFI_RX_GPIO_Port     GPIOA
 
-//GPIO 
-
-
 #define OLDER_PCB 1
 
 #if OLDER_PCB
@@ -99,6 +96,21 @@ void Error_Handler(void);
 #define FAN_CCW_GPIO_Port         GPIOA
 
 #endif 
+
+
+//GPIO 
+//#define PLASMA_Pin            LL_GPIO_PIN_4
+//#define PLASMA_GPIO_Port        GPIOA
+
+//#define FAN_CW_Pin            LL_GPIO_PIN_5
+//#define FAN_CW_GPIO_Port        GPIOA
+
+
+
+//#define FAN_CCW_Pin               LL_GPIO_PIN_7
+//#define FAN_CCW_GPIO_Port           GPIOA
+
+//
 
 #define RELAY_Pin           			LL_GPIO_PIN_0
 #define RELAY_GPIO_Port 				GPIOB

@@ -616,7 +616,7 @@ static void receive_cmd_or_notice_handler(void)
 
 	 case 0x07: //AI command
 	  if(gl_tMsg.execuite_cmd_notice == 0x02){
-	     //  buzzer_sound();
+	       buzzer_sound();
 		
           gctl_t.gModel=2;
           gctl_t.mode_ai_switch_flag =1;
@@ -628,7 +628,7 @@ static void receive_cmd_or_notice_handler(void)
        else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
        
 	
-      //   buzzer_sound();
+         buzzer_sound();
          gctl_t.gModel=1;
 	     gctl_t.mode_ai_switch_flag =1;
           SendWifiData_Answer_Cmd(0x07,0x01); //
