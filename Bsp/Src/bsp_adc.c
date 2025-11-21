@@ -63,6 +63,7 @@ void adc_detected_hundler(void)
 			      gpro_t.fan_warning_flag=1;
 				  gctl_t.ptc_on_off_flag = 1;
 			      gctl_t.gDry =0;
+				  ptc_recoder_flag = 0; //WT.EDIT 2025.11.17
 				  PTC_SetLow();
 			  }
 		  }
@@ -213,6 +214,7 @@ void fan_warning_sound(void)
    
 		   gctl_t.ptc_on_off_flag = 1;
 		   gctl_t.gDry =0;
+		    ptc_recoder_flag = 0; //WT.EDIT 2025.11.17
 		    PTC_SetLow();
 
 

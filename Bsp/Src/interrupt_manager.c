@@ -44,7 +44,7 @@ void callback_register_fun(void)
 static void tim17_isr_callback_handler(void)
 {
    static  uint16_t tm0;
-  
+ 
 
     tm0 ++ ;
        gctl_t.gTimer_copy_cmd_counter++;
@@ -83,13 +83,14 @@ static void tim17_isr_callback_handler(void)
 	   gpro_t.gTimer_power_on_auto_link++;
 	   gpro_t.gTimer_update_todisplay++;
 	   gpro_t.gTimer_update_tencet_dht11++;
+	
 
 	    gpro_t.gTimer_poweroff_fan++;
 		gpro_t.gTimer_read_dth11_sensor ++;
-		if(gpro_t.gTimer_twohours_seconds_counter > 59){//one mintues
-		 gpro_t.gTimer_twohours_seconds_counter=0;
-		  counter_two_hours++;
-		  gpro_t.gTimer_check_twohours++;
+		if(gpro_t.gTimer_twohours_seconds_counter>59){ //WT.EDI 2025.11.17 
+			gpro_t.gTimer_twohours_seconds_counter=0;	
+			counter_two_hours++;
+			gpro_t.gTimer_check_twohours++;
 
 		}
    

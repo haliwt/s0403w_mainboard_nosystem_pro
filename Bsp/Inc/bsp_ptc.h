@@ -8,7 +8,7 @@
 #define PTC_SetHigh()      LL_GPIO_SetOutputPin(RELAY_GPIO_Port,RELAY_Pin)//do{RELAY_GPIO_Port->BSRR = RELAY_Pin;}while(0)//HAL_GPIO_WritePin(PTC_GPIO,PTC_PIN ,GPIO_PIN_SET) // do{PTC_GPIO->BSRR |= PTC_PIN;}while(0)//    // output high level
 #define PTC_SetLow()       LL_GPIO_ResetOutputPin(RELAY_GPIO_Port,RELAY_Pin)//do{RELAY_GPIO_Port->BSRR = (uint32
 
-
+extern uint8_t ptc_recoder_flag ;
 
 void Dry_Function(uint8_t id);
 

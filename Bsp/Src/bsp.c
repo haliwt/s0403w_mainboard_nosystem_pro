@@ -61,7 +61,7 @@ uint8_t bcc_check(const unsigned char *data, int len)
   void bsp_init(void)
   {
    
-   delay_init(64);
+  // delay_init(64);
    DHT11_Init();//dht11_init();//sensor_dht11_init();//updateDht11_sensorData_toDisp();//dht11_init();
    wifi_init();
    // 注册回调函数
@@ -77,19 +77,7 @@ uint8_t bcc_check(const unsigned char *data, int len)
 	
   
   }
-  
-/**********************************************************************
-    *
-    *Function Name:void send_data_to_disp(void)
-    *Function: 
-    *Input Ref:NO
-    *Return Ref:NO
-    *
-**********************************************************************/
-
-
-
-/********************************************************************************
+  /********************************************************************************
 	*
 	*Functin Name:void wifi_communication_tnecent_handler(void)
 	*Functin :

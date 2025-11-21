@@ -494,6 +494,7 @@ static void receive_cmd_or_notice_handler(void)
           vTaskDelay(pdMS_TO_TICKS(10)); 
 		
           gctl_t.gDry = 1;
+		  ptc_recoder_flag = 1;
 	      gpro_t.ptc_switch_flag++;
 		  gctl_t.app_timer_power_on_flag=0;
 
@@ -513,6 +514,7 @@ static void receive_cmd_or_notice_handler(void)
 			gpro_t.ptc_onoff_cp_counter=0;
           buzzer_sound();
           gctl_t.gDry =0;
+		  ptc_recoder_flag = 0;
           SendWifiData_Answer_Cmd(0x02,0x0); //
           vTaskDelay(pdMS_TO_TICKS(10)); 
          
@@ -655,14 +657,14 @@ static void receive_cmd_or_notice_handler(void)
 	  case 0x1A: //receive from display board set temperature value .
 
 	   if(gpro_t.soft_version ==1){
-	       gctl_t.set_temperature_flag = 1; 
+	      // gctl_t.set_temperature_flag = 1; 
 	     
 	       gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
 		   gctl_t.ptc_on_off_flag =0;
 		   gctl_t.set_temp_first_closeptc=0;
 		   gctl_t.rx_set_temp_flag =0;
 		   
-		 // set_temperature_compare_value_fun();
+	
 		   
 	       if(wifi_link_net_state()==1){
 	            MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
@@ -686,7 +688,7 @@ static void receive_cmd_or_notice_handler(void)
 	  
 	 case 0x1C: //display board to send time of value for two hours stop have a rest.
 				//no sound is notice
-			   if(gl_tMsg.rx_data[0]== 0x78){ //2 hours 
+			   if(gl_tMsg.rx_data[0]== 0x78 &&  gpro_t.soft_version ==1){ //2 hours 
 	 
                   gpro_t.stopTwoHours_flag = 1;
 				  SendWifiData_Answer_Cmd(0x1C,0x01); //WT.EDIT 2025.07.28
@@ -701,11 +703,9 @@ static void receive_cmd_or_notice_handler(void)
                  
 			 
 			   }
-			   else if(gl_tMsg.rx_data[0]== 0x0A){ //10mintues
-
-			 
-				 gpro_t.stopTwoHours_flag =0;
-				 gpro_t.two_hours_state= 0;
+			   else if(gl_tMsg.rx_data[0]== 0x0A && gpro_t.soft_version ==1){ //10mintues
+                 gpro_t.stopTwoHours_flag =0;
+				
 			     SendWifiData_Answer_Cmd(0x1C,0x0); //WT.EDIT 2025.07.28
                  vTaskDelay(pdMS_TO_TICKS(10));
 			      #if DEBUG_FLAG
@@ -725,22 +725,24 @@ static void receive_cmd_or_notice_handler(void)
 
      case 0x22: //PTC notice don't buzzer sound
         if(gl_tMsg.execuite_cmd_notice== 0x01){
-        
-
         gctl_t.gDry = 1;
+		ptc_recoder_flag =1 ;//WT.EDIT 2025.11.17
 		gpro_t.ptc_switch_flag ++;
-		 if(gpro_t.soft_version==1){
+		if(gpro_t.soft_version ==1){
 		 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
          vTaskDelay(pdMS_TO_TICKS(5));
-		 }
+		}
    
         if(gpro_t.stopTwoHours_flag ==0){
               PTC_SetHigh();
-            
-          }
+        }
+		if(wifi_link_net_state()==1){ 
+			MqttData_Publish_SetPtc(0x01);
+			
+		}
 			#if DEBUG_FLAG
 
-			  printf("disp_gctl_t.gDry = %d\r\n",gctl_t.gDry);
+			  printf("disp_gDry = %d\r\n",gctl_t.gDry);
 
 			#endif 
           
@@ -748,17 +750,23 @@ static void receive_cmd_or_notice_handler(void)
       else if(gl_tMsg.execuite_cmd_notice== 0x0){
         
           gctl_t.gDry =0;
+		  ptc_recoder_flag =0 ;
           PTC_SetLow();
           gpro_t.ptc_switch_flag++;
 		  if(gpro_t.soft_version==1){
 		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
             vTaskDelay(pdMS_TO_TICKS(5));
+
+		  }
+		  if(wifi_link_net_state()==1){ 
+			MqttData_Publish_SetPtc(0x0);
+			
 		  }
          
 		  	
 			#if DEBUG_FLAG
 
-			  printf("disp_gctl_t.gDry = %d\r\n",gctl_t.gDry);
+			  printf("disp_gDry = %d\r\n",gctl_t.gDry);
 
 			#endif 
 			 
@@ -847,19 +855,19 @@ static void parse_recieve_copy_data_handler(void)
           
           if(gl_tMsg.execuite_cmd_notice == 0x01){
 
-		     if(gctl_t.gDry ==1)
+		     if(ptc_recoder_flag ==1)//if(gctl_t.gDry ==1)
                gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
-			else{
+			else if(ptc_recoder_flag ==0){
 			  gpro_t.copy_cmd_notice_buff[2] =COPY_NG;
 			  gpro_t.gTimer_timer_start_counter = 0;
 			}
             
           }
           else if(gl_tMsg.execuite_cmd_notice == 0){
-             if(gctl_t.gDry ==0){
+            if(ptc_recoder_flag ==0){//if(gctl_t.gDry ==0){
                 gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
-             }
-			else{
+            }
+			else if(ptc_recoder_flag == 1){
 			  gpro_t.copy_cmd_notice_buff[2] =COPY_NG;
 			  gpro_t.gTimer_timer_start_counter = 0;
 			 }
@@ -895,15 +903,6 @@ static void parse_recieve_copy_data_handler(void)
  
 
 }
-
-/**********************************************************************
-	*
-	*Function Name:static void parse_recieve_copy_data_handler(void)
-	*Function: display board send to mainboard answer signal
-	*Input Ref:NO
-	*Return Ref:NO
-	*
-**********************************************************************/
 
 
 

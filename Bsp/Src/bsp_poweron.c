@@ -74,12 +74,10 @@ void power_on_handler(void)
 
 	read_sensorData();
 		 
-	 gpro_t.process_run_step= 2;
+	 gpro_t.process_run_step= 3;
 	   
     break;
 	
-	
-	case 2:
 		
     case 3:
 	
@@ -107,13 +105,13 @@ void power_on_handler(void)
 
       counter_two_hours = 0;
       gpro_t.gTimer_check_twohours = 0;
-	  gpro_t.gTimer_twohours_seconds_counter=0;//WT.EDIT 2025.11.17
+	  gpro_t.gTimer_twohours_seconds_counter = 0;
 	  gpro_t.process_run_step= 6;
 	 
 	 break;
 	     
 		
-    case 6:
+    case 6: //repeat process 
 
 
      
@@ -163,20 +161,29 @@ void power_on_handler(void)
 
 
  case 8:
-     if(gpro_t.fan_warning_flag > 1 || gpro_t.ptc_warning  > 1 || gpro_t.stopTwoHours_flag>1 || gctl_t.gDry >1){
+     if(gpro_t.fan_warning_flag > 1 || gpro_t.ptc_warning  > 1){
         if(gpro_t.fan_warning_flag > 1 ) gpro_t.fan_warning_flag = 0; //strictly forbid 
 	    if(gpro_t.ptc_warning  > 1)gpro_t.ptc_warning = 0;
-		if(gpro_t.stopTwoHours_flag>1)gpro_t.stopTwoHours_flag=0;
-		if(gctl_t.gDry > 1) gctl_t.gDry =0;
-
+		
      }
-	 if(gpro_t.soft_version==1){
-	     works_run_two_hours_state();
-	 }
-	 else{
-	    older_works_run_two_hours_state();
 
-	 }
+	 
+	 
+//		 if(gpro_t.soft_version==1){
+//		     new_works_run_two_hours_state();
+//			 if(gctl_t.gTimer_senddata_panel >6 && gpro_t.stopTwoHours_flag == 0){ //300ms
+//				 gctl_t.gTimer_senddata_panel=0;
+//				 twoHours_stop_flag=0;
+//				 ActionEvent_Handler();
+//		     }
+		  
+//		 }
+//		 else{
+		 	
+		    older_works_run_two_hours_state();
+
+		// }
+	 
 
      gpro_t.process_run_step= 9;
   break;
@@ -208,14 +215,6 @@ void power_on_handler(void)
 		if( gctl_t.set_temp_first_closeptc > 1)  gctl_t.set_temp_first_closeptc =0;
 	 }
 
-
-//     if(gpro_t.soft_version ==1){
-//		 if(gctl_t.gTimer_read_dht11_counter>2 && gpro_t.stopTwoHours_flag==0 && gpro_t.two_hours_state==0){
-//			   gctl_t.gTimer_read_dht11_counter=0;
-//	           set_temperature_compare_value_fun();
-		   
-//		  }
-//     }
 	   gpro_t.process_run_step= 6;	
 
    break;
@@ -242,38 +241,34 @@ void ActionEvent_Handler(void)
 
    if(gpro_t.stopTwoHours_flag ==1) return ; //WT.EDIT 2025.10.29
    
-   if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
+   if( ptc_recoder_flag==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
-		
+		gctl_t.gDry =1;
 		PTC_SetHigh();
-		//SendData_Set_Command(0x02,0x01); //close ptc 
-	    //vTaskDelay(pdMS_TO_TICKS(5));
-		if(ptc_default!=gpro_t.ptc_switch_flag){
-		   gpro_t.ptc_switch_flag++;
-		   ptc_default = gpro_t.ptc_switch_flag;
-		if(wifi_link_net_state()==1){ 
-			MqttData_Publish_SetPtc(0x01);
-			//vTaskDelay(pdMS_TO_TICKS(200));
-		}
-	  }
+//		if(ptc_default!=gpro_t.ptc_switch_flag){
+//		   gpro_t.ptc_switch_flag++;
+//		   ptc_default = gpro_t.ptc_switch_flag;
+//		if(wifi_link_net_state()==1){ 
+//			MqttData_Publish_SetPtc(0x01);
+			
+//		}
+//	  }
 		   	
 		
 	  }
 	}
-	else if(gctl_t.gDry ==0){
+	else if(ptc_recoder_flag ==0){
 		
-	
+	    gctl_t.gDry =0;
 		PTC_SetLow();
-	    // SendData_Set_Command(0x02,0x00); //close ptc 
-	    //vTaskDelay(pdMS_TO_TICKS(5));
-		if(ptc_default!=gpro_t.ptc_switch_flag){
-			 gpro_t.ptc_switch_flag++;
-			ptc_default = gpro_t.ptc_switch_flag;
-			if(wifi_link_net_state()==1){ 
-				MqttData_Publish_SetPtc(0x0);
-				//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-			}
-		}
+//		if(ptc_default!=gpro_t.ptc_switch_flag){
+//			 gpro_t.ptc_switch_flag++;
+//			ptc_default = gpro_t.ptc_switch_flag;
+//			if(wifi_link_net_state()==1){ 
+//				MqttData_Publish_SetPtc(0x0);
+//				//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+//			}
+//		}
    }
    
 
@@ -334,24 +329,7 @@ void ActionEvent_Handler(void)
 
 /************************************************************************************
 ************************************************************************************/
-void display_ptc_icon(void)
-{
 
-   if( gctl_t.gDry==1){
-	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning != 1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
-		
-		   SendData_Set_Command(0x02,0x01); //close ptc 
-	       vTaskDelay(pdMS_TO_TICKS(5));
-		}
-	}
-	else{
-		gctl_t.gDry =0;
-	
-		 SendData_Set_Command(0x02,0x00); //close ptc 
-	     vTaskDelay(pdMS_TO_TICKS(5));
-		
-   }
-  }
 
 void smartphone_timer_power_on_and_normal_handler(void)
 {
@@ -389,13 +367,14 @@ void smartphone_timer_power_on_and_normal_handler(void)
 
 
 
-			if(gctl_t.gDry==1){
+			if(ptc_recoder_flag ==1){//if(gctl_t.gDry==1){
                 gpro_t.ptc_onoff_cp_counter=1;
 				SendWifiData_To_Cmd(0x02,0x01);
 				vTaskDelay(pdMS_TO_TICKS(5));
 			}
-			else{
+			else if(ptc_recoder_flag ==0){
 					gctl_t.gDry=0;
+
                     gpro_t.ptc_onoff_cp_counter=0;
 					SendWifiData_To_Cmd(0x02,0x0);
 					 vTaskDelay(pdMS_TO_TICKS(5));
@@ -481,7 +460,8 @@ void power_off_handler(void)
 
 		   counter_two_hours = 0;
            gpro_t.gTimer_check_twohours = 0;
-		   gpro_t.two_hours_seconds_counter=0;//WT.EDIT 2025.11.17
+		   gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
+		  
 		   gpro_t.power_onoff_cp_counter=0;
            gpro_t.ptc_onoff_cp_counter=0;
           gpro_t.two_hours_cp_counter=0;
@@ -605,6 +585,7 @@ void every_power_on_run(void)
      // gctl_t.gModel=1;
       gctl_t.gFan = 1;
       gctl_t.gDry = 1;
+      ptc_recoder_flag =1; //WT.EDIT 2025.11.17
 	 
       //g_dry_open_flag =1;
       gctl_t.gPlasma =1;       //"é„1¤7?é‘„1¤7?"

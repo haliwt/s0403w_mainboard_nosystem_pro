@@ -31,30 +31,6 @@ void SystemReset(void)
 		
 
 }
-
-
-
-
-/**********************************************************************
-    *
-    *Functin Name: void main_function_detected_handler(uint8_t cmd)
-    *Function : 
-    *Input Ref:  key of value
-    *Return Ref: NO
-    *
-************************************************************************/
-//void main_function_detected_handler(uint8_t cmd)
-//{
-//
-//if(gctl_t.gTimer_senddata_panel >1  &&  cmd ==0){ //300ms
-//         gctl_t.gTimer_senddata_panel=0;
-//         
-//           ActionEvent_Handler();
-//     }
-//
-//
-//}
-
 /**********************************************************************
     *
     *Functin Name:  void set_temperature_compare_value_fun(void)
@@ -77,6 +53,7 @@ void SystemReset(void)
 
               PTC_SetLow();
               gctl_t.gDry=0;
+	          ptc_recoder_flag = 0; //WT.EDIT 2025.11.17
 		      if(gctl_t.rx_set_temp_flag ==1){
 				  gctl_t.rx_set_temp_flag++;
 				  gctl_t.set_temp_first_closeptc =1;
@@ -97,6 +74,7 @@ void SystemReset(void)
 	          
               PTC_SetHigh();
               gctl_t.gDry=1;//
+               ptc_recoder_flag = 1; //WT.EDIT 2025.11.17
 	          SendData_Set_Command(0x02,0x01); //open ptc 
 	          vTaskDelay(pdMS_TO_TICKS(5));
 			  
@@ -117,6 +95,7 @@ void SystemReset(void)
                 
 				PTC_SetHigh();
                 gctl_t.gDry=1;//
+                ptc_recoder_flag = 1; //WT.EDIT 2025.11.17
 	            SendData_Set_Command(0x02,0x01); //open ptc 
 	            vTaskDelay(pdMS_TO_TICKS(10));
 				
@@ -144,6 +123,7 @@ void SystemReset(void)
     
             PTC_SetLow();
             gctl_t.gDry=0;
+	        ptc_recoder_flag = 0; //WT.EDIT 2025.11.17
             set_temp_first_closeptc  = 1 ;
                
             SendData_Set_Command(0x02,0x00); //close ptc 
@@ -161,7 +141,7 @@ void SystemReset(void)
               if(gctl_t.gDht11_temperature < 38){
                  PTC_SetHigh();
                   gctl_t.gDry=1;
-                     
+                  ptc_recoder_flag = 1; //WT.EDIT 2025.11.17  
                   SendData_Set_Command(0x02,0x01); //open ptc  
                  vTaskDelay(pdMS_TO_TICKS(5));
 		
@@ -178,6 +158,7 @@ void SystemReset(void)
 
         PTC_SetHigh();
         gctl_t.gDry=1;
+	    ptc_recoder_flag = 1; //WT.EDIT 2025.11.17
           
         SendData_Set_Command(0x02,0x01); //open ptc  
         vTaskDelay(pdMS_TO_TICKS(5));

@@ -441,7 +441,7 @@ void Tencent_Cloud_Rx_Handler(void)
 	if(strstr((char *)gpro_t.wifi_rx_data_array,"ptc\":0")){
             if(gpro_t.gpower_on ==power_on){
 				  gctl_t.gDry=0;
-                
+                  ptc_recoder_flag =0;
 	           gctl_t.response_wifi_signal_label = PTC_OFF_ITEM;
 	         
              }
@@ -450,7 +450,7 @@ void Tencent_Cloud_Rx_Handler(void)
     else if(strstr((char *)gpro_t.wifi_rx_data_array,"ptc\":1")){
             if(gpro_t.gpower_on ==power_on){
 	          gctl_t.gDry=1;
-             
+              ptc_recoder_flag =1;
 			  gctl_t.response_wifi_signal_label = PTC_ON_ITEM;
 				
             }
@@ -594,6 +594,7 @@ void Json_Parse_Command_Fun(void)
          MqttData_Publish_SetPtc(0x01);
 	
 	      gctl_t.gDry=1;
+		  ptc_recoder_flag =1;
           gctl_t.gTimer_senddata_panel=8;  
 		  gctl_t.ptc_on_off_flag = 0;
 		  gctl_t.set_temp_first_closeptc =0;
@@ -625,6 +626,7 @@ void Json_Parse_Command_Fun(void)
 		 gctl_t.rx_set_temp_flag =0;
 	
      	 gctl_t.gDry=0;
+		 ptc_recoder_flag =0;
 		 PTC_SetLow();
          gctl_t.app_timer_power_on_flag = 0;
 		
@@ -747,12 +749,12 @@ void Json_Parse_Command_Fun(void)
             if( gctl_t.set_temperature_value > 40)  gctl_t.set_temperature_value=40;
             if( gctl_t.set_temperature_value <20 )  gctl_t.set_temperature_value=20;
             MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-			gctl_t.set_temperature_flag=1; //WT.EDIT 2025.09.18
+		//	gctl_t.set_temperature_flag=1; //WT.EDIT 2025.09.18
 			gctl_t.ptc_on_off_flag =0;
 		
 			SendWifiData_To_Data(0x3A, gctl_t.set_temperature_value); //smart phone set temperature value .
 			vTaskDelay(pdMS_TO_TICKS(10));//osDelay(10);//HAL_Delay(10);
-			//if(gpro_t.soft_version ==1)set_temperature_compare_value_fun();
+			
 			gctl_t.set_temp_first_closeptc = 0;
 			gctl_t.rx_set_temp_flag =0;
 			 gctl_t.app_timer_power_on_flag = 0;
@@ -917,12 +919,14 @@ void Parse_Json_Statement(void)
      if(strstr((char *)TCMQTTRCVPUB,"ptc\":0")){
 				
 		gctl_t.gDry=0;
+	    ptc_recoder_flag = 0;
            
 				  
 		}
 		else if(strstr((char *)TCMQTTRCVPUB,"ptc\":1")){
 				
 				    gctl_t.gDry=1;
+		            ptc_recoder_flag = 1;
                  
 				  
 					
