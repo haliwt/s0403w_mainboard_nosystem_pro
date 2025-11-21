@@ -31,30 +31,6 @@ void SystemReset(void)
 		
 
 }
-
-
-
-
-/**********************************************************************
-    *
-    *Functin Name: void main_function_detected_handler(uint8_t cmd)
-    *Function : 
-    *Input Ref:  key of value
-    *Return Ref: NO
-    *
-************************************************************************/
-//void main_function_detected_handler(uint8_t cmd)
-//{
-//
-//if(gctl_t.gTimer_senddata_panel >1  &&  cmd ==0){ //300ms
-//         gctl_t.gTimer_senddata_panel=0;
-//         
-//           ActionEvent_Handler();
-//     }
-//
-//
-//}
-
 /**********************************************************************
     *
     *Functin Name:  void set_temperature_compare_value_fun(void)

@@ -74,12 +74,10 @@ void power_on_handler(void)
 
 	read_sensorData();
 		 
-	 gpro_t.process_run_step= 2;
+	 gpro_t.process_run_step= 3;
 	   
     break;
 	
-	
-	case 2:
 		
     case 3:
 	
@@ -113,7 +111,7 @@ void power_on_handler(void)
 	 break;
 	     
 		
-    case 6:
+    case 6: //repeat process 
 
 
      
@@ -163,29 +161,29 @@ void power_on_handler(void)
 
 
  case 8:
-     if(gpro_t.fan_warning_flag > 1 || gpro_t.ptc_warning  > 1 || gpro_t.stopTwoHours_flag>1 || gctl_t.gDry >1){
+     if(gpro_t.fan_warning_flag > 1 || gpro_t.ptc_warning  > 1){
         if(gpro_t.fan_warning_flag > 1 ) gpro_t.fan_warning_flag = 0; //strictly forbid 
 	    if(gpro_t.ptc_warning  > 1)gpro_t.ptc_warning = 0;
-		if(gpro_t.stopTwoHours_flag>1)gpro_t.stopTwoHours_flag=0;
-		if(gctl_t.gDry > 1){
-
-		    if( ptc_recoder_flag == 0){// //WT.EDIT 2025.11.17)
-			    gctl_t.gDry =0;
-		    }
-			else if(ptc_recoder_flag == 1) gctl_t.gDry =1;
-
-		}
-
+		
      }
-	 
-	 if(gpro_t.soft_version==1){
-	     new_works_run_two_hours_state();
-	 }
-	 else{
-	 	
-	    older_works_run_two_hours_state();
 
-	 }
+	 
+	 
+//		 if(gpro_t.soft_version==1){
+//		     new_works_run_two_hours_state();
+//			 if(gctl_t.gTimer_senddata_panel >6 && gpro_t.stopTwoHours_flag == 0){ //300ms
+//				 gctl_t.gTimer_senddata_panel=0;
+//				 twoHours_stop_flag=0;
+//				 ActionEvent_Handler();
+//		     }
+		  
+//		 }
+//		 else{
+		 	
+		    older_works_run_two_hours_state();
+
+		// }
+	 
 
      gpro_t.process_run_step= 9;
   break;
@@ -245,32 +243,32 @@ void ActionEvent_Handler(void)
    
    if( ptc_recoder_flag==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
-		
+		gctl_t.gDry =1;
 		PTC_SetHigh();
-		if(ptc_default!=gpro_t.ptc_switch_flag){
-		   gpro_t.ptc_switch_flag++;
-		   ptc_default = gpro_t.ptc_switch_flag;
-		if(wifi_link_net_state()==1){ 
-			MqttData_Publish_SetPtc(0x01);
-			//vTaskDelay(pdMS_TO_TICKS(200));
-		}
-	  }
+//		if(ptc_default!=gpro_t.ptc_switch_flag){
+//		   gpro_t.ptc_switch_flag++;
+//		   ptc_default = gpro_t.ptc_switch_flag;
+//		if(wifi_link_net_state()==1){ 
+//			MqttData_Publish_SetPtc(0x01);
+			
+//		}
+//	  }
 		   	
 		
 	  }
 	}
 	else if(ptc_recoder_flag ==0){
 		
-	
+	    gctl_t.gDry =0;
 		PTC_SetLow();
-		if(ptc_default!=gpro_t.ptc_switch_flag){
-			 gpro_t.ptc_switch_flag++;
-			ptc_default = gpro_t.ptc_switch_flag;
-			if(wifi_link_net_state()==1){ 
-				MqttData_Publish_SetPtc(0x0);
-				//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
-			}
-		}
+//		if(ptc_default!=gpro_t.ptc_switch_flag){
+//			 gpro_t.ptc_switch_flag++;
+//			ptc_default = gpro_t.ptc_switch_flag;
+//			if(wifi_link_net_state()==1){ 
+//				MqttData_Publish_SetPtc(0x0);
+//				//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+//			}
+//		}
    }
    
 

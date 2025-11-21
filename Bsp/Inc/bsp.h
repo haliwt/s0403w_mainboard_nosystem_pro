@@ -67,7 +67,7 @@
 #include "bsp_subscription.h"
 
 
-#define Enable_EventRecorder  1
+#define Enable_EventRecorder  0
 
 #define DEBUG_FLAG        Enable_EventRecorder //(Enable_EventRecorder? 1:0)
 
@@ -171,6 +171,7 @@ typedef struct PROCESS_T{
    uint8_t gTimer_timer_start_counter;
    uint8_t gTimer_check_twohours;
    uint8_t gTimer_twohours_seconds_counter;
+  
 
   
 

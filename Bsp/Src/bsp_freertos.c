@@ -132,10 +132,9 @@ static void vTaskStart(void *pvParameters)
 			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   
 
-			if(gpro_t.answer_buzzer_flag > 1 || gpro_t.two_hours_state > 2 || gpro_t.stopTwoHours_flag > 1){
+			if(gpro_t.answer_buzzer_flag > 1){
 				if(gpro_t.answer_buzzer_flag == 1)gpro_t.answer_buzzer_flag =0;
-				if(gpro_t.two_hours_state >2)gpro_t.two_hours_state=0; //WT.EDIT 2025.10.28
-				if(gpro_t.stopTwoHours_flag > 1)gpro_t.stopTwoHours_flag=0;//WT.EDIT 2025.10.29
+				//if(gpro_t.stopTwoHours_flag > 1)gpro_t.stopTwoHours_flag=0;//WT.EDIT 2025.10.29
 				
             }
 			else if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 

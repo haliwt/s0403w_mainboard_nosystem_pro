@@ -1,6 +1,7 @@
 #include "bsp.h"
 
-
+// 假设已定义全局变量 HCLK_MHz (例如 64)
+#define HCLK_MHZ 64
 static uint32_t g_fac_us = 0;       /* us延时倍乘数 */
 
 #define SYS_SUPPORT_OS        0
@@ -108,22 +109,29 @@ void delay_init(uint16_t sysclk)
  */
 void delay_us(uint32_t us)
 {
-   static  uint32_t SystemCoreClock= 64000000;
+   uint32_t ticks = us * HCLK_MHZ; // 需要计数的时钟周期数
+    uint32_t told, tnow, tcnt = 0;
+    uint32_t reload = SysTick->LOAD; // 获取 SysTick 的重载值（通常是 1ms 的计数值）
 
-   uint32_t ticks = us * (SystemCoreClock / 1000000); // 需要的时钟数
-    uint32_t start = SysTick->VAL;  //current value register 现在的记录数据值
-    uint32_t load  = SysTick->LOAD; //最大值
-    uint32_t elapsed = 0;
-    uint32_t now;
+    told = SysTick->VAL; // 记录初始值
 
-    while (elapsed < ticks)
+    while (1)
     {
-        now = SysTick->VAL;
-        if (start >= now)  // 没有溢出,到计时
-            elapsed += start - now;
-        else               // 发生溢出
-            elapsed += start + (load + 1) - now;
-        start = now;
+        tnow = SysTick->VAL; // 读取当前值
+        
+        // SysTick 是倒计时的，所以 tnow < told
+        if (tnow < told) {
+            tcnt += told - tnow; // 正常倒数，累加差值
+        } else {
+            // 发生溢出（从 reload 倒数到 0），一个溢出周期等于 reload+1 个时钟周期
+            tcnt += reload - tnow + told; 
+        }
+
+        told = tnow; // 更新上次的值
+
+        if (tcnt >= ticks) {
+            break; // 达到目标延时
+        }
     }
 
 }

@@ -616,7 +616,7 @@ static void receive_cmd_or_notice_handler(void)
 
 	 case 0x07: //AI command
 	  if(gl_tMsg.execuite_cmd_notice == 0x02){
-	     //  buzzer_sound();
+	       buzzer_sound();
 		
           gctl_t.gModel=2;
           gctl_t.mode_ai_switch_flag =1;
@@ -628,7 +628,7 @@ static void receive_cmd_or_notice_handler(void)
        else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
        
 	
-      //   buzzer_sound();
+         buzzer_sound();
          gctl_t.gModel=1;
 	     gctl_t.mode_ai_switch_flag =1;
           SendWifiData_Answer_Cmd(0x07,0x01); //
@@ -704,10 +704,8 @@ static void receive_cmd_or_notice_handler(void)
 			 
 			   }
 			   else if(gl_tMsg.rx_data[0]== 0x0A && gpro_t.soft_version ==1){ //10mintues
-
-			 
-				 gpro_t.stopTwoHours_flag =0;
-				 gpro_t.two_hours_state= 0;
+                 gpro_t.stopTwoHours_flag =0;
+				
 			     SendWifiData_Answer_Cmd(0x1C,0x0); //WT.EDIT 2025.07.28
                  vTaskDelay(pdMS_TO_TICKS(10));
 			      #if DEBUG_FLAG
@@ -727,8 +725,6 @@ static void receive_cmd_or_notice_handler(void)
 
      case 0x22: //PTC notice don't buzzer sound
         if(gl_tMsg.execuite_cmd_notice== 0x01){
-        
-
         gctl_t.gDry = 1;
 		ptc_recoder_flag =1 ;//WT.EDIT 2025.11.17
 		gpro_t.ptc_switch_flag ++;
@@ -739,11 +735,14 @@ static void receive_cmd_or_notice_handler(void)
    
         if(gpro_t.stopTwoHours_flag ==0){
               PTC_SetHigh();
-            
-          }
+        }
+		if(wifi_link_net_state()==1){ 
+			MqttData_Publish_SetPtc(0x01);
+			
+		}
 			#if DEBUG_FLAG
 
-			  printf("disp_gctl_t.gDry = %d\r\n",gctl_t.gDry);
+			  printf("disp_gDry = %d\r\n",gctl_t.gDry);
 
 			#endif 
           
@@ -758,12 +757,16 @@ static void receive_cmd_or_notice_handler(void)
 		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
             vTaskDelay(pdMS_TO_TICKS(5));
 
-		  	}
+		  }
+		  if(wifi_link_net_state()==1){ 
+			MqttData_Publish_SetPtc(0x0);
+			
+		  }
          
 		  	
 			#if DEBUG_FLAG
 
-			  printf("disp_gctl_t.gDry = %d\r\n",gctl_t.gDry);
+			  printf("disp_gDry = %d\r\n",gctl_t.gDry);
 
 			#endif 
 			 
@@ -900,15 +903,6 @@ static void parse_recieve_copy_data_handler(void)
  
 
 }
-
-/**********************************************************************
-	*
-	*Function Name:static void parse_recieve_copy_data_handler(void)
-	*Function: display board send to mainboard answer signal
-	*Input Ref:NO
-	*Return Ref:NO
-	*
-**********************************************************************/
 
 
 
