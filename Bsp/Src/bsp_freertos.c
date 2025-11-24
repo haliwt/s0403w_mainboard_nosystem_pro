@@ -60,17 +60,20 @@ void freeRTOS_Handler(void)
  * @param   None
  * @retval  None
  */
+ #if 1
 static void vTaskMsgPro(void *pvParameters)
 {
   
-	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 1.?????-?????????50ms */
-    uint32_t ulValue;
+//	BaseType_t xResult;
+//	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 1.?????-?????????50ms */
+//    uint32_t ulValue;
     
 	
     while(1)
     {
-       xResult = xTaskNotifyWait(0x00000000,      
+
+       #if 0
+	   xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
 						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
 						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
@@ -90,10 +93,36 @@ static void vTaskMsgPro(void *pvParameters)
                 
          }
 
+		#else 
+		//		 xResult = xTaskNotifyWait(0x00000000,      
+//						           0xFFFFFFFF,      
+//						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
+//						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
+//        if(xResult == pdPASS){
+//             if((ulValue & DECODER_BIT_0 ) != 0)
+          if(gpro_t.decoder_success_flag == 1){
+                  // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
+             gpro_t.decoder_success_flag++;
+				 usart1_protocol_state_machine();
+				// vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
+	       		///taskYIELD();  // ??????
+	    		///vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
+
+                  
+             //}
+			 
+                
+         }
+
+
+        vTaskDelay(20);
+
+		#endif 
+
 				                                   
  	}
 }	
-
+#endif 
 /**
  * @brief  :  static void vTaskStart(void *pvParameters)�������ݴ����������ȼ�Ϊ�е�
  * @note    �����ڲ�ʹ�ö��н������ݣ����ȳ�ʼ������
@@ -103,6 +132,7 @@ static void vTaskMsgPro(void *pvParameters)
 static void vTaskStart(void *pvParameters)
 {
     
+
 
 	while(1)
     {
@@ -116,16 +146,15 @@ static void vTaskStart(void *pvParameters)
         }
 
 
+
           switch(gpro_t.gpower_on){ 
 
             case power_on:
 		 
 			gpro_t.power_off_run_step=0;
             power_on_handler();
-           
             link_wifi_to_tencent_handler(); //detected ADC of value 
-
-		    ai_mode_display_fun();
+            ai_mode_display_fun();
 
 			//ack_handler();
 
@@ -171,12 +200,12 @@ static void vTaskStart(void *pvParameters)
            }
 		  
 		
-		  vTaskDelay(pdMS_TO_TICKS(50));//�?1�?7?0
+		  vTaskDelay(pdMS_TO_TICKS(30));//�?1�?7?0
 
 
         }
-       
-    }
+}
+
  /**
  * @brief  :  void AppTaskCreate (void)�����ݴ����������ȼ�Ϊ�е�
  * @note    �����ڲ�ʹ�ö��н������ݣ����ȳ�ʼ������
@@ -185,18 +214,18 @@ static void vTaskStart(void *pvParameters)
  */
 void AppTaskCreate (void)
 {
-
+   #if 1
 	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
                  128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskMsgPro);   /* 任务句柄  */
-
+   #endif 
 
    xTaskCreate( vTaskStart,     		/* 任务函数  */
                  "vTaskStart",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 256,            		/* 任务栈大小，单位word，也就是4字节 */
+                 128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskStart );   /* 任务句柄  */

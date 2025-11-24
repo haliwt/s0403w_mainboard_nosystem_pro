@@ -67,7 +67,7 @@
 #include "bsp_subscription.h"
 
 
-#define Enable_EventRecorder  0
+#define Enable_EventRecorder  1
 
 #define DEBUG_FLAG        Enable_EventRecorder //(Enable_EventRecorder? 1:0)
 
@@ -150,6 +150,7 @@ typedef struct PROCESS_T{
    uint8_t ptc_warning ;
    uint8_t fan_warning_flag;
    uint8_t soft_version;
+   uint8_t decoder_success_flag;
 
    
    uint8_t disp_works_hours ;    

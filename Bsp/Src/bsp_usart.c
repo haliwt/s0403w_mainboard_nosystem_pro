@@ -309,7 +309,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 		  break;
 	
 
-		  case 6: //BCC CHECK CODE 
+		  case 6: //BCC CHECK CODE ,receive success 
 			  
 		  	 gl_tMsg.usData[rx_data_counter]=data;
 			 gl_tMsg.bcc_check_code=gl_tMsg.usData[rx_data_counter];
@@ -325,8 +325,9 @@ static void usart1_isr_callback_handler(uint8_t data)
 			gl_tMsg.usData[0]=0;
 			gl_tMsg.usData[1]=0;
 	         gl_tMsg.usData[6]=0;
-			 freertos_decoder_isr_handler();
-			//usart1_protocol_state_machine();
+			 gpro_t.decoder_success_flag=1;
+			 //freertos_decoder_isr_handler();
+			
 
 
 
@@ -621,7 +622,7 @@ static void receive_cmd_or_notice_handler(void)
           gctl_t.gModel=2;
           gctl_t.mode_ai_switch_flag =1;
           SendWifiData_Answer_Cmd(0x07,0x02); //
-          vTaskDelay(pdMS_TO_TICKS(10)); 
+          vTaskDelay(pdMS_TO_TICKS(5)); 
         
           
        }
@@ -631,8 +632,8 @@ static void receive_cmd_or_notice_handler(void)
          buzzer_sound();
          gctl_t.gModel=1;
 	     gctl_t.mode_ai_switch_flag =1;
-          SendWifiData_Answer_Cmd(0x07,0x01); //
-          vTaskDelay(pdMS_TO_TICKS(10)); 
+         SendWifiData_Answer_Cmd(0x07,0x01); //
+         vTaskDelay(pdMS_TO_TICKS(5)); 
 		 
        }
 

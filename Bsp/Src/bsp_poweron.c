@@ -150,8 +150,10 @@ void power_on_handler(void)
             Subscriber_Data_FromCloud_Handler();
     	  
 	    }
-		SendWifiData_To_Data(0x1F,0x01);
-         vTaskDelay(pdMS_TO_TICKS(5));
+		
+		   SendWifiData_To_Data(0x1F,0x01);
+           vTaskDelay(pdMS_TO_TICKS(5));
+		 
 	
 	  }
    
@@ -167,22 +169,9 @@ void power_on_handler(void)
 		
      }
 
-	 
-	 
-//		 if(gpro_t.soft_version==1){
-//		     new_works_run_two_hours_state();
-//			 if(gctl_t.gTimer_senddata_panel >6 && gpro_t.stopTwoHours_flag == 0){ //300ms
-//				 gctl_t.gTimer_senddata_panel=0;
-//				 twoHours_stop_flag=0;
-//				 ActionEvent_Handler();
-//		     }
-		  
-//		 }
-//		 else{
-		 	
-		    older_works_run_two_hours_state();
+	 older_works_run_two_hours_state();
 
-		// }
+		
 	 
 
      gpro_t.process_run_step= 9;
