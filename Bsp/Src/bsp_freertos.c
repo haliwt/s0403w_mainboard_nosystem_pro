@@ -115,7 +115,7 @@ static void vTaskMsgPro(void *pvParameters)
          }
 
 
-        vTaskDelay(20);
+        vTaskDelay(40);
 
 		#endif 
 
@@ -225,7 +225,7 @@ void AppTaskCreate (void)
 
    xTaskCreate( vTaskStart,     		/* 任务函数  */
                  "vTaskStart",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 128,            		/* 任务栈大小，单位word，也就是4字节 */
+                 256,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskStart );   /* 任务句柄  */
