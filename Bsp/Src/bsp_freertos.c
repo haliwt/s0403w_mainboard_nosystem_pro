@@ -10,7 +10,7 @@
 ***********************************************************************************************************/
 //static void vTaskWifiPro(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
-static void vTaskStart(void *pvParameters);
+//static void vTaskStart(void *pvParameters);
 static void AppTaskCreate (void);
 
 
@@ -23,7 +23,7 @@ static void AppTaskCreate (void);
 ***********************************************************************************************************/
 //static TaskHandle_t xHandleTaskWifiPro = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
-static TaskHandle_t xHandleTaskStart = NULL;
+//static TaskHandle_t xHandleTaskStart = NULL;
 
 
 
@@ -72,6 +72,14 @@ static void vTaskMsgPro(void *pvParameters)
     while(1)
     {
 
+		if(power_on_sound_flag==0){
+            power_on_sound_flag ++;
+            FAN_Stop();  //WT.EDIT.2025.01.03
+            buzzer_sound();//buzzer_sound();
+			//printf("buzzer_sound !!!\r\n");
+
+        }
+
        #if 0
 	   xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
@@ -110,14 +118,72 @@ static void vTaskMsgPro(void *pvParameters)
 
                   
              //}
-			  vTaskDelay(200);
+			  vTaskDelay(100);
                 
          }
-		 else
-             vTaskDelay(100);
+		 else{
+
+
+		 switch(gpro_t.gpower_on){ 
+
+            case power_on:
+		 
+			gpro_t.power_off_run_step=0;
+            power_on_handler();
+            link_wifi_to_tencent_handler(); //detected ADC of value 
+            ai_mode_display_fun();
+
+			//ack_handler();
+
+			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
+		   
+
+			if(gpro_t.answer_buzzer_flag > 1){
+				if(gpro_t.answer_buzzer_flag == 1)gpro_t.answer_buzzer_flag =0;
+				//if(gpro_t.stopTwoHours_flag > 1)gpro_t.stopTwoHours_flag=0;//WT.EDIT 2025.10.29
+				
+            }
+			else if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
+				gpro_t.answer_buzzer_flag =0;
+
+				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+				vTaskDelay(pdMS_TO_TICKS(10));
+		   	}
+		  break;
+
+		  
+
+          case power_off:
+              gpro_t.process_run_step=0;
+	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
+		     power_off_handler();
+             break;
+          }
+
+
+             if(gpro_t.process_run_step > 10){
+
+		      gpro_t.process_run_step=6;
+			  freertos_set_prority();
+
+		  }
+          else if(gpro_t.wifi_led_fast_blink_flag > 1){
+		  	 gpro_t.wifi_led_fast_blink_flag=0;
+			
+		  }
+		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
+             wifi_communication_tnecent_handler();//
+             getBeijingTime_cofirmLinkNetState_handler();
+             wifi_auto_detected_link_state();
+           }
+
+
+		 
+            vTaskDelay(100);
+
+		 	}
 
 		#endif 
-
 				                                   
  	}
 }	
@@ -128,6 +194,7 @@ static void vTaskMsgPro(void *pvParameters)
  * @param   None
  * @retval  None
  */
+#if 0
 static void vTaskStart(void *pvParameters)
 {
     
@@ -182,6 +249,7 @@ static void vTaskStart(void *pvParameters)
              break;
           }
 
+      #if 0
           if(gpro_t.process_run_step > 10){
 
 		      gpro_t.process_run_step=6;
@@ -198,13 +266,13 @@ static void vTaskStart(void *pvParameters)
              wifi_auto_detected_link_state();
            }
 		  
-		
-		  vTaskDelay(pdMS_TO_TICKS(20));//�?1�?7?0
+		 #endif 
+		  vTaskDelay(pdMS_TO_TICKS(50));//�?1�?7?0
 
 
         }
 }
-
+#endif 
  /**
  * @brief  :  void AppTaskCreate (void)�����ݴ����������ȼ�Ϊ�е�
  * @note    �����ڲ�ʹ�ö��н������ݣ����ȳ�ʼ������
@@ -213,14 +281,15 @@ static void vTaskStart(void *pvParameters)
  */
 void AppTaskCreate (void)
 {
-   #if 1
-	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
+   
+    xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 196,            		/* 任务栈大小，单位word，也就是4字节 */
+                 512,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
-                 2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
+                 1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskMsgPro);   /* 任务句柄  */
-   #endif 
+
+  #if 0
 
    xTaskCreate( vTaskStart,     		/* 任务函数  */
                  "vTaskStart",   		/* 任务�?1�?7?1�?1�?7?7    */
@@ -228,6 +297,8 @@ void AppTaskCreate (void)
                  NULL,           		/* 任务参数  */
                  1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskStart );   /* 任务句柄  */
+
+  #endif 
 }
 
 
@@ -242,9 +313,9 @@ void AppTaskCreate (void)
 void freertos_set_prority(void)
 {
 	
-	vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
-	taskYIELD();  // ??????
-	vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+//	vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
+//	taskYIELD();  // ??????
+//	vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
 
    
 } 
