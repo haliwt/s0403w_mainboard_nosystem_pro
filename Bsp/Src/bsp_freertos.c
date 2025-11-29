@@ -101,8 +101,8 @@ static void vTaskMsgPro(void *pvParameters)
 //        if(xResult == pdPASS){
 //             if((ulValue & DECODER_BIT_0 ) != 0)
           if(gpro_t.decoder_success_flag == 1){
-                  // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
-             gpro_t.decoder_success_flag++;
+                
+                 gpro_t.decoder_success_flag++;
 				 usart1_protocol_state_machine();
 				// vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
 	       		///taskYIELD();  // ??????
@@ -110,12 +110,11 @@ static void vTaskMsgPro(void *pvParameters)
 
                   
              //}
-			 
+			  vTaskDelay(200);
                 
          }
-
-
-        vTaskDelay(40);
+		 else
+             vTaskDelay(100);
 
 		#endif 
 
@@ -200,7 +199,7 @@ static void vTaskStart(void *pvParameters)
            }
 		  
 		
-		  vTaskDelay(pdMS_TO_TICKS(30));//�?1�?7?0
+		  vTaskDelay(pdMS_TO_TICKS(20));//�?1�?7?0
 
 
         }
@@ -217,7 +216,7 @@ void AppTaskCreate (void)
    #if 1
 	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 128,            		/* 任务栈大小，单位word，也就是4字节 */
+                 196,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskMsgPro);   /* 任务句柄  */
