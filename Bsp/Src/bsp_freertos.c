@@ -125,9 +125,9 @@ static void vTaskMsgPro(void *pvParameters)
              
 				 usart1_protocol_state_machine();
 				#if 0
-				vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
-	       		taskYIELD();  // ??????
-	    		vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
+					vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
+		       		taskYIELD();  // ??????
+		    		vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
 				#else 
 				  // 设置事件位，通知 vTaskStart
                xTaskNotify(xHandleTaskStart, /* 目标任务 */
@@ -197,7 +197,7 @@ static void vTaskStart(void *pvParameters)
 		
 		if( xResult == pdPASS )
 		{
-		    if((ulValue & BIT_1) != 0)
+		    if((ulValue & BIT_2) != 0)
 			{
 
 		    }
