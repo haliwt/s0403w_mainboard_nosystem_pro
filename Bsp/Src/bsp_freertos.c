@@ -1,9 +1,12 @@
 #include "bsp.h"
 
+#define DECODER_BIT_0        (1<< 0)
 
 #define BIT_1                (1<<1)
 
-#define DECODER_BIT_0        (1<< 0)
+#define BIT_2                (1<<2)
+
+
 
 /***********************************************************************************************************
 											函数声明
@@ -24,6 +27,7 @@ static void AppTaskCreate (void);
 static TaskHandle_t xHandleTaskWifiPro = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
 static TaskHandle_t xHandleTaskStart = NULL;
+//static QueueHandle_t xQueue1 = NULL;
 
 
 
@@ -47,7 +51,7 @@ void freeRTOS_Handler(void)
 	   AppTaskCreate();
 	  
 	  /* 创建任务通信机制 */
-//	   AppObjCreate();
+	 //  AppObjCreate();
 	  
 	  /* 启动调度，开始执行任�?1�?7?1�?1�?7?7 */
 	   vTaskStartScheduler();
@@ -120,9 +124,18 @@ static void vTaskMsgPro(void *pvParameters)
                   // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
              
 				 usart1_protocol_state_machine();
+				#if 0
 				vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
 	       		taskYIELD();  // ??????
 	    		vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
+				#else 
+				  // 设置事件位，通知 vTaskStart
+               xTaskNotify(xHandleTaskStart, /* 目标任务 */
+								BIT_2,             /* 设置目标任务事件标志位bit0  */
+								eSetBits);         /* 将目标任务的事件标志位与BIT_0进行或操作， 
+				                                      将结果赋值给事件标志位。*/
+
+				#endif 
 
                   
              }
@@ -170,21 +183,30 @@ static void vTaskMsgPro(void *pvParameters)
  */
 static void vTaskStart(void *pvParameters)
 {
-    
+   BaseType_t xResult;
+    const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为500ms */
+   uint32_t ulValue; 
+   
    while(1)
     {
   
-       	if(power_on_sound_flag==0){
-            power_on_sound_flag ++;
-            FAN_Stop();  //WT.EDIT.2025.01.03
-            buzzer_sound();//buzzer_sound();
-			//printf("buzzer_sound !!!\r\n");
+       xResult = xTaskNotifyWait(0x00000000,      
+						          0xFFFFFFFF,      
+						          &ulValue,        /* 保存ulNotifiedValue到变量ulValue中 */
+						          xMaxBlockTime);  /* 最大允许延迟时间 */
+		
+		if( xResult == pdPASS )
+		{
+		    if((ulValue & BIT_1) != 0)
+			{
 
-        }
+		    }
 
 
+		}
+		else{
 
-          switch(gpro_t.gpower_on){ 
+		  switch(gpro_t.gpower_on){ 
 
             case power_on:
 		 
@@ -223,8 +245,8 @@ static void vTaskStart(void *pvParameters)
 		  
 
      
-		  vTaskDelay(pdMS_TO_TICKS(200));//�?1�?7?0
-
+		  //vTaskDelay(pdMS_TO_TICKS(200));//�?1�?7?0
+		}
 
         }
 }
@@ -266,6 +288,30 @@ void AppTaskCreate (void)
 
  
 }
+/*
+*********************************************************************************************************
+*	函 数 名: AppObjCreate
+*	功能说明: 创建任务通信机制
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+//static void AppObjCreate (void)
+//{
+//	/* 创建10个uint8_t型消息队列 */
+//	xQueue1 = xQueueCreate(10, sizeof(uint8_t));
+//    if( xQueue1 == 0 )
+//    {
+//        /* 没有创建成功，用户可以在这里加入创建失败的处理机制 */
+//    }
+	
+////	/* 创建10个存储指针变量的消息队列，由于CM3/CM4内核是32位机，一个指针变量占用4个字节 */
+////	xQueue2 = xQueueCreate(10, sizeof(struct Msg *));
+////    if( xQueue2 == 0 )
+////    {
+////        /* 没有创建成功，用户可以在这里加入创建失败的处理机制 */
+////    }
+//}
 
 
 /********************************************************************************
