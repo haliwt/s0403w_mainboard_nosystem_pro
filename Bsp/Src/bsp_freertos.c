@@ -33,7 +33,7 @@ static TaskHandle_t xHandleTaskStart = NULL;
 
 
 #define LOWEST_PRIORITY   1  // ???????
-#define HIGHEST_PRIORITY  2
+#define HIGHEST_PRIORITY  3
 
 
 uint8_t power_on_sound_flag ;
@@ -98,7 +98,7 @@ static void vTaskMsgPro(void *pvParameters)
 {
   
 	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 1.?????-?????????50ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
    uint32_t ulValue;
     
 	
@@ -244,9 +244,11 @@ static void vTaskStart(void *pvParameters)
           }
 
 		  
+	 
 
      
-		vTaskDelay(pdMS_TO_TICKS(200));//�?1�?7?0
+		vTaskDelay(pdMS_TO_TICKS(300));//�?1�?7?0
+		freertos_set_prority();
 		}
  }
         
@@ -326,9 +328,9 @@ void AppTaskCreate (void)
 void freertos_set_prority(void)
 {
 	
-//	vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
-//	taskYIELD();  // ??????
-//	vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+	vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
+	taskYIELD();  // ??????
+	vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
 
    
 } 
