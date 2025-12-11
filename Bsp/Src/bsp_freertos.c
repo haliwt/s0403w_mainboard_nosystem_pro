@@ -124,7 +124,7 @@ static void vTaskMsgPro(void *pvParameters)
                   // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
              
 				 usart1_protocol_state_machine();
-				#if 0
+				#if 1
 					vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
 		       		taskYIELD();  // ??????
 		    		vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
@@ -183,13 +183,13 @@ static void vTaskMsgPro(void *pvParameters)
  */
 static void vTaskStart(void *pvParameters)
 {
-   BaseType_t xResult;
-    const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为500ms */
-   uint32_t ulValue; 
+   //BaseType_t xResult;
+   /// const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为500ms */
+   //uint32_t ulValue; 
    
    while(1)
     {
-  
+       #if 0
        xResult = xTaskNotifyWait(0x00000000,      
 						          0xFFFFFFFF,      
 						          &ulValue,        /* 保存ulNotifiedValue到变量ulValue中 */
@@ -205,6 +205,7 @@ static void vTaskStart(void *pvParameters)
 
 		}
 		else{
+		#endif 
 
 		  switch(gpro_t.gpower_on){ 
 
@@ -245,11 +246,11 @@ static void vTaskStart(void *pvParameters)
 		  
 
      
-		  //vTaskDelay(pdMS_TO_TICKS(200));//�?1�?7?0
+		vTaskDelay(pdMS_TO_TICKS(200));//�?1�?7?0
 		}
+ }
+        
 
-        }
-}
 
  /**
  * @brief  :  void AppTaskCreate (void)�����ݴ����������ȼ�Ϊ�е�
