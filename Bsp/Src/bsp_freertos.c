@@ -68,17 +68,18 @@ static void vTaskWifiPro(void * pvParameters)
 {
    while(1)
    {
-    if(gpro_t.process_run_step > 10){
+          if(gpro_t.process_run_step > 10){
 
 		      gpro_t.process_run_step=6;
-			  freertos_set_prority();
+			  
 
 		  }
           else if(gpro_t.wifi_led_fast_blink_flag > 1){
 		  	 gpro_t.wifi_led_fast_blink_flag=0;
 			
 		  }
-		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
+		  
+		  if(gpro_t.wifi_led_fast_blink_flag==0 ){
              wifi_communication_tnecent_handler();//
              getBeijingTime_cofirmLinkNetState_handler();
              wifi_auto_detected_link_state();
@@ -117,7 +118,7 @@ static void vTaskMsgPro(void *pvParameters)
 	   xResult = xTaskNotifyWait(0x00000000,      
 						           0xFFFFFFFF,      
 						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
-						           portMAX_DELAY);  /* ????????,????-block portMAX_DELAY */
+						           xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
         if(xResult == pdPASS){
              if((ulValue & DECODER_BIT_0 ) != 0)
              {
@@ -247,7 +248,7 @@ static void vTaskStart(void *pvParameters)
 	 
 
      
-		vTaskDelay(pdMS_TO_TICKS(300));//�?1�?7?0
+		vTaskDelay(pdMS_TO_TICKS(500));//�?1�?7?0
 		freertos_set_prority();
 		}
  }
