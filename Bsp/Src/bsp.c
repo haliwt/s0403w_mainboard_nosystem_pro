@@ -91,7 +91,9 @@ void wifi_communication_tnecent_handler(void)
    if(wifi_t.get_rx_beijing_time_enable==0){
     
          Tencent_Cloud_Rx_Handler();
+		 decoder_handler();
     	 Json_Parse_Command_Fun();
+		 decoder_handler();
   
    }
 }

@@ -11,9 +11,9 @@
 /***********************************************************************************************************
 											函数声明
 ***********************************************************************************************************/
-static void vTaskWifiPro(void *pvParameters);
+//static void vTaskWifiPro(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
-static void vTaskStart(void *pvParameters);
+//static void vTaskStart(void *pvParameters);
 static void AppTaskCreate (void);
 
 
@@ -24,9 +24,9 @@ static void AppTaskCreate (void);
 /***********************************************************************************************************
 											变量声明
 ***********************************************************************************************************/
-static TaskHandle_t xHandleTaskWifiPro = NULL;
+//static TaskHandle_t xHandleTaskWifiPro = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
-static TaskHandle_t xHandleTaskStart = NULL;
+//static TaskHandle_t xHandleTaskStart = NULL;
 //static QueueHandle_t xQueue1 = NULL;
 
 
@@ -34,6 +34,8 @@ static TaskHandle_t xHandleTaskStart = NULL;
 
 #define LOWEST_PRIORITY   1  // ???????
 #define HIGHEST_PRIORITY  3
+
+
 
 
 uint8_t power_on_sound_flag ;
@@ -58,43 +60,14 @@ void freeRTOS_Handler(void)
 
 
 }
-/**
- * @brief  : 
- * @note    
- * @param   None
- * @retval  None
- */
-static void vTaskWifiPro(void * pvParameters)
-{
-   while(1)
-   {
-          if(gpro_t.process_run_step > 10){
-
-		      gpro_t.process_run_step=6;
-			  
-
-		  }
-          else if(gpro_t.wifi_led_fast_blink_flag > 1){
-		  	 gpro_t.wifi_led_fast_blink_flag=0;
-			
-		  }
-		  
-		  if(gpro_t.wifi_led_fast_blink_flag==0 ){
-             wifi_communication_tnecent_handler();//
-             getBeijingTime_cofirmLinkNetState_handler();
-             wifi_auto_detected_link_state();
-           }
-     vTaskDelay(pdMS_TO_TICKS(100));
-   	}
-}
-
+ 
 /**
  * @brief  :  static void vTaskStart(void *pvParameters
  * @note    
  * @param   None
  * @retval  None
  */
- #if 1
+
 static void vTaskMsgPro(void *pvParameters)
 {
   
@@ -113,100 +86,17 @@ static void vTaskMsgPro(void *pvParameters)
 			//printf("buzzer_sound !!!\r\n");
 
         }
-
-       #if 1
-	   xResult = xTaskNotifyWait(0x00000000,      
-						           0xFFFFFFFF,      
-						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
-						           xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
-        if(xResult == pdPASS){
-             if((ulValue & DECODER_BIT_0 ) != 0)
-             {
-                  // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
-             
-				 usart1_protocol_state_machine();
-				#if 1
-					vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
-		       		taskYIELD();  // ??????
-		    		vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
-				#else 
-				  // 设置事件位，通知 vTaskStart
-               xTaskNotify(xHandleTaskStart, /* 目标任务 */
-								BIT_2,             /* 设置目标任务事件标志位bit0  */
-								eSetBits);         /* 将目标任务的事件标志位与BIT_0进行或操作， 
-				                                      将结果赋值给事件标志位。*/
-
-				#endif 
-
-                  
-             }
-			 
-                
-         }
-
-		#else 
-		//		 xResult = xTaskNotifyWait(0x00000000,      
-//						           0xFFFFFFFF,      
-//						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
-//						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
-//        if(xResult == pdPASS){
-//             if((ulValue & DECODER_BIT_0 ) != 0)
-          if(gpro_t.decoder_success_flag == 1){
-                
-                 gpro_t.decoder_success_flag++;
-				 usart1_protocol_state_machine();
-				// vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
-	       		///taskYIELD();  // ??????
-	    		///vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
-
-                  
-             //}
-			  vTaskDelay(200);
-                
-         }
-		 else{
-
-
-		      vTaskDelay(100);
-
-		 	}
-
-		#endif 
-				                                   
- 	}
-}	
-#endif 
-/**
- * @brief  :  static void vTaskStart(void *pvParameters
- * @note    
- * @param   None
- * @retval  None
- */
-static void vTaskStart(void *pvParameters)
-{
-   //BaseType_t xResult;
-   /// const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为500ms */
-   //uint32_t ulValue; 
-   
-   while(1)
-    {
-       #if 0
-       xResult = xTaskNotifyWait(0x00000000,      
-						          0xFFFFFFFF,      
-						          &ulValue,        /* 保存ulNotifiedValue到变量ulValue中 */
-						          xMaxBlockTime);  /* 最大允许延迟时间 */
+      
+		if(gpro_t.decoder_success_flag==1){
+			gpro_t.decoder_success_flag++;
 		
-		if( xResult == pdPASS )
-		{
-		    if((ulValue & BIT_2) != 0)
-			{
+		    usart1_protocol_state_machine();
+		
+		
+		  }
+          else{
 
-		    }
 
-
-		}
-		else{
-		#endif 
 
 		  switch(gpro_t.gpower_on){ 
 
@@ -219,8 +109,12 @@ static void vTaskStart(void *pvParameters)
 
 			//ack_handler();
 
+		
+			decoder_handler();
+
 			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   
+		
 
 			if(gpro_t.answer_buzzer_flag > 1){
 				if(gpro_t.answer_buzzer_flag == 1)gpro_t.answer_buzzer_flag =0;
@@ -238,19 +132,39 @@ static void vTaskStart(void *pvParameters)
 		  
 
           case power_off:
+		  	 decoder_handler();
               gpro_t.process_run_step=0;
 	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
 		     power_off_handler();
              break;
           }
 
-		  
-	 
+           if(gpro_t.process_run_step > 10){
 
+		      gpro_t.process_run_step=6;
+			  
+
+		  }
+          else if(gpro_t.wifi_led_fast_blink_flag > 1){
+		  	 gpro_t.wifi_led_fast_blink_flag=0;
+			
+		  }
+		  
+		  if(gpro_t.wifi_led_fast_blink_flag==0 ){
+             wifi_communication_tnecent_handler();//
+             decoder_handler();
+             getBeijingTime_cofirmLinkNetState_handler();
+			 decoder_handler();
+             wifi_auto_detected_link_state();
+			 decoder_handler();
+           }
+		  
+	      decoder_handler();
      
-		vTaskDelay(pdMS_TO_TICKS(500));//�?1�?7?0
-		freertos_set_prority();
+
+		
 		}
+      }
  }
         
 
@@ -264,7 +178,7 @@ static void vTaskStart(void *pvParameters)
 void AppTaskCreate (void)
 {
    
-  
+  #if 0
 	xTaskCreate( vTaskWifiPro,		   /* 任务函数	*/
 					"vTaskWifiPro",		   /* 任务�?1�?7?1�?1�?7?7	*/
 					128,				   /* 任务栈大小，单位word，也就是4字节 */
@@ -272,24 +186,24 @@ void AppTaskCreate (void)
 					2,					   /* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
 					&xHandleTaskWifiPro );   /* 任务句柄	*/
 
-
+   #endif 
 
 	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 128,            		/* 任务栈大小，单位word，也就是4字节 */
+                 256,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
-                 3,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
+                 1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskMsgPro);   /* 任务句柄  */
 
  
-
+  #if 0
    xTaskCreate( vTaskStart,     		/* 任务函数  */
                  "vTaskStart",   		/* 任务�?1�?7?1�?1�?7?7    */
                  128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskStart );   /* 任务句柄  */
-
+   #endif 
  
 }
 /*
@@ -329,9 +243,9 @@ void AppTaskCreate (void)
 void freertos_set_prority(void)
 {
 	
-	vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
-	taskYIELD();  // ??????
-	vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+	//vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
+	//taskYIELD();  // ??????
+	//vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
 
    
 } 
@@ -349,3 +263,15 @@ void freertos_decoder_isr_handler(void)
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
 }
+
+
+void decoder_handler(void)
+{
+if(gpro_t.decoder_success_flag==1){
+	gpro_t.decoder_success_flag++;
+		
+	usart1_protocol_state_machine();
+		
+}
+}
+
