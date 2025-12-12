@@ -326,7 +326,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 			gl_tMsg.usData[1]=0;
 	         gl_tMsg.usData[6]=0;
 			 gpro_t.decoder_success_flag=1;
-		
+		     continue; // 使用 continue 立即跳过下面所有代码，回到 while(1) 顶部
 			 //freertos_decoder_isr_handler();
 			
 
