@@ -86,19 +86,9 @@ void SysTick_Handler(void)
 #endif
 /**
  * @brief     初始化延迟函数
- * @param     sysclk: 系统时钟频率, 即CPU频率(rcc_c_ck), 72MHz
+ * @param     sysclk: 系统时钟频率, 即CPU频率(rcc_c_ck), 64MHz
  * @retval    无
  */  
-void delay_init(uint16_t sysclk)
-{
-	// 假设系统时钟 64 MHz
-    // 1 tick = 1 us → 需要 64 个时钟周期
-    LL_Init1msTick(64000000);   // 先初始化为 1ms 基准
-    SysTick->LOAD  = (64000000 / 1000000) - 1; // 64-1 = 63
-    SysTick->VAL   = 0;                         // 清零当前值
-    SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk;
-
-}
 
 /**
  * @brief     延时nus
@@ -109,28 +99,21 @@ void delay_init(uint16_t sysclk)
  */
 void delay_us(uint32_t us)
 {
-   uint32_t ticks = us * HCLK_MHZ; // 需要计数的时钟周期数
-    uint32_t told, tnow, tcnt = 0;
-    uint32_t reload = SysTick->LOAD; // 获取 SysTick 的重载值（通常是 1ms 的计数值）
+  uint32_t ticks = us * (SystemCoreClock / 1000000); // 目标时钟周期数
+    uint32_t told = SysTick->VAL;
+    uint32_t tnow, tcnt = 0;
+    uint32_t reload = SysTick->LOAD;
 
-    told = SysTick->VAL; // 记录初始值
-
-    while (1)
+    while (tcnt < ticks)
     {
-        tnow = SysTick->VAL; // 读取当前值
-        
-        // SysTick 是倒计时的，所以 tnow < told
-        if (tnow < told) {
-            tcnt += told - tnow; // 正常倒数，累加差值
-        } else {
-            // 发生溢出（从 reload 倒数到 0），一个溢出周期等于 reload+1 个时钟周期
-            tcnt += reload - tnow + told; 
-        }
-
-        told = tnow; // 更新上次的值
-
-        if (tcnt >= ticks) {
-            break; // 达到目标延时
+        tnow = SysTick->VAL;
+        if (tnow != told) {
+            if (tnow < told) {
+                tcnt += told - tnow;
+            } else {
+                tcnt += reload - tnow + told;
+            }
+            told = tnow;
         }
     }
 
@@ -145,6 +128,22 @@ void delay_ms(uint16_t nms)
 {
        delay_us((uint32_t)(nms * 1000));                   /* 普通方式延时 */
 }
+
+// 获取当前毫秒数
+uint32_t millis(void) 
+{
+    return HAL_GetTick();   // 或者用 LL 的全局 tick 变量
+}
+
+// 非阻塞延时检查
+bool delayExpired(uint32_t start, uint32_t delay_ms) 
+{
+    return (millis() - start) >= delay_ms;
+}
+
+
+
+
 #if 0
 /**
  * @brief       LL 使用TIM2 定时器作为us级延时.

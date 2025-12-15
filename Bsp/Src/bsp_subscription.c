@@ -576,7 +576,7 @@ void Json_Parse_Command_Fun(void)
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
             gpro_t.send_ack_cmd = 1; //ack_app_power_off;
-             gpro_t.gTimer_timer_start_counter=0;
+            gpro_t.gTimer_timer_start_counter=0;
             SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
 			osDelay(10);//HAL_Delay(5);
           
@@ -585,7 +585,7 @@ void Json_Parse_Command_Fun(void)
          
             gctl_t.response_wifi_signal_label = 0xff;
              }
-        
+        decoder_handler();
 	  break;
 
 	  case PTC_ON_ITEM:
@@ -611,7 +611,7 @@ void Json_Parse_Command_Fun(void)
 		 buzzer_temp_on=0;
          gctl_t.response_wifi_signal_label=0xff;
 	  	
-       
+         decoder_handler();
 	   break;
 
 	  case PTC_OFF_ITEM:
@@ -636,7 +636,7 @@ void Json_Parse_Command_Fun(void)
 		buzzer_temp_on=0;
 	     gctl_t.response_wifi_signal_label = 0xff;
 
-	  	
+	  	decoder_handler();
 	  	break;
 
 	  case ANION_OFF_ITEM: //"�?�?" //5
@@ -652,6 +652,7 @@ void Json_Parse_Command_Fun(void)
       
 		buzzer_temp_on=0;
 	   gctl_t.response_wifi_signal_label = 0xff;
+	   decoder_handler();
 	   break;
 		
 	  case ANION_ON_ITEM: //plasma 
@@ -684,6 +685,7 @@ void Json_Parse_Command_Fun(void)
         }
 		buzzer_temp_on=0;
 	   gctl_t.response_wifi_signal_label=0xff;
+	   decoder_handler();
 	  	break;
 
 	  case SONIC_ON_ITEM://ultransonic off
@@ -721,6 +723,7 @@ void Json_Parse_Command_Fun(void)
     
 	    buzzer_temp_on=0;
 	   gctl_t.response_wifi_signal_label = 0xff;
+	   decoder_handler();
 	  break;
 		
 	  case STATE_AI_MODEL_ITEM: // beijing timing 0x09
@@ -737,6 +740,7 @@ void Json_Parse_Command_Fun(void)
      
 		buzzer_temp_on=0;
 	    gctl_t.response_wifi_signal_label = 0xff;
+		decoder_handler();
 	  	break;
 
 	  case TEMPERATURE_ITEM:
@@ -763,6 +767,7 @@ void Json_Parse_Command_Fun(void)
      
 	  buzzer_temp_on=0;
 	  gctl_t.response_wifi_signal_label = 0xff;
+	  decoder_handler();
 	  break;
 
 	  case FAN_ITEM:
@@ -798,6 +803,7 @@ void Json_Parse_Command_Fun(void)
      
 	  	buzzer_temp_on=0;
 	    gctl_t.response_wifi_signal_label = 0xff;
+		decoder_handler();
 	  	break;
 
 	  case APP_TIMER_POWER_ON_REF :
@@ -856,6 +862,8 @@ void Json_Parse_Command_Fun(void)
 
 	         gctl_t.response_wifi_signal_label=0xff;
 	       	}
+
+	   decoder_handler();
 
 	  break;
 

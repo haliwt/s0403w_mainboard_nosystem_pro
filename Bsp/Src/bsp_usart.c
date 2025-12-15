@@ -326,7 +326,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 			gl_tMsg.usData[1]=0;
 	         gl_tMsg.usData[6]=0;
 			 gpro_t.decoder_success_flag=1;
-		     continue; // 使用 continue 立即跳过下面所有代码，回到 while(1) 顶部
+		     //continue; // 使用 continue 立即跳过下面所有代码，回到 while(1) 顶部
 			 //freertos_decoder_isr_handler();
 			
 
@@ -466,7 +466,7 @@ static void receive_cmd_or_notice_handler(void)
 
               vTaskDelay(pdMS_TO_TICKS(10)); 
               wifi_link_counter=0;
-              freertos_set_prority();
+             
              
               
              gpro_t.power_off_run_step=1;
@@ -476,7 +476,7 @@ static void receive_cmd_or_notice_handler(void)
 			 else if(gpro_t.power_onoff_cp_counter==0){
 			      SendWifiData_Answer_Cmd(0x01,0x02); //power off .
 			      vTaskDelay(pdMS_TO_TICKS(10)); 
-			       freertos_set_prority();
+			    
                    gpro_t.gpower_on = power_off;
 
 

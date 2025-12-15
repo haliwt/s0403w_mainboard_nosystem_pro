@@ -6,9 +6,9 @@
 
 void freeRTOS_Handler(void);
 
-void freertos_set_prority(void);
 
-void freertos_decoder_isr_handler(void);
+
+
 
 void decoder_handler(void);
 
