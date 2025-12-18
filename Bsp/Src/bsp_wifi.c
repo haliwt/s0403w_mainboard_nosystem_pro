@@ -66,7 +66,7 @@ void link_wifi_net_handler(void)
         		at_send_data((const uint8_t *)"AT+RST\r\n", strlen("AT+RST\r\n"));
         
         		vTaskDelay(pdMS_TO_TICKS(3000));//osDelay(1000);
-        		decoder_handler();
+        		
               gpro_t.link_net_step = 1;
 
             break;
@@ -80,7 +80,7 @@ void link_wifi_net_handler(void)
 			          vTaskDelay(pdMS_TO_TICKS(1000));
                 gpro_t.gTimer_link_net_timer_time = 0;
 		
-                 decoder_handler();
+                
                 gpro_t.link_net_step = 2;
 
             break;
@@ -94,11 +94,11 @@ void link_wifi_net_handler(void)
                         sprintf((char *)device_massage, "AT+TCPRDINFOSET=1,\"%s\",\"%s\",\"UYIJIA01-%d\"\r\n", PRODUCT_ID, DEVICE_SECRET,gctl_t.randomName[0]);
             			at_send_data(device_massage, strlen((const char *)device_massage));
             	  		vTaskDelay(pdMS_TO_TICKS(1000));
-                         decoder_handler();
+                 
                        gpro_t.link_net_step = 3;
 
                  }
-				 decoder_handler();
+		
 
             break;
 
@@ -115,10 +115,10 @@ void link_wifi_net_handler(void)
 				at_send_data((const uint8_t *)"AT+TCDEVREG\r\n", strlen("AT+TCDEVREG\r\n"));
 
 			    vTaskDelay(pdMS_TO_TICKS(1000));
-                  decoder_handler();
+               
                   gpro_t.link_net_step = 4;
             }
-			 decoder_handler();
+	
 
             break;
 
@@ -131,7 +131,7 @@ void link_wifi_net_handler(void)
                   wifi_t.soft_ap_config_flag =1; //WE.EIDT 
                   gpro_t.link_net_step = 5;
                  }
-                decoder_handler();
+            
             break;
 
             case 5:
@@ -139,9 +139,9 @@ void link_wifi_net_handler(void)
 	            sprintf((char *)device_massage, "AT+TCSAP=\"UYIJIA01-%d\"\r\n",gctl_t.randomName[0]);
                 at_send_data(device_massage, strlen((const char *)device_massage));
 	            vTaskDelay(pdMS_TO_TICKS(1000));
-				 decoder_handler();
+			
                vTaskDelay(pdMS_TO_TICKS(1000));
-               decoder_handler();
+       
               gpro_t.link_net_step = 6;
 
 
@@ -159,11 +159,11 @@ void link_wifi_net_handler(void)
  //           HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 5000);//å¼?å§‹è¿žæŽ?
             at_send_data((const uint8_t *)"AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
 			vTaskDelay(pdMS_TO_TICKS(1000));
-			 decoder_handler();
+	
 	         gpro_t.link_net_step = 7;
             gpro_t.gTimer_link_net_timer_time = 0;
             }
-              decoder_handler();
+            
                    
             break;
 
@@ -181,7 +181,7 @@ void link_wifi_net_handler(void)
                 
                SendWifiData_To_Data(0x1F,0x01); //link wifi order 1 --link wifi net is success.
                vTaskDelay(pdMS_TO_TICKS(10));
-			    decoder_handler();
+			
 			    gpro_t.link_net_step = 8;
                
 				
@@ -192,7 +192,7 @@ void link_wifi_net_handler(void)
                   gpro_t.link_net_step = 11;
                   SendWifiData_To_Data(0x1F,0x00) ;	 //Link wifi net is fail .WT.EDTI .2024.08.31
                   vTaskDelay(pdMS_TO_TICKS(10));
-                   decoder_handler();
+                  
                 }
                 
                }
@@ -208,13 +208,13 @@ void link_wifi_net_handler(void)
 		      
 		       vTaskDelay(pdMS_TO_TICKS(100));
 		        
-				  decoder_handler();
+				
 			  gpro_t.link_net_step = 9; // this is flag: link wifi times 119s is over.
 		    break;
 				 
 
 			 case 9: 
-			 	 decoder_handler();
+			 
 			    gpro_t.link_net_step = 10;
 
 
@@ -225,7 +225,7 @@ void link_wifi_net_handler(void)
 				Subscriber_Data_FromCloud_Handler();
 		
 	             vTaskDelay(pdMS_TO_TICKS(100));
-              decoder_handler();
+        
 			 gpro_t.link_net_step = 0xfe;
 
                    
@@ -234,7 +234,7 @@ void link_wifi_net_handler(void)
 
             case 11:
 
-			  decoder_handler();
+	
 
               gpro_t.get_beijing_flag= 10;
               wifi_t.gTimer_auto_detected_net_state_times = 120;

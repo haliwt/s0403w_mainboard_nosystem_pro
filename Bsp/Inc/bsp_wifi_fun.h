@@ -48,7 +48,7 @@ typedef struct _WIFI_FUN{
   
 
    
-	uint8_t gTimer_beijing_time;
+
 
 
 	

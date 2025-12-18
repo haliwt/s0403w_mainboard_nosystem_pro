@@ -83,6 +83,7 @@ static void tim17_isr_callback_handler(void)
 	   gpro_t.gTimer_power_on_auto_link++;
 	   gpro_t.gTimer_update_todisplay++;
 	   gpro_t.gTimer_update_tencet_dht11++;
+
 	
 
 	    gpro_t.gTimer_poweroff_fan++;

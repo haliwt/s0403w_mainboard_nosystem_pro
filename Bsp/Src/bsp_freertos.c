@@ -13,7 +13,7 @@
 ***********************************************************************************************************/
 //static void vTaskWifiPro(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
-//static void vTaskStart(void *pvParameters);
+static void vTaskStart(void *pvParameters);
 static void AppTaskCreate (void);
 
 
@@ -26,7 +26,7 @@ static void AppTaskCreate (void);
 ***********************************************************************************************************/
 //static TaskHandle_t xHandleTaskWifiPro = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
-//static TaskHandle_t xHandleTaskStart = NULL;
+static TaskHandle_t xHandleTaskStart = NULL;
 //static QueueHandle_t xQueue1 = NULL;
 
 
@@ -87,18 +87,8 @@ static void vTaskMsgPro(void *pvParameters)
 
         }
       
-		if(gpro_t.decoder_success_flag==1){
-			gpro_t.decoder_success_flag++;
-		
-		    usart1_protocol_state_machine();
-		
-		
-		 }
-         
-
-
-
-		  switch(gpro_t.gpower_on){ 
+	
+         switch(gpro_t.gpower_on){ 
 
             case power_on:
 		 
@@ -110,7 +100,7 @@ static void vTaskMsgPro(void *pvParameters)
 			//ack_handler();
 
 		
-			decoder_handler();
+	
 
 			if(gpro_t.process_run_step > 10)gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 		   
@@ -132,7 +122,7 @@ static void vTaskMsgPro(void *pvParameters)
 		  
 
           case power_off:
-		  	  decoder_handler();
+		  
               gpro_t.process_run_step=0;
 	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
 		     power_off_handler();
@@ -152,23 +142,41 @@ static void vTaskMsgPro(void *pvParameters)
 		  
 		  if(gpro_t.wifi_led_fast_blink_flag==0 ){
              wifi_communication_tnecent_handler();//
-             decoder_handler();
+        
              getBeijingTime_cofirmLinkNetState_handler();
-			 decoder_handler();
+	
              wifi_auto_detected_link_state();
-			 decoder_handler();
+		
            }
 		  
-	      decoder_handler();
 
-		  waiting_ack_handler();
+
+		//  waiting_ack_handler();
      
-
+       vTaskDelay(10);
 		
 		}
       
  }
-        
+
+ /**
+  * @brief	:  static void vTaskStart(void *pvParameters
+  * @note	 
+  * @param	 None
+  * @retval  None
+  */
+ 
+ static void vTaskStart(void *pvParameters)
+ {
+   
+	 while(1)
+	 {
+	    decoder_handler();
+		vTaskDelay(20);
+
+	 }
+
+ 	}
 
 
  /**
@@ -192,18 +200,18 @@ void AppTaskCreate (void)
 
 	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 256,            		/* 任务栈大小，单位word，也就是4字节 */
+                 128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
                  1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskMsgPro);   /* 任务句柄  */
 
  
-  #if 0
+  #if 1
    xTaskCreate( vTaskStart,     		/* 任务函数  */
                  "vTaskStart",   		/* 任务�?1�?7?1�?1�?7?7    */
                  128,            		/* 任务栈大小，单位word，也就是4字节 */
                  NULL,           		/* 任务参数  */
-                 1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
+                 2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskStart );   /* 任务句柄  */
    #endif 
  

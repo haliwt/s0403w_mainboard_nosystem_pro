@@ -73,7 +73,7 @@ void power_on_handler(void)
 		every_power_on_run();
 
 	read_sensorData();
-	decoder_handler();
+	
 	 gpro_t.process_run_step= 3;
 	   
     break;
@@ -91,7 +91,7 @@ void power_on_handler(void)
 		
 		 }
 	  read_sensorData();
-	decoder_handler();
+
       gpro_t.process_run_step= 4;
 	break;
 
@@ -107,7 +107,7 @@ void power_on_handler(void)
       gpro_t.gTimer_check_twohours = 0;
 	  gpro_t.gTimer_twohours_seconds_counter = 0;
 	  gpro_t.process_run_step= 6;
-	 decoder_handler();
+
 	 break;
 	     
 		
@@ -122,7 +122,7 @@ void power_on_handler(void)
 	     
 		           
        }
-       decoder_handler();
+      
        gpro_t.process_run_step=7 ;
 
 
@@ -154,7 +154,7 @@ void power_on_handler(void)
 	
 	  }
    
-      decoder_handler();
+    
 	 gpro_t.process_run_step=8 ;
  break; 
 
@@ -169,7 +169,7 @@ void power_on_handler(void)
 	 older_works_run_two_hours_state();
 
 		
-	 decoder_handler();
+
 
      gpro_t.process_run_step= 9;
   break;
@@ -184,7 +184,7 @@ void power_on_handler(void)
 				gpro_t.gTimer_update_tencet_dht11=0;
 				Update_Dht11_Totencent_Value();
         }
-      decoder_handler();
+	  
        gpro_t.process_run_step= 10; 
 
 
@@ -200,7 +200,7 @@ void power_on_handler(void)
 		if(gctl_t.app_timer_power_on_flag > 1)gctl_t.app_timer_power_on_flag=0;
 		if( gctl_t.set_temp_first_closeptc > 1)  gctl_t.set_temp_first_closeptc =0;
 	 }
-	   decoder_handler();
+	   
 
 	   gpro_t.process_run_step= 6;	
 

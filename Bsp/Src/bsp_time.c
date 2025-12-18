@@ -288,7 +288,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
      gpro_t.get_beijing_flag = 1;
 
     }
-    decoder_handler();
+   
 
    break;
 
@@ -326,7 +326,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
             gpro_t.get_beijing_flag = 0;
        }
 
-      decoder_handler();
+ 
       break;
 
 
@@ -355,7 +355,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
         }
 
 
-     decoder_handler();
+
     break;
 
 
@@ -371,7 +371,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
     		Get_BeiJing_Time_Cmd();
     	    vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10//HAL_Delay(20);
     	    beijing_step =1;
-           decoder_handler();
+         
          break;
 
          case 1:
@@ -386,7 +386,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
         	
                 beijing_step =2;
           
-         decoder_handler();
+        
 
           break; 
 
@@ -440,7 +440,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
             break;
          }
 
-		 decoder_handler();
+		 
     break;
 
 
@@ -453,7 +453,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
        wifi_t.gTimer_auto_detected_net_state_times=0;  
 
        gpro_t.get_beijing_flag = 0;
-       decoder_handler();
+       
     break;
 
     //auto link net 
@@ -489,7 +489,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
           gpro_t.get_beijing_flag = 0;
 
      }
-       decoder_handler();
+       
      break;
 
 
@@ -517,7 +517,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
          }
         
                
-	 decoder_handler();
+
 
      break;
 
@@ -546,7 +546,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
            
         }
 
-	 decoder_handler();
+
 
      break;
 
@@ -586,7 +586,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 			 vTaskDelay(pdMS_TO_TICKS(10));
              gpro_t.get_beijing_flag = 10;
          }
-	     decoder_handler();
+	   
 
        break;
 	

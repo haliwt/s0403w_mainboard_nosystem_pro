@@ -473,12 +473,14 @@ static void usart1_isr_callback_handler(uint8_t data)
 void usart1_protocol_state_machine(void)
 {
   
-   static uint8_t  parse_decoder_flag;
+   static uint8_t  parse_decoder_flag, parse_exit_flag;
 
    uint8_t i;
    memcpy(rx_inputBuf,gl_tMsg.usData,rx_numbers);
 
- 
+   parse_decoder_flag=1;
+
+   while(parse_decoder_flag==1){
 	
         if(rx_inputBuf[2]==0xFF){ //copy command 
 
@@ -490,10 +492,10 @@ void usart1_protocol_state_machine(void)
 		     gl_tMsg.execuite_cmd_notice = rx_inputBuf[4];
 			
 		  
-			 parse_decoder_flag=1;
+			 parse_exit_flag =1;
 
 			 rx_data_counter=0;
-			 return ;
+			
 			 
 		 }
 		 else{
@@ -514,25 +516,25 @@ void usart1_protocol_state_machine(void)
                }
 			   rx_data_counter=0;
    
-			    parse_decoder_flag=1;
+			    parse_exit_flag=1;
 			
-				// return ;
+		 
            }
 		   else if(inputBuf[3]!=0x0F){
                 gl_tMsg.execuite_cmd_notice =  rx_inputBuf[3];
 				 rx_data_counter=0;
 				
-                parse_decoder_flag=1;
+                parse_exit_flag=1;
 		
 		  
-				//return ;
+			 
 
             }
 		  
 
 		 }
 
-   if(parse_decoder_flag==1){
+   if(parse_exit_flag==1){
    
    if(gl_tMsg.copy_cmd_flag == 0){
  
@@ -540,16 +542,17 @@ void usart1_protocol_state_machine(void)
 	   
 
    }
-   else {
+   else{
 
-     parse_recieve_copy_data_handler();
+        parse_recieve_copy_data_handler();
 	
     }
 
 	parse_decoder_flag=0;
 
-   	}
+   }
 
+   }
 
 }
 
@@ -1118,10 +1121,10 @@ void USART1_IRQHandler(void)
 void decoder_handler(void)
 {
 if(gpro_t.decoder_success_flag==1){
-	
+	gpro_t.decoder_success_flag++;
 		
 	usart1_protocol_state_machine();
-	gpro_t.decoder_success_flag++;
+	
 
 		
 }
