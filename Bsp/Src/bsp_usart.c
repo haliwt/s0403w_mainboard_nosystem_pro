@@ -20,6 +20,7 @@ static Usart1RxCallback usart1_rx_cb = NULL;  //定义一个全局静态函数�
 
 static void usart1_isr_callback_handler(uint8_t data);
 
+uint8_t rx_inputBuf[12];
 
 //提供注册接口
 void usart1_register_rx_callback(Usart1RxCallback cb)
@@ -146,7 +147,7 @@ MSG_T   gl_tMsg;
 uint8_t inputBuf[1];
 uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 
-
+uint8_t rx_numbers;
 
 static void receive_cmd_or_notice_handler(void);
 
@@ -167,7 +168,7 @@ volatile uint8_t rx_data_counter=0;
 static void usart1_isr_callback_handler(uint8_t data)
 {
        
-	    
+	#if 0    
        switch(rx_state){
 	
          case 0:
@@ -380,6 +381,86 @@ static void usart1_isr_callback_handler(uint8_t data)
 		  break;
 
 		}
+	   #else 
+	   switch(rx_state){
+	  
+		   case 0:
+			if(data == FRAME_HEADER){
+			 gl_tMsg.usData[rx_data_counter]=data;
+			  rx_data_counter++;
+			  rx_state =1;
+	
+			}
+			break;
+	
+			case 1:
+			  if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
+				 gl_tMsg.usData[rx_data_counter]=data;
+				  rx_data_counter++;
+				
+				  rx_state =2;
+			  }
+			  else{
+				  rx_state =0;
+				  rx_data_counter=0;
+				  gl_tMsg.usData[0]=0;
+				  gl_tMsg.usData[1]=0;
+			  }
+	
+			break;
+	
+			case 2: //rx command or notice or oxFF --> copy command or notice .
+				gl_tMsg.usData[rx_data_counter]=data;
+			    rx_data_counter++;
+//			    if(data == 0xA5){
+//				   rx_state =0;
+
+//				   rx_data_counter=0;
+//				   gl_tMsg.usData[0]=0;
+//				   gl_tMsg.usData[1]=0;
+
+
+//				}
+//				else 
+
+				if(data==0xFE && rx_data_counter>2){ //older version is copy command or notice "0xFF"
+				   
+				    rx_state =3;
+	
+	              
+				}
+				
+				
+	
+			break;
+	
+			case 3: //rx excuite command and notice or data 
+			   
+				gl_tMsg.usData[rx_data_counter]=data;
+				rx_data_counter++;
+
+			    rx_numbers =rx_data_counter;
+			
+				 
+			
+				gpro_t.decoder_success_flag=1;
+				rx_data_counter=0;
+				gl_tMsg.usData[0]=0;
+				gl_tMsg.usData[1]=0;
+				
+	           rx_state =0;
+				  
+	
+	
+			break;
+	
+			
+	
+	
+		  }
+
+
+	   #endif 
 }
 /********************************************************************************
 	**
@@ -391,7 +472,67 @@ static void usart1_isr_callback_handler(uint8_t data)
 *******************************************************************************/
 void usart1_protocol_state_machine(void)
 {
+  
+   static uint8_t  parse_decoder_flag;
 
+   uint8_t i;
+   memcpy(rx_inputBuf,gl_tMsg.usData,rx_numbers);
+
+ 
+	
+        if(rx_inputBuf[2]==0xFF){ //copy command 
+
+		     gl_tMsg.copy_cmd_flag = 0xFF;
+			  
+		     gl_tMsg.cmd_notice = rx_inputBuf[3];
+		
+		
+		     gl_tMsg.execuite_cmd_notice = rx_inputBuf[4];
+			
+		  
+			 parse_decoder_flag=1;
+
+			 rx_data_counter=0;
+			 return ;
+			 
+		 }
+		 else{
+		 	gl_tMsg.copy_cmd_flag = 0;
+			gl_tMsg.cmd_notice = rx_inputBuf[2];
+            //gl_tMsg.usData[rx_data_counter] = inputBuf[3];
+          
+           if(inputBuf[3]==0x0F){ //is data frame ,don't is command 
+
+               gl_tMsg.data_length =rx_inputBuf[4]; //receive data of length
+               gl_tMsg.execuite_cmd_notice=0;
+               for(i=0;i<gl_tMsg.data_length;i++){
+		          rx_data_counter++;
+               
+			      gl_tMsg.rx_data[i] = rx_inputBuf[4+rx_data_counter];
+         
+                 
+               }
+			   rx_data_counter=0;
+   
+			    parse_decoder_flag=1;
+			
+				// return ;
+           }
+		   else if(inputBuf[3]!=0x0F){
+                gl_tMsg.execuite_cmd_notice =  rx_inputBuf[3];
+				 rx_data_counter=0;
+				
+                parse_decoder_flag=1;
+		
+		  
+				//return ;
+
+            }
+		  
+
+		 }
+
+   if(parse_decoder_flag==1){
    
    if(gl_tMsg.copy_cmd_flag == 0){
  
@@ -404,6 +545,10 @@ void usart1_protocol_state_machine(void)
      parse_recieve_copy_data_handler();
 	
     }
+
+	parse_decoder_flag=0;
+
+   	}
 
 
 }
@@ -487,7 +632,7 @@ static void receive_cmd_or_notice_handler(void)
 
      case ptc_on_off: //PTC key of command .
 
-     if(gl_tMsg.execuite_cmd_notice  == 0x01){
+     if(gl_tMsg.execuite_cmd_notice  == 0x01 && gpro_t.gpower_on == power_on){//phone_cmd_power
 
 	     if(gpro_t.ptc_onoff_cp_counter==0){
 		  	gpro_t.ptc_onoff_cp_counter++;
@@ -511,7 +656,7 @@ static void receive_cmd_or_notice_handler(void)
          }
 	      }
        }
-       else if(gl_tMsg.execuite_cmd_notice  == 0x0){
+       else if(gl_tMsg.execuite_cmd_notice  == 0x0 && gpro_t.gpower_on == power_on){
 	   	if(gpro_t.ptc_onoff_cp_counter==1){
 			gpro_t.ptc_onoff_cp_counter=0;
           buzzer_sound();
@@ -730,10 +875,10 @@ static void receive_cmd_or_notice_handler(void)
         gctl_t.gDry = 1;
 		ptc_recoder_flag =1 ;//WT.EDIT 2025.11.17
 		gpro_t.ptc_switch_flag ++;
-		if(gpro_t.soft_version ==1){
-		 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
-         vTaskDelay(pdMS_TO_TICKS(5));
-		}
+//		if(gpro_t.soft_version ==1){
+//		 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
+//         vTaskDelay(pdMS_TO_TICKS(5));
+//		}
    
         if(gpro_t.stopTwoHours_flag ==0){
               PTC_SetHigh();
@@ -744,7 +889,7 @@ static void receive_cmd_or_notice_handler(void)
 		}
 			#if DEBUG_FLAG
 
-			  printf("disp_gDry = %d\r\n",gctl_t.gDry);
+			//  printf("disp_gDry = %d\r\n",gctl_t.gDry);
 
 			#endif 
           
@@ -755,11 +900,12 @@ static void receive_cmd_or_notice_handler(void)
 		  ptc_recoder_flag =0 ;
           PTC_SetLow();
           gpro_t.ptc_switch_flag++;
-		  if(gpro_t.soft_version==1){
-		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
-            vTaskDelay(pdMS_TO_TICKS(5));
+		  
+//		  if(gpro_t.soft_version==1){
+//		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
+//            vTaskDelay(pdMS_TO_TICKS(5));
 
-		  }
+//		  }
 		  if(wifi_link_net_state()==1){ 
 			MqttData_Publish_SetPtc(0x0);
 			
@@ -768,7 +914,7 @@ static void receive_cmd_or_notice_handler(void)
 		  	
 			#if DEBUG_FLAG
 
-			  printf("disp_gDry = %d\r\n",gctl_t.gDry);
+			//  printf("disp_gDry = %d\r\n",gctl_t.gDry);
 
 			#endif 
 			 
@@ -878,6 +1024,38 @@ static void parse_recieve_copy_data_handler(void)
     
         break;
 
+		case 0x31: //phone power on 
+		  if(gl_tMsg.execuite_cmd_notice == 0x01){
+           
+             //gctl_t.ptc_warning =0;
+			
+	        ///gpro_t.fan_warning_flag =0;
+	        //gpro_t.power_off_run_step=1;
+	        //powerOffFanRun_flag = 1;
+	
+			//gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
+			gpro_t.phone_power_on_flag = 0; //ack_app_power_on;
+	     
+
+		   }
+
+		break;
+
+		case 0x30: //phone power off 
+
+		  if(gl_tMsg.execuite_cmd_notice == 0x00){
+			           //gpro_t.gpower_on = power_off;
+					   //gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
+					   //powerOffFanRun_flag = 1;
+					   gpro_t.phone_power_on_flag = 0; //ack_app_power_off;
+					
+
+               
+
+		    }
+
+		break;
+
         case ack_app_timer_power_on:
 
           
@@ -906,5 +1084,46 @@ static void parse_recieve_copy_data_handler(void)
 
 }
 
+/**
+  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
+  */
+void USART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+  volatile uint8_t data;
+  // static uint8_t rx_flag;
+   if(LL_USART_IsActiveFlag_RXNE_RXFNE(USART1)){
+   
+      //LL_USART_ClearFlag_RXNE(USART1);
+      data = LL_USART_ReceiveData8(USART1);
+      //usart1_isr_callback_handler(data);
+       //  usart1_invoke_callback(data);
+       usart1_isr_callback_handler(data);
 
+     
+
+   }
+  /* USER CODE END USART1_IRQn 0 */
+
+  
+  /* USER CODE BEGIN USART1_IRQn 1 */
+	 // 清除错误标志
+    if (LL_USART_IsActiveFlag_ORE(USART1)) LL_USART_ClearFlag_ORE(USART1);
+    if (LL_USART_IsActiveFlag_FE(USART1))  LL_USART_ClearFlag_FE(USART1);
+    if (LL_USART_IsActiveFlag_NE(USART1))  LL_USART_ClearFlag_NE(USART1);
+  /* USER CODE END USART1_IRQn 1 */
+}
+
+
+void decoder_handler(void)
+{
+if(gpro_t.decoder_success_flag==1){
+	
+		
+	usart1_protocol_state_machine();
+	gpro_t.decoder_success_flag++;
+
+		
+}
+}
 

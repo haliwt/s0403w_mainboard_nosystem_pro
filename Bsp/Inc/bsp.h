@@ -135,6 +135,7 @@ typedef struct PROCESS_T{
 
    uint8_t receive_copy_cmd ;
    uint8_t send_ack_cmd;
+   uint8_t phone_power_on_flag;
    //uint8_t gFan_pwm_duty_level;
    uint8_t answer_buzzer_flag ;
    uint8_t two_hours_state ;
@@ -190,5 +191,8 @@ void link_wifi_to_tencent_handler(void);
 void wifi_communication_tnecent_handler(void);
 
 void wifi_auto_detected_link_state(void);
+
+void waiting_ack_handler(void);
+
 
 #endif 

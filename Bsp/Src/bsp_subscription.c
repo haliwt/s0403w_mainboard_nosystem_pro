@@ -534,8 +534,8 @@ void Json_Parse_Command_Fun(void)
 
  
     static uint8_t wind_hundred, wind_decade,wind_unit,temp_decade,temp_unit;
-	static uint8_t buzzer_temp_on;
-
+	static uint8_t buzzer_temp_on,phone_power_flag;
+    
 
    switch(gctl_t.response_wifi_signal_label){
   
@@ -545,8 +545,10 @@ void Json_Parse_Command_Fun(void)
 			vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(100);//osDelay(100);//HAL_Delay(100);
 
 	        Publish_Data_ToTencent_Initial_Data();
-		    //vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
+		    vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
+            phone_power_flag=1;
 
+			#if 1
 			gctl_t.ptc_warning =0;
 			
 	        gpro_t.fan_warning_flag =0;
@@ -554,10 +556,14 @@ void Json_Parse_Command_Fun(void)
 	        powerOffFanRun_flag = 1;
 	
 			gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
-			gpro_t.send_ack_cmd = 1; //ack_app_power_on;
+			//gpro_t.send_ack_cmd = 1; //ack_app_power_on;
+	        gpro_t.gTimer_timer_start_counter=0;
+			#endif 
+			gpro_t.phone_power_on_flag = 1; //ack_app_power_on;
 	        gpro_t.gTimer_timer_start_counter=0;
 		    SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
-			vTaskDelay(pdMS_TO_TICKS(10));//osDelay(5);//HAL_Delay(5);
+			vTaskDelay(pdMS_TO_TICKS(20));//osDelay(5);//HAL_Delay(5);
+
 	       
 			buzzer_temp_on=0;
 			
@@ -568,24 +574,30 @@ void Json_Parse_Command_Fun(void)
 
        case OPEN_OFF_ITEM:
 
+	      
+
              if(wifi_link_net_state()==1){  //WT.EDIT 2025.03.27
 		 	MqttData_Publish_SetOpen(0);  
-			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
-
+			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
+             phone_power_flag=2;
+			#if 1
             gpro_t.gpower_on = power_off;
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
-            gpro_t.send_ack_cmd = 1; //ack_app_power_off;
+           // gpro_t.send_ack_cmd = 1; //ack_app_power_off;
             gpro_t.gTimer_timer_start_counter=0;
-            SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
-			osDelay(10);//HAL_Delay(5);
-          
+            #endif 
+			gpro_t.phone_power_on_flag = 2; //ack_app_power_on;
+	        gpro_t.gTimer_timer_start_counter=0;
+             SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
+             vTaskDelay(pdMS_TO_TICKS(10));
+		
 			buzzer_temp_on=0;
 	
          
             gctl_t.response_wifi_signal_label = 0xff;
              }
-        decoder_handler();
+       
 	  break;
 
 	  case PTC_ON_ITEM:
@@ -877,6 +889,18 @@ void Json_Parse_Command_Fun(void)
 			buzzer_temp_on++;
    	        buzzer_sound();
         }
+		if(phone_power_flag==1){
+
+		   phone_power_flag=3;
+            SendWifiData_To_Cmd(0x31,0x1); //smart phone is power off
+			LL_mDelay(10);//vTaskDelay(pdMS_TO_TICKS(20));
+		}
+		else if(phone_power_flag==2){
+		     phone_power_flag=4;
+              SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
+			LL_mDelay(10);//vTaskDelay(pdMS_TO_TICKS(20));
+
+		}
         memset(gpro_t.wifi_rx_data_array,0,20);
       
 		gctl_t.response_wifi_signal_label=0xf0;

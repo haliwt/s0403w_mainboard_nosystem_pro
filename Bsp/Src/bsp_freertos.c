@@ -93,8 +93,8 @@ static void vTaskMsgPro(void *pvParameters)
 		    usart1_protocol_state_machine();
 		
 		
-		  }
-          else{
+		 }
+         
 
 
 
@@ -132,7 +132,7 @@ static void vTaskMsgPro(void *pvParameters)
 		  
 
           case power_off:
-		  	 decoder_handler();
+		  	  decoder_handler();
               gpro_t.process_run_step=0;
 	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
 		     power_off_handler();
@@ -160,11 +160,13 @@ static void vTaskMsgPro(void *pvParameters)
            }
 		  
 	      decoder_handler();
+
+		  waiting_ack_handler();
      
 
 		
 		}
-      }
+      
  }
         
 
@@ -241,13 +243,4 @@ void AppTaskCreate (void)
 	*
 *******************************************************************************/
 
-void decoder_handler(void)
-{
-if(gpro_t.decoder_success_flag==1){
-	gpro_t.decoder_success_flag++;
-		
-	usart1_protocol_state_machine();
-		
-}
-}
 

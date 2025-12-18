@@ -205,7 +205,7 @@ void TIM17_IRQHandler(void)
  
   /* USER CODE END TIM17_IRQn 1 */
 }
-
+#if 0
 /**
   * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
   */
@@ -214,7 +214,7 @@ void USART1_IRQHandler(void)
   /* USER CODE BEGIN USART1_IRQn 0 */
   volatile uint8_t data;
   // static uint8_t rx_flag;
-   if(LL_USART_IsActiveFlag_RXNE(USART1)){
+   if(LL_USART_IsActiveFlag_RXNE_RXFNE(USART1)){
    
       //LL_USART_ClearFlag_RXNE(USART1);
       data = LL_USART_ReceiveData8(USART1);
@@ -263,7 +263,7 @@ void USART1_IRQHandler(void)
 //  }
   /* USER CODE END USART1_IRQn 1 */
 }
-
+#endif 
 /**
   * @brief This function handles USART2 global interrupt / USART2 wake-up interrupt through EXTI line 26.
   */
@@ -272,7 +272,7 @@ void USART2_IRQHandler(void)
   /* USER CODE BEGIN USART2_IRQn 0 */
   volatile uint8_t data;
 
-  if(LL_USART_IsActiveFlag_RXNE(USART2)){
+  if(LL_USART_IsActiveFlag_RXNE_RXFNE(USART2)){
 
      //LL_USART_ClearFlag_RXNE(USART2);
     data = LL_USART_ReceiveData8(USART2);

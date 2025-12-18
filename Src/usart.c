@@ -134,7 +134,7 @@ void MX_USART1_UART_Init(void)
   /* USER CODE BEGIN USART1_Init 2 */
   
   // LL_USART_EnableIT_IDLE(USART1);	// 使能空闲中断
-   LL_USART_EnableIT_RXNE(USART1);
+   LL_USART_EnableIT_RXNE_RXFNE(USART1);
   
   /* USER CODE END USART1_Init 2 */
 
@@ -241,7 +241,7 @@ void MX_USART2_UART_Init(void)
   {
   }
   /* USER CODE BEGIN USART2_Init 2 */
-   LL_USART_EnableIT_RXNE(USART2);
+   LL_USART_EnableIT_RXNE_RXFNE(USART2);
    LL_DMA_EnableIT_TC(DMA1,LL_DMA_CHANNEL_5);
    LL_DMA_EnableIT_TE(DMA1,LL_DMA_CHANNEL_5);
   /* USER CODE END USART2_Init 2 */

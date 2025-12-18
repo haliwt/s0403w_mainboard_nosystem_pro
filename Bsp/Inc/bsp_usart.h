@@ -20,6 +20,9 @@ void usart1_invoke_callback(uint8_t data);
 
 void callback_register_usart1_rx(void);
 
+void decoder_handler(void);
+
+
 
 #endif 
 

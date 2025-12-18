@@ -8,7 +8,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
+//#include "cmsis_os.h"
 #include "adc.h"
 #include "dma.h"
 #include "tim.h"
@@ -44,13 +44,14 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_FREERTOS_Init(void);
+//void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 
 /* USER CODE END 0 */
 
@@ -97,9 +98,9 @@ int main(void)
   
    bsp_init();
    //EEPROM_Write(0x0001,15);
-   freeRTOS_Handler();
+  
 
-   
+   freeRTOS_Handler();
 
   /* USER CODE END 2 */
 

@@ -115,14 +115,11 @@ void power_on_handler(void)
 
 
      
-	  if(gpro_t.gTimer_update_todisplay > 2){
+	  if(gpro_t.gTimer_update_todisplay > 4){
 			gpro_t.gTimer_update_todisplay=0;
 
 			updateDht11_sensorData_toDisp();
-	       if(LL_USART_IsActiveFlag_ORE(USART1)){
-
-               LL_USART_ClearFlag_ORE(USART1);
-            }
+	     
 		           
        }
        decoder_handler();
