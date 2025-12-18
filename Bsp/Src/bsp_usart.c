@@ -403,8 +403,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 			  else{
 				  rx_state =0;
 				  rx_data_counter=0;
-				  gl_tMsg.usData[0]=0;
-				  gl_tMsg.usData[1]=0;
+		 
 			  }
 	
 			break;
@@ -445,8 +444,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 			
 				gpro_t.decoder_success_flag=1;
 				rx_data_counter=0;
-				gl_tMsg.usData[0]=0;
-				gl_tMsg.usData[1]=0;
+			 
 				
 	           rx_state =0;
 				  
