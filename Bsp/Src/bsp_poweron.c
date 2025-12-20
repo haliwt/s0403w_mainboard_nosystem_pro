@@ -87,7 +87,7 @@ void power_on_handler(void)
 	         gctl_t.set_wind_speed_value =100;
 
 		     MqttData_Publish_SetOpen(1);  
-			 //vTaskDelay(pdMS_TO_TICKS(200));
+			 vTaskDelay(pdMS_TO_TICKS(200));
 		
 		 }
 	  read_sensorData();
@@ -100,7 +100,7 @@ void power_on_handler(void)
      if(wifi_link_net_state() ==1 &&  gctl_t.app_timer_power_on_flag==0){
     
 		  MqttData_Publish_Init();
-		 // vTaskDelay(pdMS_TO_TICKS(200));
+		 vTaskDelay(pdMS_TO_TICKS(200));
      	}
 
       counter_two_hours = 0;
@@ -119,10 +119,7 @@ void power_on_handler(void)
 			gpro_t.gTimer_update_todisplay=0;
 
 			updateDht11_sensorData_toDisp();
-	       if(LL_USART_IsActiveFlag_ORE(USART1)){
-
-               LL_USART_ClearFlag_ORE(USART1);
-            }
+	      
 		           
        }
        
@@ -141,7 +138,7 @@ void power_on_handler(void)
                MqttData_Publish_Update_Data();
 			  // vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
              SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-             vTaskDelay(pdMS_TO_TICKS(5));
+             vTaskDelay(pdMS_TO_TICKS(100));
           
     	}
 	    else if(gctl_t.first_link_tencent_cloud_flag < 4){
@@ -151,7 +148,7 @@ void power_on_handler(void)
     	  
 	    }
 		SendWifiData_To_Data(0x1F,0x01);
-         vTaskDelay(pdMS_TO_TICKS(5));
+         vTaskDelay(pdMS_TO_TICKS(100));
 	
 	  }
    
@@ -306,7 +303,7 @@ void ActionEvent_Handler(void)
 	   ultrasonic_default = gpro_t.ultrasonic_switch_flag;
 		 if(wifi_link_net_state()==1){ 
 		   MqttData_Publish_SetUltrasonic(0x01);
-		
+		 vTaskDelay(pdMS_TO_TICKS(200));
 		 }
 		}
 	}
@@ -316,6 +313,7 @@ void ActionEvent_Handler(void)
 			ultrasonic_default = gpro_t.ultrasonic_switch_flag;	
 			if(wifi_link_net_state()==1){ 
 			MqttData_Publish_SetUltrasonic(0);
+			 vTaskDelay(pdMS_TO_TICKS(200));
 		
 			}
 		}
@@ -344,25 +342,25 @@ void smartphone_timer_power_on_and_normal_handler(void)
 			
 
 				SendWifiData_To_Cmd(0x03,0x01);
-                vTaskDelay(pdMS_TO_TICKS(10));
+                vTaskDelay(pdMS_TO_TICKS(100));
 			
 			}
 			else{
 				gctl_t.gPlasma =0;
 				SendWifiData_To_Cmd(0x03,0x0);
-				vTaskDelay(pdMS_TO_TICKS(10));
+				vTaskDelay(pdMS_TO_TICKS(100));
 			}
 
 
 			if(gctl_t.gUlransonic==1){
 
 					SendWifiData_To_Cmd(0x04,0x01);
-					vTaskDelay(pdMS_TO_TICKS(10));
+					vTaskDelay(pdMS_TO_TICKS(100));
 			}
 			else {
 					gctl_t.gUlransonic=0;
 					SendWifiData_To_Cmd(0x04,0x0);
-					vTaskDelay(pdMS_TO_TICKS(10));
+					vTaskDelay(pdMS_TO_TICKS(100));
 			}
 
 
@@ -370,24 +368,24 @@ void smartphone_timer_power_on_and_normal_handler(void)
 			if(ptc_recoder_flag ==1){//if(gctl_t.gDry==1){
                 gpro_t.ptc_onoff_cp_counter=1;
 				SendWifiData_To_Cmd(0x02,0x01);
-				vTaskDelay(pdMS_TO_TICKS(5));
+				vTaskDelay(pdMS_TO_TICKS(100));
 			}
 			else if(ptc_recoder_flag ==0){
 					gctl_t.gDry=0;
 
                     gpro_t.ptc_onoff_cp_counter=0;
 					SendWifiData_To_Cmd(0x02,0x0);
-					 vTaskDelay(pdMS_TO_TICKS(5));
+					 vTaskDelay(pdMS_TO_TICKS(100));
 
 			}
 
 		     gctl_t.set_wind_speed_value =100;
 	         gpro_t.two_hours_cp_counter =0;//WT.EDIT 2025.11.10
 		     MqttData_Publish_Update_Data();
-		    // vTaskDelay(pdMS_TO_TICKS(200));
+		    vTaskDelay(pdMS_TO_TICKS(200));
 
 			
-	 
+	
 		}
 			
 }
@@ -434,7 +432,7 @@ void power_off_handler(void)
 
     case 1:
 		  SendWifiData_Answer_Cmd(0x01,0x02); //compatible older version 
-	      vTaskDelay(pdMS_TO_TICKS(10));
+	      vTaskDelay(pdMS_TO_TICKS(100));
           gpro_t.gTimer_poweroff_fan=0;
           gctl_t.gTimer_fan_run_one_minute=0;
        
@@ -477,7 +475,7 @@ void power_off_handler(void)
        if(wifi_link_net_state() == 1){
 
           MqttData_Publish_PowerOff_Ref(); 
-          //vTaskDelay(pdMS_TO_TICKS(200)); //WT.EDTI 2024.11.19 
+          vTaskDelay(pdMS_TO_TICKS(200)); //WT.EDTI 2024.11.19 
        }
          gpro_t.power_off_run_step = 4;
        break;
@@ -487,7 +485,7 @@ void power_off_handler(void)
           if(gctl_t.ptc_warning == 1){
 		 	
 		  	Publish_Data_Warning(ptc_temp_warning,0);
-		  	//vTaskDelay(pdMS_TO_TICKS(100));
+		  	vTaskDelay(pdMS_TO_TICKS(100));
             
           }
            gpro_t.power_off_run_step = 5;
@@ -496,7 +494,7 @@ void power_off_handler(void)
         case 5:
             if(gctl_t.ptc_warning == 1){
 			Publish_Data_Warning(fan_warning,0);
-			//vTaskDelay(pdMS_TO_TICKS(100));
+			vTaskDelay(pdMS_TO_TICKS(100));
 			
           }
         gpro_t.power_off_run_step = 6;
