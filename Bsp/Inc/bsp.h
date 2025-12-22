@@ -125,8 +125,7 @@ typedef struct PROCESS_T{
   
    uint8_t copy_cmd_notice_buff[10];
    //copy command 
-   uint8_t power_onoff_cp_counter;
-   uint8_t ptc_onoff_cp_counter;
+
    uint8_t two_hours_cp_counter;
 
 

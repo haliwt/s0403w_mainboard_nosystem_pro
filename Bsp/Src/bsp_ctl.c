@@ -70,7 +70,7 @@ void SystemReset(void)
   }
   else{
 
-	      if(gctl_t.set_temp_first_closeptc ==0 && gctl_t.ptc_on_off_flag ==0 && gctl_t.app_timer_power_on_flag ==0){//the first open ptc heating //WT.DEDIT 2028.08.27 modify this flow codes
+	      if(gctl_t.set_temp_first_closeptc ==0 && gctl_t.ptc_on_off_flag ==0 ){//the first open ptc heating //WT.DEDIT 2028.08.27 modify this flow codes
 	          
               PTC_SetHigh();
               gctl_t.gDry=1;//
@@ -154,7 +154,7 @@ void SystemReset(void)
                    
 
       }
-      else if(gctl_t.ptc_on_off_flag ==0 &&  set_temp_first_closeptc==0 && gctl_t.app_timer_power_on_flag ==0){
+      else if(gctl_t.ptc_on_off_flag ==0 &&  set_temp_first_closeptc==0 ){
 
         PTC_SetHigh();
         gctl_t.gDry=1;
