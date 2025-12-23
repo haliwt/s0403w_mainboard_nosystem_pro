@@ -13,7 +13,7 @@
 /***********************************************************************************************************
 											函数声明
 ***********************************************************************************************************/
-#if 0
+#if 0  //动态创建 内存
 //static void vTaskWifiPro(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
 static void vTaskStart(void *pvParameters);
@@ -52,9 +52,6 @@ static TaskHandle_t xHandleTaskStart = NULL;
 /* 定义静态内存块 */
 static StaticTask_t xIdleTaskTCB;
 static StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE];
-
-
-
 
 
 /* 内核会自动调用这个回调函数来获取 Idle 任务的内存 */
@@ -124,11 +121,11 @@ static void vTaskMsgPro(void *pvParameters)
            wifi_run_handler();
         
 		  
-         // decoder_handler();
+
 
 		//  waiting_ack_handler();
      
-        vTaskDelay(500);
+        vTaskDelay(1000);//500
 		
 		}
       
