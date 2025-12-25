@@ -127,6 +127,7 @@ typedef struct PROCESS_T{
    uint8_t power_onoff_cp_counter;
    uint8_t ptc_onoff_cp_counter;
    uint8_t two_hours_cp_counter;
+   uint8_t decoder_success_flag;
 
 
    uint8_t get_beijing_flag;

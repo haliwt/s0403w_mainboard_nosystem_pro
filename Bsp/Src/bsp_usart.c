@@ -325,7 +325,8 @@ static void usart1_isr_callback_handler(uint8_t data)
 			gl_tMsg.usData[0]=0;
 			gl_tMsg.usData[1]=0;
 	         gl_tMsg.usData[6]=0;
-			 freertos_decoder_isr_handler();
+			  gpro_t.decoder_success_flag = 1;
+			 //freertos_decoder_isr_handler();
 			//usart1_protocol_state_machine();
 
 

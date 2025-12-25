@@ -9,9 +9,25 @@
 /***********************************************************************************************************
 											函数声明
 ***********************************************************************************************************/
+#if 0
 //static void vTaskWifiPro(void *pvParameters);
 static void vTaskMsgPro(void *pvParameters);
 static void vTaskStart(void *pvParameters);
+#else 
+/*------------------ 静态任务内存定义 ------------------*/
+
+/* vTaskMsgPro 任务 */
+static StaticTask_t xTaskMsgProTCB;
+static StackType_t xTaskMsgProStack[256];
+
+/* vTaskStart 任务 */
+static StaticTask_t xTaskStartTCB;
+static StackType_t xTaskStartStack[128];
+
+
+#endif 
+
+
 static void AppTaskCreate (void);
 
 
@@ -27,6 +43,20 @@ static void wifi_handler(void);
 //static TaskHandle_t xHandleTaskWifiPro = NULL;
 static TaskHandle_t xHandleTaskMsgPro = NULL;
 static TaskHandle_t xHandleTaskStart = NULL;
+
+/* 定义静态内存块 */
+static StaticTask_t xIdleTaskTCB;
+static StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE];
+
+/* 内核会自动调用这个回调函数来获取 Idle 任务的内存 */
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
+                                    StackType_t **ppxIdleTaskStackBuffer,
+                                    uint32_t *pulIdleTaskStackSize )
+{
+    *ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
+    *ppxIdleTaskStackBuffer = uxIdleTaskStack;
+    *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+}
 
 
 
@@ -63,46 +93,10 @@ void freeRTOS_Handler(void)
  * @param   None
  * @retval  None
  */
-#if 0
-static void vTaskWifiPro(void *pvParameters)
-{
-	    if(gpro_t.process_run_step > 10){
-
-		      gpro_t.process_run_step=6;
-			  freertos_set_prority();
-
-		  }
-          else if(gpro_t.wifi_led_fast_blink_flag > 1){
-		  	 gpro_t.wifi_led_fast_blink_flag=0;
-			
-		  }
-		  else if(gpro_t.wifi_led_fast_blink_flag==0 ){
-             wifi_communication_tnecent_handler();//
-             getBeijingTime_cofirmLinkNetState_handler();
-             wifi_auto_detected_link_state();
-           }
-		  
-		
-		  vTaskDelay(pdMS_TO_TICKS(100));//�?1�?7?0
-
-
-}
-#endif 
-/**
- * @brief  :  static void vTaskStart(void *pvParameters
- * @note    
- * @param   None
- * @retval  None
- */
 static void vTaskMsgPro(void *pvParameters)
 {
   
-	//BaseType_t xResult;
-	//const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 1.?????-?????????50ms */
-    uint32_t  notify_val;
-    
-	
-    while(1)
+	while(1)
     {
 
        	if(power_on_sound_flag==0){
@@ -113,51 +107,11 @@ static void vTaskMsgPro(void *pvParameters)
 
         }
 
-     #if 0
+	    power_handler();
+		wifi_handler();
 
 
-
-	   xResult = xTaskNotifyWait(0x00000000,      
-						           0xFFFFFFFF,      
-						          &ulValue,        /* ??ulNotifiedValue???ulValue? */
-						          xMaxBlockTime);  /* ????????,????-block portMAX_DELAY */
-        if(xResult == pdPASS){
-             if((ulValue & DECODER_BIT_0 ) != 0)
-             {
-                  // parse_recieve_data_handler();//receive_data_from_display(gl_tMsg.usData);
-             
-				 usart1_protocol_state_machine();
-				#if 0
-				 vTaskPrioritySet(xHandleTaskMsgPro, LOWEST_PRIORITY);  // ???????
-	       		taskYIELD();  // ??????
-	    		vTaskPrioritySet(xHandleTaskStart,HIGHEST_PRIORITY);  // ???????
-				#else
-					  xTaskNotify(xHandleTaskStart, /* 目标任务 */
-								BIT_2,             /* 设置目标任务事件标志位bit0  */
-								eSetBits);         /* 将目标任务的事件标志位与BIT_0进行或操作， 
-				                                      将结果赋值给事件标志位。*/
-
-				#endif 
-
-                  
-             }
-			 
-                
-         }
-	#else
-
-	    /* * 等待中断通知，不占用任何 CPU 资源
-         * 如果 500ms 没收到数据，ulTaskNotifyTake 会自动返回 0
-         */
-         notify_val = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(500));
-        
-        if (notify_val > 0) 
-        {
-
-           usart1_protocol_state_machine();
-        }
-
-	#endif 
+	    vTaskDelay(pdMS_TO_TICKS(1000));//
 
 				                                   
  	}
@@ -176,9 +130,15 @@ static void vTaskStart(void *pvParameters)
 	while(1)
     {
   
-         power_handler();
-         wifi_handler();
-		 vTaskDelay(pdMS_TO_TICKS(500));
+       
+		
+		 if(gpro_t.decoder_success_flag==1){
+		   	   gpro_t.decoder_success_flag++; 
+              usart1_protocol_state_machine();
+
+          }
+		 
+	       vTaskDelay(pdMS_TO_TICKS(10));//
 	} 
 }
  /**
@@ -197,7 +157,7 @@ void AppTaskCreate (void)
                  2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskMsgPro);   /* 任务句柄  */
 
-  #endif 
+
 	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
                  "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
                  128,            		/* 任务栈大小，单位word，也就是4字节 */
@@ -212,6 +172,31 @@ void AppTaskCreate (void)
                  NULL,           		/* 任务参数  */
                  2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
                  &xHandleTaskStart );   /* 任务句柄  */
+   #else 
+	/*------------------ 静态任务创建 ------------------*/
+	
+	xHandleTaskMsgPro = xTaskCreateStatic(
+			vTaskMsgPro,			/* 任务函数 */
+			"vTaskMsgPro",			/* 任务名 */
+			256,					/* 栈大小（word） */
+			NULL,					/* 参数 */
+			2,						/* 优先级 */
+			xTaskMsgProStack,		/* 栈数组 */
+			&xTaskMsgProTCB 		/* TCB */
+	);
+	
+	xHandleTaskStart = xTaskCreateStatic(
+			vTaskStart, 			/* 任务函数 */
+			"vTaskStart",			/* 任务名 */
+			128,					/* 栈大小（word） */
+			NULL,					/* 参数 */
+			1,						/* 优先级 */
+			xTaskStartStack,		/* 栈数组 */
+			&xTaskStartTCB			/* TCB */
+	);
+ 
+
+   #endif 
 }
 
 /**************************************************************************
@@ -304,12 +289,16 @@ static void wifi_handler(void)
 void freertos_set_prority(void)
 {
 	
-	vTaskPrioritySet(xHandleTaskStart, LOWEST_PRIORITY);  // ???????
-	taskYIELD();  // ??????
-	vTaskPrioritySet(xHandleTaskMsgPro,HIGHEST_PRIORITY);  // ???????
+	
 
    
 } 
+/**
+ * @brief  : 
+ * @note    
+ * @param   None
+ * @retval  None
+ */
 
 void freertos_decoder_isr_handler(void)
 {
