@@ -234,21 +234,7 @@ void updateDht11_sensorData_toDisp(void)
 		vTaskDelay(pdMS_TO_TICKS(100));
 	
 }
-/**
-*@breif :
-*@note:
-*@param:
-*@return:
-*
-*/
-void read_sensorData(void)
-{
-	
-	    Dht11_Read_TempHumidity_Handler(&DHT11);
-	    sendData_Real_TimeHum(gctl_t.gDht11_humidity ,gctl_t.gDht11_temperature);
-		vTaskDelay(pdMS_TO_TICKS(100));
-	
-}
+
 
 /**
 *@breif :

@@ -58,8 +58,6 @@ void power_on_handler(void)
 		 gpro_t.stopTwoHours_flag =0;
 		/*end */
        
-     
-         read_sensorData();//updateDht11_sensorData_toDisp();
 		 gpro_t.process_run_step= 1;
 	break; 
 
@@ -72,8 +70,9 @@ void power_on_handler(void)
 	else 
 		every_power_on_run();
 
-	read_sensorData();
-		 
+	 updateDht11_sensorData_toDisp();
+	 vTaskDelay(pdMS_TO_TICKS(300));
+	 gpro_t.gTimer_update_todisplay=5;	 
 	 gpro_t.process_run_step= 3;
 	   
     break;
@@ -90,7 +89,7 @@ void power_on_handler(void)
 			 vTaskDelay(pdMS_TO_TICKS(200));
 		
 		 }
-	  read_sensorData();
+	 
 	
       gpro_t.process_run_step= 4;
 	break;
@@ -531,7 +530,8 @@ void power_off_handler(void)
 	   if(gpro_t.gTimer_update_todisplay > 3){
 			gpro_t.gTimer_update_todisplay=0;
 
-			read_sensorData();
+			updateDht11_sensorData_toDisp();
+	   
 	
 		}
 		

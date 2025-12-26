@@ -189,12 +189,8 @@ void updateDht11_sensorData_toDisp(void)
 	
 	    Dht22_Read_TempHumidity_Handler(&DHT22);
 	    sendData_Real_TimeHum(gctl_t.gDht11_humidity ,gctl_t.gDht11_temperature);
-		vTaskDelay(pdMS_TO_TICKS(10));//osDelay(20);
+		vTaskDelay(pdMS_TO_TICKS(100));//osDelay(20);
 	
-
-     //dht11_read_data(&gctl_t.gDht11_temperature, &gctl_t.gDht11_humidity);
-//sendData_Real_TimeHum(gctl_t.gDht11_humidity ,gctl_t.gDht11_temperature);
-	 //osDelay(20);
 
 }
 
