@@ -42,17 +42,17 @@ static void FLASH_WaitBusy(void)
     while (FLASH->SR & FLASH_SR_BSY1) {}
 }
 
-static uint32_t EEPROM_GetActivePage(void)
-{
-    uint16_t status0 = *(uint16_t*)EEPROM_PAGE0_ADDR;
-    uint16_t status1 = *(uint16_t*)EEPROM_PAGE1_ADDR;
+//static uint32_t EEPROM_GetActivePage(void)
+//{
+//    uint16_t status0 = *(uint16_t*)EEPROM_PAGE0_ADDR;
+//    uint16_t status1 = *(uint16_t*)EEPROM_PAGE1_ADDR;
 
-    if (status0 == PAGE_STATUS_VALID) return EEPROM_PAGE0_ADDR;
-    if (status1 == PAGE_STATUS_VALID) return EEPROM_PAGE1_ADDR;
+//    if (status0 == PAGE_STATUS_VALID) return EEPROM_PAGE0_ADDR;
+//    if (status1 == PAGE_STATUS_VALID) return EEPROM_PAGE1_ADDR;
 
-    // 默认 Page0
-    return EEPROM_PAGE0_ADDR;
-}
+//    // 默认 Page0
+//    return EEPROM_PAGE0_ADDR;
+//}
 
 
 /* 擦除最后一页 */

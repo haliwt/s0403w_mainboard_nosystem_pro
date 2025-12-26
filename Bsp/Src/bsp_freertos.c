@@ -100,9 +100,9 @@ void freeRTOS_Handler(void)
 static void vTaskMsgPro(void *pvParameters)
 {
   
-	BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
-   uint32_t ulValue;
+	//BaseType_t xResult;
+	//const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
+   //uint32_t ulValue;
     
 	
     while(1)

@@ -2,7 +2,7 @@
 
 // 假设已定义全局变量 HCLK_MHz (例如 64)
 #define HCLK_MHZ 64
-static uint32_t g_fac_us = 0;       /* us延时倍乘数 */
+//static uint32_t g_fac_us = 0;       /* us延时倍乘数 */
 
 #define SYS_SUPPORT_OS        0
 

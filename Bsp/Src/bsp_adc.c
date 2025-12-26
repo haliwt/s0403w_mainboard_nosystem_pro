@@ -161,23 +161,23 @@ void ADC_GetValues(void)
 	*Return Ref: No
 	*
 *****************************************************************/
-static uint16_t ADC_FAN_ReadVoltage(void)
-{
-    uint16_t raw_value;
-	LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1, LL_ADC_CHANNEL_0);
-    LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_0, LL_ADC_SAMPLINGTIME_COMMON_1);
+//static uint16_t ADC_FAN_ReadVoltage(void)
+//{
+//    uint16_t raw_value;
+//	LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1, LL_ADC_CHANNEL_0);
+//    LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_0, LL_ADC_SAMPLINGTIME_COMMON_1);
 
-	LL_ADC_REG_StartConversion(ADC1);
+//	LL_ADC_REG_StartConversion(ADC1);
 
-	while(!LL_ADC_IsActiveFlag_EOC(ADC1));
+//	while(!LL_ADC_IsActiveFlag_EOC(ADC1));
 
-	raw_value= LL_ADC_REG_ReadConversionData12(ADC1);
-	
-	LL_ADC_ClearFlag_EOC(ADC1);
+//	raw_value= LL_ADC_REG_ReadConversionData12(ADC1);
+//	
+//	LL_ADC_ClearFlag_EOC(ADC1);
 
-	return compute_voltage(raw_value);
+//	return compute_voltage(raw_value);
 
-}
+//}
 /*****************************************************************
 	*
 	*Function Name: static uint16_t ADC_PTC_ReadVoltage(void)
@@ -186,23 +186,23 @@ static uint16_t ADC_FAN_ReadVoltage(void)
 	*Return Ref: No
 	*
 *****************************************************************/
-static uint16_t ADC_PTC_ReadVoltage(void)
-{
-    uint16_t raw_value;
-    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2, LL_ADC_CHANNEL_1);
-    LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_1, LL_ADC_SAMPLINGTIME_COMMON_1);
+//static uint16_t ADC_PTC_ReadVoltage(void)
+//{
+//    uint16_t raw_value;
+//    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2, LL_ADC_CHANNEL_1);
+//    LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_1, LL_ADC_SAMPLINGTIME_COMMON_1);
 
-	LL_ADC_REG_StartConversion(ADC1);
+//	LL_ADC_REG_StartConversion(ADC1);
 
-	while(!LL_ADC_IsActiveFlag_EOC(ADC1));
+//	while(!LL_ADC_IsActiveFlag_EOC(ADC1));
 
-	raw_value= LL_ADC_REG_ReadConversionData12(ADC1);
-	
-	LL_ADC_ClearFlag_EOC(ADC1);
+//	raw_value= LL_ADC_REG_ReadConversionData12(ADC1);
+//	
+//	LL_ADC_ClearFlag_EOC(ADC1);
 
-	return compute_voltage(raw_value);
+//	return compute_voltage(raw_value);
 
-}
+//}
 
 
 

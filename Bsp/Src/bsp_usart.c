@@ -569,7 +569,7 @@ void usart1_protocol_state_machine(void)
 static void receive_cmd_or_notice_handler(void)
 {
 
-   static uint8_t wifi_link_counter,ptc_tx_default=0xff;
+   static uint8_t ptc_tx_default=0xff;
    static uint8_t plasma_tx_default =0xff, sonic_tx_default = 0xff;
    	switch(gl_tMsg.cmd_notice){
 
@@ -588,7 +588,7 @@ static void receive_cmd_or_notice_handler(void)
 		        buzzer_sound();//buzzer_sound_fun();
 	            SendWifiData_Answer_Cmd(0x01,0x01);
 	            vTaskDelay(pdMS_TO_TICKS(50));
-	            wifi_link_counter=0;
+	            
 	            gpro_t.process_run_step=0;
 	           	gpro_t.gpower_on = power_on;
 
@@ -604,7 +604,7 @@ static void receive_cmd_or_notice_handler(void)
               SendWifiData_Answer_Cmd(0x01,0x02); //power off .
 
               vTaskDelay(pdMS_TO_TICKS(50)); 
-              wifi_link_counter=0;
+             
              
              
              gpro_t.power_off_run_step=1;

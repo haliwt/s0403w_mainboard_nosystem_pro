@@ -534,7 +534,7 @@ void Json_Parse_Command_Fun(void)
 
  
     static uint8_t wind_hundred, wind_decade,wind_unit,temp_decade,temp_unit;
-	static uint8_t buzzer_temp_on,phone_power_flag;
+	static uint8_t buzzer_temp_on;
     
 
    switch(gctl_t.response_wifi_signal_label){
@@ -546,7 +546,7 @@ void Json_Parse_Command_Fun(void)
 
 	        Publish_Data_ToTencent_Initial_Data();
 		    vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
-            phone_power_flag=1;
+            
 
 			#if 1
 			gctl_t.ptc_warning =0;
@@ -579,7 +579,7 @@ void Json_Parse_Command_Fun(void)
              if(wifi_link_net_state()==1){  //WT.EDIT 2025.03.27
 		 	MqttData_Publish_SetOpen(0);  
 			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
-             phone_power_flag=2;
+           
 			#if 1
             gpro_t.gpower_on = power_off;
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
@@ -867,7 +867,7 @@ void Json_Parse_Command_Fun(void)
 			vTaskDelay(100);//HAL_Delay(5);
             buzzer_sound();
 			
-	        phone_power_flag=2;
+	     
          
             gctl_t.response_wifi_signal_label = 0xff;
              
