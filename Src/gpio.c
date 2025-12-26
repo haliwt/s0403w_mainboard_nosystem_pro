@@ -144,12 +144,6 @@ void MX_GPIO_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   #endif 
-
-  /**/
-  
-  /**/
-  
-
 }
 
 /* USER CODE BEGIN 2 */

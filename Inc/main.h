@@ -50,7 +50,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-#define NEWPCB_FAN       0
+#define NEWPCB_FAN       1
 
 /* USER CODE END ET */
 
@@ -81,36 +81,17 @@ void Error_Handler(void);
 #define WIFI_RX_Pin           LL_GPIO_PIN_3
 #define WIFI_RX_GPIO_Port     GPIOA
 
-#define OLDER_PCB 1
+//GPIO 
+#define PLASMA_Pin            LL_GPIO_PIN_4
+#define PLASMA_GPIO_Port        GPIOA
 
-#if OLDER_PCB
-
-
-#define PLASMA_Pin            LL_GPIO_PIN_5
-#define PLASMA_GPIO_Port      GPIOA
-
-#define FAN_CW_Pin            LL_GPIO_PIN_7 //COM 
+#define FAN_CW_Pin            LL_GPIO_PIN_5
 #define FAN_CW_GPIO_Port        GPIOA
 
-#define FAN_CCW_Pin               LL_GPIO_PIN_6 //RUN
-#define FAN_CCW_GPIO_Port         GPIOA
-
-#endif 
 
 
-//GPIO 
-//#define PLASMA_Pin            LL_GPIO_PIN_4
-//#define PLASMA_GPIO_Port        GPIOA
-
-//#define FAN_CW_Pin            LL_GPIO_PIN_5
-//#define FAN_CW_GPIO_Port        GPIOA
-
-
-
-//#define FAN_CCW_Pin               LL_GPIO_PIN_7
-//#define FAN_CCW_GPIO_Port           GPIOA
-
-//
+#define FAN_CCW_Pin               LL_GPIO_PIN_7
+#define FAN_CCW_GPIO_Port           GPIOA
 
 #define RELAY_Pin           			LL_GPIO_PIN_0
 #define RELAY_GPIO_Port 				GPIOB
@@ -133,6 +114,7 @@ void Error_Handler(void);
 //TIM
 #define BEEP_Pin              LL_GPIO_PIN_1
 #define BEEP_GPIO_Port        GPIOB
+
 
 
 /* USER CODE END Private defines */

@@ -3,25 +3,11 @@
 #include "main.h"
 
 
-#if NEWPCB_FAN
- 
-
 #define FAN_COM_SetHigh()            LL_GPIO_SetOutputPin(FAN_CCW_GPIO_Port,FAN_CCW_Pin)//(FAN_GPIO,FAN_CCW,GPIO_PIN_SET)    // output high level
 #define FAN_COM_SetLow()             LL_GPIO_ResetOutputPin(FAN_CCW_GPIO_Port,FAN_CCW_Pin)//HAL_GPIO_WritePin(FAN_GPIO,FAN_CCW,GPIO_PIN_RESET)    // output low level
 
 #define FAN_RUN_SetHigh()            LL_GPIO_SetOutputPin(FAN_CW_GPIO_Port,FAN_CW_Pin) //HAL_GPIO_WritePin(FAN_GPIO,FAN_CW,GPIO_PIN_SET)    // output high level
 #define FAN_RUN_SetLow()             LL_GPIO_ResetOutputPin(FAN_CW_GPIO_Port,FAN_CW_Pin)//HAL_GPIO_WritePin(FAN_GPIO,FAN_CW,GPIO_PIN_RESET)    // output low level
-
-#else 
-#define FAN_RUN_SetHigh()            LL_GPIO_SetOutputPin(GPIOA,FAN_CCW_Pin)//(FAN_GPIO,FAN_CCW,GPIO_PIN_SET)    // output high level
-#define FAN_RUN_SetLow()             LL_GPIO_ResetOutputPin(GPIOA,FAN_CCW_Pin)//HAL_GPIO_WritePin(FAN_GPIO,FAN_CCW,GPIO_PIN_RESET)    // output low level
-
-#define FAN_COM_SetHigh()            LL_GPIO_SetOutputPin(GPIOA,FAN_CW_Pin) //HAL_GPIO_WritePin(FAN_GPIO,FAN_CW,GPIO_PIN_SET)    // output high level
-#define FAN_COM_SetLow()             LL_GPIO_ResetOutputPin(GPIOA,FAN_CW_Pin)//HAL_GPIO_WritePin(FAN_GPIO,FAN_CW,GPIO_PIN_RESET)    // outp
-
-
-
-#endif 
 
 
 
