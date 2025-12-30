@@ -3,6 +3,13 @@
 #include "main.h"
 
 
+
+#define UART1_RX_BUF_SIZE 64
+
+
+extern uint8_t uart1_rx_buf[64];
+
+
 typedef enum{
 
    COPY_OK,

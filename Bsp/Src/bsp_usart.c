@@ -12,7 +12,12 @@
 #define ACK_SUCCESS 0x00U
 #define ACK_FAILURE 0x01U
 
-#define UART1_RX_BUF_SIZE 20
+#define UART1_RING_SIZE 64
+
+uint16_t dma_len;
+
+
+
 
 typedef void (*Usart1RxCallback)(uint8_t data);
 
@@ -22,13 +27,82 @@ static void usart1_isr_callback_handler(uint8_t data);
 
 uint8_t rx_inputBuf[12];
 
-//提供注册接口
+
+typedef struct
+{
+    uint8_t *buffer;      // 缓冲区指针
+    uint16_t size;        // 缓冲区大小
+    volatile uint16_t head; // 写指针
+    volatile uint16_t tail; // 读指针
+} ring_buffer_t;
+
+uint8_t uart1_ring_buffer[UART1_RING_SIZE]; 
+ring_buffer_t uart1_rx_ring;
+
+
+//初始化函数
+void ring_buffer_init(ring_buffer_t *rb, uint8_t *buf, uint16_t size)
+{
+    rb->buffer = buf;
+    rb->size = size;
+    rb->head = 0;
+    rb->tail = 0;
+}
+
+void ring_buffer_write(ring_buffer_t *rb, uint8_t *data, uint16_t len)
+{
+    for(uint16_t i = 0; i < len; i++)
+    {
+        uint16_t next = (rb->head + 1) % rb->size;
+
+        // 缓冲区满了（丢弃最旧数据）
+        if(next == rb->tail)
+        {
+            rb->tail = (rb->tail + 1) % rb->size;
+        }
+
+        rb->buffer[rb->head] = data[i];
+        rb->head = next;
+    }
+}
+
+
+uint8_t ring_buffer_read_byte(ring_buffer_t *rb)
+{
+    if(rb->head == rb->tail)
+        return 0; // 空
+
+    uint8_t ch = rb->buffer[rb->tail];
+    rb->tail = (rb->tail + 1) % rb->size;
+
+    return ch;
+}
+
+/**
+	*@brief //提供注册接口
+	*@note
+	*@param
+**/
 void usart1_register_rx_callback(Usart1RxCallback cb)
 {
    usart1_rx_cb = cb;
 
 }
+/**
+	*@brief 判断是否有数据
+	*@note
+	*@param
+**/
+uint8_t ring_buffer_has_data(ring_buffer_t *rb)
+{
+    return (rb->head != rb->tail);
+}
 
+/**
+	*@brief  回调函数
+	*@note
+	*@param
+**/
 void usart1_invoke_callback(uint8_t data)
 {
    if(usart1_rx_cb !=NULL){
@@ -49,7 +123,7 @@ void callback_register_usart1_rx(void)
 
 
 
-volatile uint8_t uart1_rx_buf[UART1_RX_BUF_SIZE];
+uint8_t uart1_rx_buf[64];
 volatile uint8_t uart1_rx_head = 0;
 volatile uint8_t uart1_rx_tail = 0;
 volatile uint8_t rx_state;
@@ -476,8 +550,8 @@ void usart1_protocol_state_machine(void)
 
 
    uint8_t i;
-   memcpy(rx_inputBuf,gl_tMsg.usData,rx_numbers);
-
+   //memcpy(rx_inputBuf,gl_tMsg.usData,rx_numbers);
+   memcpy(rx_inputBuf,uart1_rx_buf, dma_len);
    parse_decoder_flag=1;
 
    while(parse_decoder_flag==1){
@@ -1119,17 +1193,35 @@ void USART1_IRQHandler(void)
   /* USER CODE BEGIN USART1_IRQn 0 */
   volatile uint8_t data;
   // static uint8_t rx_flag;
+
+   #if 0
    if(LL_USART_IsActiveFlag_RXNE_RXFNE(USART1)){
    
       //LL_USART_ClearFlag_RXNE(USART1);
       data = LL_USART_ReceiveData8(USART1);
-      //usart1_isr_callback_handler(data);
-       //  usart1_invoke_callback(data);
        usart1_isr_callback_handler(data);
 
      
 
    }
+   #else 
+  
+     if(LL_USART_IsActiveFlag_IDLE(USART1))
+	  {
+		  LL_USART_ClearFlag_IDLE(USART1);
+  
+		  dma_len = UART1_RX_BUF_SIZE - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
+  
+		  // 写入环形缓冲区
+		  ring_buffer_write(&uart1_rx_ring, uart1_rx_buf, dma_len);
+  
+		  // 重启 DMA
+		  LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+		  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, UART1_RX_BUF_SIZE);
+		  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
+	  }
+  
+   #endif 
   /* USER CODE END USART1_IRQn 0 */
 
   
@@ -1148,14 +1240,36 @@ void USART1_IRQHandler(void)
 **/
 void decoder_handler(void)
 {
-if(gpro_t.decoder_success_flag==1){
-	
-	gpro_t.decoder_success_flag++;
-	
-	usart1_protocol_state_machine();
-	
-
+#if 0
+	if(gpro_t.decoder_success_flag==1){
 		
-}
+		gpro_t.decoder_success_flag++;
+		
+		usart1_protocol_state_machine();
+		
+
+			
+	}
+#else
+
+	while(ring_buffer_has_data(&uart1_rx_ring))
+	{
+		//uint8_t ch = ring_buffer_read_byte(&uart1_rx_ring);
+		//protocol_state_machine(ch);  // 你的解析器
+		//if(ch == 0xA5){
+	       usart1_protocol_state_machine();
+           memset(&uart1_rx_ring,0,12);
+		//}
+	//    usart1_isr_callback_handler(ch);
+	//	if(gpro_t.decoder_success_flag==1){
+	//	  usart1_protocol_state_machine();
+	//	gpro_t.decoder_success_flag++;
+	//	}
+
+	}
+		
+				
+#endif 
+
 }
 
