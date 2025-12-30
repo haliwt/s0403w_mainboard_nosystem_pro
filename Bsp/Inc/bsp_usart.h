@@ -4,10 +4,10 @@
 
 
 
-#define UART1_RX_BUF_SIZE 64
+#define UART1_RX_BUF_SIZE 20
 
 
-extern uint8_t uart1_rx_buf[64];
+extern uint8_t uart1_rx_buf[UART1_RX_BUF_SIZE];
 
 
 typedef enum{

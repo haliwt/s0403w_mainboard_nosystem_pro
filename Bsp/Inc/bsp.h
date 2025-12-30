@@ -58,6 +58,7 @@
 #endif
 #include "bsp_fan.h"
 #include "bsp_ultrasonic.h"
+#include "bsp_disp_parse.h"
 
 //wifi files
 #include "bsp_esp8266.h"
@@ -98,7 +99,7 @@
 
 
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
-extern uint8_t inputBuf[1];
+extern uint8_t inputBuf[12];
 
 
 
