@@ -59,6 +59,7 @@
 #include "bsp_fan.h"
 #include "bsp_ultrasonic.h"
 #include "bsp_disp_parse.h"
+#include "bsp_usart_ack.h"
 
 //wifi files
 #include "bsp_esp8266.h"

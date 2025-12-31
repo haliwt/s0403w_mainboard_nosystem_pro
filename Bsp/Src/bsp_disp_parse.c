@@ -285,7 +285,7 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
       
          }
           SendWifiData_Answer_Cmd(0x02,0x01); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
+          vTaskDelay(pdMS_TO_TICKS(100)); 
 		
           gctl_t.gDry = 1;
 		  ptc_recoder_flag = 1;
