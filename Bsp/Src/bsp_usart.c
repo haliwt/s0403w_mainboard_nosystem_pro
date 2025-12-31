@@ -31,9 +31,9 @@ uint8_t rx_inputBuf[12];
 typedef struct
 {
     uint8_t *buffer;      // 缓冲区指针
-    uint16_t size;        // 缓冲区大小
-    volatile uint16_t head; // 写指针
-    volatile uint16_t tail; // 读指针
+    uint8_t size;        // 缓冲区大小
+    volatile uint8_t head; // 写指针
+    volatile uint8_t tail; // 读指针
 } ring_buffer_t;
 
 uint8_t uart1_ring_buffer[UART1_RING_SIZE]; 
@@ -41,19 +41,26 @@ ring_buffer_t uart1_rx_ring;
 
 
 //初始化函数
-void ring_buffer_init(ring_buffer_t *rb, uint8_t *buf, uint16_t size)
+void ring_buffer_init(ring_buffer_t *rb, uint8_t *buf, uint8_t size)
 {
     rb->buffer = buf;
     rb->size = size;
     rb->head = 0;
     rb->tail = 0;
 }
-
-void ring_buffer_write(ring_buffer_t *rb, uint8_t *data, uint16_t len)
+/**
+	*@brief
+	*@note
+	*@param
+	*@rtrval 
+**/
+void ring_buffer_write(ring_buffer_t *rb, uint8_t *data, uint8_t len)
 {
-    for(uint16_t i = 0; i < len; i++)
+
+    uint8_t i, next;
+	for(i = 0; i < len; i++)
     {
-        uint16_t next = (rb->head + 1) % rb->size;
+        next = (rb->head + 1) % rb->size;
 
         // 缓冲区满了（丢弃最旧数据）
         if(next == rb->tail)
@@ -66,7 +73,12 @@ void ring_buffer_write(ring_buffer_t *rb, uint8_t *data, uint16_t len)
     }
 }
 
-
+/**
+	*@brief  读取环形缓冲器
+	*@note
+	*@param
+	*@rtrval 
+**/
 uint8_t ring_buffer_read_byte(ring_buffer_t *rb)
 {
     if(rb->head == rb->tail)
@@ -517,103 +529,6 @@ static void usart1_isr_callback_handler(uint8_t data)
 	   #endif 
 }
 #endif 
-/*****************************************************************************
-	**
-	*Function Name:void usart1_protocol_state_machine(void)
-	*Function :  in process bsp_freertos.c xTaskMsgPro
-	*Input Ref:NO
-	*Return Ref:NO
-	*
-*******************************************************************************/
-uint8_t parse_exit_flag,parse_decoder_flag;
-
-void usart1_protocol_state_machine(void)
-{
-  
-
-
-   uint8_t i;
-   //memcpy(rx_inputBuf,gl_tMsg.usData,rx_numbers);
-   memcpy(rx_inputBuf,uart1_rx_buf, dma_len);
-   parse_decoder_flag=1;
-
-   while(parse_decoder_flag==1){
-	
-        if(rx_inputBuf[2]==0xFF){ //copy command 
-
-		     gl_tMsg.copy_cmd_flag = 0xFF;
-			  
-		     gl_tMsg.cmd_notice = rx_inputBuf[3];
-		
-		
-		     gl_tMsg.execuite_cmd_notice = rx_inputBuf[4];
-			
-		  
-			 parse_exit_flag =1;
-
-			 rx_data_counter=0;
-			
-			 
-		 }
-		 else{
-		 	gl_tMsg.copy_cmd_flag = 0;
-			gl_tMsg.cmd_notice = rx_inputBuf[2];
-            //gl_tMsg.usData[rx_data_counter] = inputBuf[3];
-          
-           if(inputBuf[3]==0x0F){ //is data frame ,don't is command 
-
-               gl_tMsg.data_length =rx_inputBuf[4]; //receive data of length
-               gl_tMsg.execuite_cmd_notice=0;
-               for(i=0;i<gl_tMsg.data_length;i++){
-		          rx_data_counter++;
-               
-			      gl_tMsg.rx_data[i] = rx_inputBuf[4+rx_data_counter];
-         
-                 
-               }
-			   rx_data_counter=0;
-   
-			    parse_exit_flag=1;
-			
-		 
-           }
-		   else if(inputBuf[3]!=0x0F){
-                gl_tMsg.execuite_cmd_notice =  rx_inputBuf[3];
-				 rx_data_counter=0;
-				
-                parse_exit_flag=1;
-		
-		  
-			 
-
-            }
-		  
-
-		 }
-
-   if(parse_exit_flag==1){
-   	
-   
-   if(gl_tMsg.copy_cmd_flag == 0){
- 
-	 // receive_cmd_or_notice_handler();
-	   
-
-   }
-   else{
-
-       // parse_recieve_copy_data_handler();
-	
-   
-
-   }
-     parse_exit_flag++;
-	parse_decoder_flag=0;
-
-   }
-   }
-
-}
 
 
 
@@ -662,9 +577,9 @@ void USART1_IRQHandler(void)
   
   /* USER CODE BEGIN USART1_IRQn 1 */
 	 // 清除错误标志
-    if (LL_USART_IsActiveFlag_ORE(USART1)) LL_USART_ClearFlag_ORE(USART1);
-    if (LL_USART_IsActiveFlag_FE(USART1))  LL_USART_ClearFlag_FE(USART1);
-    if (LL_USART_IsActiveFlag_NE(USART1))  LL_USART_ClearFlag_NE(USART1);
+   // if (LL_USART_IsActiveFlag_ORE(USART1)) LL_USART_ClearFlag_ORE(USART1);
+   // if (LL_USART_IsActiveFlag_FE(USART1))  LL_USART_ClearFlag_FE(USART1);
+   // if (LL_USART_IsActiveFlag_NE(USART1))  LL_USART_ClearFlag_NE(USART1);
   /* USER CODE END USART1_IRQn 1 */
 }
 
@@ -676,27 +591,31 @@ void USART1_IRQHandler(void)
 void decoder_handler(void)
 {
 
-    static uint8_t  decoder_copy ;
+   // static uint8_t  decoder_copy ;
 	while(ring_buffer_has_data(&uart1_rx_ring))
 	{
 	
 	       memcpy(rx_inputBuf,uart1_rx_buf,dma_len);
+		   S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
 	       //uint8_t ch = ring_buffer_read_byte(&uart1_rx_ring); 
-	       decoder_copy =1;
 		   //S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
            memset(&uart1_rx_ring,0,12);
 		   dma_len = 0;
-	       //usart1_protocol_state_machine();
+	     
 
 	}
 
-	while(decoder_copy ==1){
+   if (LL_USART_IsActiveFlag_ORE(USART1)) LL_USART_ClearFlag_ORE(USART1);
+   if (LL_USART_IsActiveFlag_FE(USART1))  LL_USART_ClearFlag_FE(USART1);
+   if (LL_USART_IsActiveFlag_NE(USART1))  LL_USART_ClearFlag_NE(USART1);
 
-	S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
+//	while(decoder_copy ==1){
 
-	decoder_copy++;
+//	S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
 
-	}
+//	decoder_copy++;
+
+//	}
 		
 				
 
