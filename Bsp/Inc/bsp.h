@@ -140,6 +140,7 @@ typedef struct PROCESS_T{
    //uint8_t gFan_pwm_duty_level;
    uint8_t answer_buzzer_flag ;
    uint8_t two_hours_state ;
+   
 	
 	
      uint8_t ptc_switch_flag;

@@ -4,7 +4,7 @@
 
 
 
-#define UART1_RX_BUF_SIZE 20
+#define UART1_RX_BUF_SIZE 40
 
 
 extern uint8_t uart1_rx_buf[UART1_RX_BUF_SIZE];
