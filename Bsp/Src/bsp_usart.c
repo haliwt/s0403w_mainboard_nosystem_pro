@@ -252,16 +252,17 @@ void USART1_IRQHandler(void)
 		  LL_USART_ClearFlag_IDLE(USART1);
   
 		  dma_len = UART1_RX_BUF_SIZE - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
-  
+          //dma_len = LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
 		  // 写入环形缓冲区
-		  ring_buffer_write(&uart1_rx_ring, uart1_rx_buf, dma_len);
+		 // ring_buffer_write(&uart1_rx_ring, uart1_rx_buf, dma_len);
 		  memcpy(rx_inputBuf,uart1_rx_buf,dma_len);
-          rx_frame_tc = 1;
+     
 		  
 		  // 重启 DMA
 		  LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
 		  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, UART1_RX_BUF_SIZE);
 		  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
+		  rx_frame_tc = 1;
 		  semaphore_isr();
 	  }
   
@@ -289,12 +290,17 @@ void decoder_handler(void)
 	//while(rx_frame_tc==1)//while(ring_buffer_has_data(&uart1_rx_ring))
 	{
 	
+          LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
+		  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, UART1_RX_BUF_SIZE);
+		  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
 	      // memcpy(rx_inputBuf,uart1_rx_buf,dma_len);
 		   S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
 	       //uint8_t ch = ring_buffer_read_byte(&uart1_rx_ring); 
 		   //S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
           // memset(&uart1_rx_ring,0,12);
 		   rx_frame_tc=0;
+		    // 重启 DMA
+		 
 	     
 
 	}

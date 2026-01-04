@@ -475,7 +475,7 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
      case buzzer_sound_s: //buzzer sound command 
 
           buzzer_sound();
-		  //vTaskDelay(pdMS_TO_TICKS(5));
+		  vTaskDelay(pdMS_TO_TICKS(5));
      break;
 
 	 case 0x07: //AI command
@@ -506,14 +506,12 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
      case 0x16 : //buzzer sound command with answer .
 
         buzzer_sound();
-        
-
-		  gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
+        gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
 
 
-          SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+        SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 
-		  vTaskDelay(pdMS_TO_TICKS(100));
+		vTaskDelay(pdMS_TO_TICKS(100));
 		  
        break;
 

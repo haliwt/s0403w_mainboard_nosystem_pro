@@ -340,7 +340,7 @@ static void wifi_run_handler(void)
 
 		      gpro_t.process_run_step=6;
 			  
-
+ 
 		  }
           else if(gpro_t.wifi_led_fast_blink_flag > 1){
 		  	 gpro_t.wifi_led_fast_blink_flag=0;
