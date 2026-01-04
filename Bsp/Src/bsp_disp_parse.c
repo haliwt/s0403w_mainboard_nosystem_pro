@@ -33,9 +33,9 @@ typedef enum {
 S03Frame_t frame;
 
 static S03_State_e s_state = S03_STATE_WAIT_HEADER;
-static uint8_t     s_buf[6 + S03_MAX_DATA_LEN];  // 最大长度：头~尾~BCC
+
 static uint16_t    s_index = 0;
-static uint8_t     s_expected_data_len = 0;
+
 static uint16_t    s_total_len_without_bcc = 0;  // 头到尾（含尾）长度
 
 
@@ -88,7 +88,7 @@ void S03_Protocol_ByteHandler(uint8_t *pdch)
    
             if(pdch[0] == S03_HEADER_DISPLAY && pdch[1]==0x01)
             {
-                s_buf[0] = pdch[0];
+               
                 s_state = S03_STATE_CMD_TYPE;
             }
 			else{
@@ -112,38 +112,60 @@ void S03_Protocol_ByteHandler(uint8_t *pdch)
 
                 frame.func_code = pdch[3]; 
 		        if(frame.func_code ==0x0F){
-		            if(s_expected_data_len == 1)  // 0~4头信息 + N 数据
+					frame.data_len = pdch[4];//数据的长度
+					if(frame.data_len >0){
+		            if( frame.data_len== 1)  // 0~4头信息 + N 数据
 		            {
 		                frame.data[0] = pdch[5]; //第一个数据
-						frame.tail  = s_buf[6];
-						recv_bcc = pdch[7];
-						s_state = S03_STATE_BCC;
-						 S03_Frame_Dispatch(frame);
+						frame.tail  = pdch[6];
+						 recv_bcc = pdch[7];
+						 s_state = S03_STATE_BCC;
+						 if(frame.tail == 0xFE){
+						    S03_Frame_Dispatch(frame);
+						 }
 						 return;
 		            }
-					else if(s_expected_data_len == 2){
+					else if(frame.data_len == 2){
 		                 frame.data[0] = pdch[5]; //第一个数据
 		                 frame.data[1] = pdch[6]; //第二个数据
-		                frame.tail = pdch[7];
+		                 frame.tail = pdch[7];
 						 recv_bcc = pdch[8];
-						s_state = S03_STATE_BCC;
-						 S03_Frame_Dispatch(frame);
+						 s_state = S03_STATE_BCC;
+						 if(frame.tail == 0xFE){
+						   S03_Frame_Dispatch(frame);
+						 }
 						 return;
 		            }
-					else if(s_expected_data_len == 3){
+					else if(frame.data_len == 3){
 		                frame.data[0] = pdch[5]; //第一个数据
 		                frame.data[1]=  pdch[6]; //第一个数据
 		                frame.data[2] = pdch[7]; //第三个数据
-		                frame.tail   = s_buf[8] ;
+		                frame.tail   = pdch[8] ;
 						 recv_bcc = pdch[9];
-						s_state = S03_STATE_BCC;
-						S03_Frame_Dispatch(frame);
+						 s_state = S03_STATE_BCC;
+						 if(frame.tail == 0xFE){
+						     S03_Frame_Dispatch(frame);
+						 }
 						return;
 		            }
 
+					}
+ 					else{
+						return;
+
+					}
+
 
 				}
-				 S03_Frame_Dispatch(frame);
+				 frame.data_len = pdch[4];
+				 frame.tail = pdch[5] ;
+				 if(frame.data_len == 0 && frame.tail == 0xFE){
+				    S03_Frame_Dispatch(frame);
+					return ;
+				 }
+				 else{
+				    return ;
+				 }
 
 			  }
               

@@ -248,7 +248,7 @@ void USART1_IRQHandler(void)
    #else 
   
      if(LL_USART_IsActiveFlag_IDLE(USART1))
-	  {
+	 {
 		  LL_USART_ClearFlag_IDLE(USART1);
   
 		  dma_len = UART1_RX_BUF_SIZE - LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
