@@ -235,7 +235,9 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
      break;
 
      
+   
 
+	 
      case power_on_off: 
 
          
@@ -244,7 +246,7 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
 		        buzzer_sound();//buzzer_sound_fun();
 	            SendWifiData_Answer_Cmd(0x01,0x01);
 	            vTaskDelay(pdMS_TO_TICKS(50));
-	            
+	          
 	            gpro_t.process_run_step=0;
 	           	gpro_t.gpower_on = power_on;
 
@@ -261,8 +263,7 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
 
               vTaskDelay(pdMS_TO_TICKS(50)); 
              
-             
-             
+            
              gpro_t.power_off_run_step=1;
              gpro_t.gpower_on = power_off;
 			 
@@ -270,6 +271,44 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
         }
 
      break;
+
+
+	 case 0x30: //power on or off don't sound WT.EDIT 2026.01.04
+
+        if(frame.func_code == 0x01){ //open
+
+		     
+	        SendWifiData_Answer_Cmd(0x01,0x01);
+	        vTaskDelay(pdMS_TO_TICKS(50));
+	            
+	            gpro_t.process_run_step=0;
+	           	gpro_t.gpower_on = power_on;
+
+			
+  
+
+        }
+        else if(frame.func_code == 0x0){ //close 
+
+		
+		
+              SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+
+              vTaskDelay(pdMS_TO_TICKS(50)); 
+             
+             if(gpro_t.again_power_off_flag == 1)gpro_t.again_power_off_flag = 0;
+			 else{
+               gpro_t.power_off_run_step=1;
+               gpro_t.gpower_on = power_off;
+
+			 }
+           
+            
+			 
+		     
+        }
+
+	 break;
 
      case ptc_on_off: //PTC key of command .
 

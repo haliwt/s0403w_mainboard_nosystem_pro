@@ -56,6 +56,7 @@ void power_on_handler(void)
 
         gpro_t.two_hours_state = 0;
 		 gpro_t.stopTwoHours_flag =0;
+		 gpro_t.again_power_off_flag=0; //WT.EDIT 2026.01.04
 		/*end */
        
      
@@ -437,7 +438,7 @@ void power_off_handler(void)
 
     case 1:
 		  SendWifiData_Answer_Cmd(0x01,0x02); //compatible older version 
-	      vTaskDelay(pdMS_TO_TICKS(10));
+	      vTaskDelay(pdMS_TO_TICKS(100));
           gpro_t.gTimer_poweroff_fan=0;
           gctl_t.gTimer_fan_run_one_minute=0;
        
@@ -468,8 +469,7 @@ void power_off_handler(void)
 	
    
           gpro_t.two_hours_cp_counter=0;
-		
-
+		  gpro_t.again_power_off_flag = 1;
           SetPowerOff_ForDoing();
 		  gpro_t.power_off_run_step = 2;
        
@@ -507,28 +507,31 @@ void power_off_handler(void)
 
 
       case 6:
-	   
-		if(gpro_t.gTimer_poweroff_fan < 60 && powerOffFanRun_flag ==1){
-          
-                   
-			Fan_One_Power_Off_Speed();
-                  
-        }       
-        else if(gpro_t.gTimer_poweroff_fan > 59 ){ //WT.EDTI 2024.11.19
-		   
-			       powerOffFanRun_flag=2;
-				   FAN_Stop();
-         }
-
-        if(gpro_t.gTimer_poweroff_fan > 61){
-              gpro_t.gTimer_poweroff_fan =0;
-
-              powerOffFanRun_flag=2;
-           
-              FAN_Stop();
 
 
-        }
+	    
+			if(gpro_t.gTimer_poweroff_fan < 60 && powerOffFanRun_flag ==1){
+	          
+	                   
+				Fan_One_Power_Off_Speed();
+	                  
+	        }       
+	        else if(gpro_t.gTimer_poweroff_fan > 59 ){ //WT.EDTI 2024.11.19
+			   
+				       powerOffFanRun_flag=2;
+					   FAN_Stop();
+	         }
+
+	        if(gpro_t.gTimer_poweroff_fan > 61){
+	              gpro_t.gTimer_poweroff_fan =0;
+
+	              powerOffFanRun_flag=2;
+	           
+	              FAN_Stop();
+
+
+	        }
+	    
         gpro_t.stopTwoHours_flag =0;
        
         power_off_stop_fun();

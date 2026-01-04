@@ -6,6 +6,7 @@
 
 void freeRTOS_Handler(void);
 
+void semaphore_isr(void);
 
 
 

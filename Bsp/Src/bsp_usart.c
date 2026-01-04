@@ -12,7 +12,7 @@
 #define ACK_SUCCESS 0x00U
 #define ACK_FAILURE 0x01U
 
-#define UART1_RING_SIZE  80
+#define UART1_RING_SIZE  120
 
 uint16_t dma_len;
 
@@ -25,7 +25,7 @@ static Usart1RxCallback usart1_rx_cb = NULL;  //定义一个全局静态函数�
 
 //static void usart1_isr_callback_handler(uint8_t data);
 
-uint8_t rx_inputBuf[12];
+uint8_t rx_inputBuf[60];
 uint8_t rx_frame_tc;
 
 
@@ -566,6 +566,7 @@ void USART1_IRQHandler(void)
 		  // 写入环形缓冲区
 		  ring_buffer_write(&uart1_rx_ring, uart1_rx_buf, dma_len);
           rx_frame_tc = 1;
+		  semaphore_isr();
 		  // 重启 DMA
 		  LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
 		  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, UART1_RX_BUF_SIZE);
@@ -593,7 +594,7 @@ void decoder_handler(void)
 {
 
    // static uint8_t  decoder_copy ;
-	while(rx_frame_tc==1)//while(ring_buffer_has_data(&uart1_rx_ring))
+	//while(rx_frame_tc==1)//while(ring_buffer_has_data(&uart1_rx_ring))
 	{
 	
 	       memcpy(rx_inputBuf,uart1_rx_buf,dma_len);

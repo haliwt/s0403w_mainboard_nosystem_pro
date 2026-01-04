@@ -1,4 +1,6 @@
 #include "bsp.h"
+#include "semphr.h"
+
 
 #define DECODER_BIT_0        (1<< 0)
 
@@ -30,15 +32,25 @@ static StackType_t xTaskStartStack[128];
 
 
 
+
 #endif 
 static void AppTaskCreate (void);
-//xTaskCreateStatic()
+static void AppObjCreate (void);
+/* 静态缓冲区和句柄（文件作用域或模块静态） */ 
+static StaticSemaphore_t xBinarySemaphoreBuffer; 
+static SemaphoreHandle_t xBinarySemaphore = NULL;
+
+
+
 
 
 /* 创建任务通信机制 */
 //static void AppObjCreate(void);
 static void power_run_handler(void);
 static void wifi_run_handler(void);
+
+
+//static SemaphoreHandle_t  xSemaphore = NULL;
 
 
 /***********************************************************************************************************
@@ -82,7 +94,7 @@ void freeRTOS_Handler(void)
 	   AppTaskCreate();
 	  
 	  /* 创建任务通信机制 */
-	 //  AppObjCreate();
+	   AppObjCreate();
 	  
 	  /* 启动调度，开始执行任�?1�?7?1�?1�?7?7 */
 	   vTaskStartScheduler();
@@ -120,10 +132,6 @@ static void vTaskMsgPro(void *pvParameters)
        
            wifi_run_handler();
         
-		  
-		
-
-
 		//  waiting_ack_handler();
      
         vTaskDelay(1000);//500
@@ -141,18 +149,18 @@ static void vTaskMsgPro(void *pvParameters)
  
  static void vTaskStart(void *pvParameters)
  {
-   
+    BaseType_t xResult;
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为300ms */
+	
 	 while(1)
 	 {
-	    decoder_handler();
-		vTaskDelay(10);
-
+        xResult = xSemaphoreTake(xBinarySemaphore, (TickType_t)xMaxBlockTime);
+		if(xResult == pdTRUE)
+			 decoder_handler();
 	 }
 
 }
-
-
- /**
+/**
  * @brief  :  void AppTaskCreate (void)�����ݴ����������ȼ�Ϊ�е�
  * @note    �����ڲ�ʹ�ö��н������ݣ����ȳ�ʼ������
  * @param   None
@@ -222,6 +230,24 @@ void AppTaskCreate (void)
 *	返 回 值: 无
 *********************************************************************************************************
 */
+static void AppObjCreate (void)
+{
+	/* 创建后信号量处于“空”状态（计数为0） */ 
+	xBinarySemaphore = xSemaphoreCreateBinaryStatic(&xBinarySemaphoreBuffer); 
+	if (xBinarySemaphore == NULL) {
+		/* 创建失败处理 */ 
+	    buzzer_sound();
+	}
+}
+
+/*
+*********************************************************************************************************
+*	函 数 名: AppObjCreate
+*	功能说明: 创建任务通信机制
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
 //static void AppObjCreate (void)
 //{
 //	/* 创建10个uint8_t型消息队列 */
@@ -239,7 +265,17 @@ void AppTaskCreate (void)
 ////    }
 //}
 
+void semaphore_isr(void)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	
+	/* 发送同步信号 */
+	xSemaphoreGiveFromISR(xBinarySemaphore, &xHigherPriorityTaskWoken);
 
+	/* 如果xHigherPriorityTaskWoken = pdTRUE，那么退出中断后切到当前最高优先级任务执行 */
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+}
 /********************************************************************************
 	**
 	*Function Name:static void power_run_handler(void)
@@ -283,6 +319,7 @@ static void power_run_handler(void)
               gpro_t.process_run_step=0;
 	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
 		      power_off_handler();
+			 
              break;
           }
 
