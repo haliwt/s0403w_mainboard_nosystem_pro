@@ -155,10 +155,10 @@ static void vTaskMsgPro(void *pvParameters)
 	 while(1)
 	 {
         xResult = xSemaphoreTake(xBinarySemaphore, (TickType_t)xMaxBlockTime);
-		if(xResult == pdTRUE)
+		if(xResult == pdTRUE){
 			 decoder_handler();
+	    }
 	 }
-
 }
 /**
  * @brief  :  void AppTaskCreate (void)�����ݴ����������ȼ�Ϊ�е�

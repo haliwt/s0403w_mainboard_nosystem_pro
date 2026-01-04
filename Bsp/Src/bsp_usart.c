@@ -12,7 +12,7 @@
 #define ACK_SUCCESS 0x00U
 #define ACK_FAILURE 0x01U
 
-#define UART1_RING_SIZE  120
+#define UART1_RING_SIZE  20
 
 uint16_t dma_len;
 
@@ -25,7 +25,7 @@ static Usart1RxCallback usart1_rx_cb = NULL;  //定义一个全局静态函数�
 
 //static void usart1_isr_callback_handler(uint8_t data);
 
-uint8_t rx_inputBuf[60];
+uint8_t rx_inputBuf[20];
 uint8_t rx_frame_tc;
 
 
@@ -224,316 +224,6 @@ uint8_t rx_numbers;
 
 
 volatile uint8_t rx_data_counter=0;
-
-#if 0
-/********************************************************************************
-	**
-	*Function Name:void usart1_isr_callback_handler(void)
-	*Function :  this is receive data from mainboard.
-	*Input Ref:NO
-	*Return Ref:NO
-	*
-*******************************************************************************/
-static void usart1_isr_callback_handler(uint8_t data)
-{
-       
-	#if 0    
-       switch(rx_state){
-	
-         case 0:
-	      if(data == FRAME_HEADER){
-	   	   gl_tMsg.usData[rx_data_counter]=data;
-		    rx_data_counter++;
-		    rx_state =1;
-
-	      }
-		  break;
-
-		  case 1:
-		    if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
-	   	       gl_tMsg.usData[rx_data_counter]=data;
-		       
-			   if(gl_tMsg.usData[rx_data_counter]==0x80){ //new version is copy command or notice 0x80
-			   	 rx_data_counter++;
-			   	 gl_tMsg.copy_cmd_flag=0x80;
-			   	}
-			   else{
-			   	 rx_data_counter++;
-			   	 gl_tMsg.copy_cmd_flag=0;
-		         rx_state =2;
-			   	}
-
-	         }
-			 else{
-			    rx_state =0;
-			    rx_data_counter=0;
-			    gl_tMsg.usData[0]=0;
-			    gl_tMsg.usData[1]=0;
-            }
-
-		  break;
-
-		  case 2: //rx command or notice or oxFF --> copy command or notice .
-		      gl_tMsg.usData[rx_data_counter]=data;
-			
-		      if(gl_tMsg.usData[rx_data_counter]==0xFF){ //older version is copy command or notice "0xFF"
-			  	gl_tMsg.copy_cmd_flag=0xFF;
-			    rx_data_counter++;
-
-		      }
-			  else{
-			  	gl_tMsg.copy_cmd_flag=0;
-			  	gl_tMsg.cmd_notice= gl_tMsg.usData[rx_data_counter];
-			    rx_data_counter++;
-			  }
-			  rx_state =3;
-
-
-		  break;
-
-		  case 3: //rx excuite command and notice or data 
-		     
-		      gl_tMsg.usData[rx_data_counter]=data;
-			
-		      if(gl_tMsg.usData[rx_data_counter]==0x0F){ //0x0F -> is receive data .
-				 rx_data_counter++;
-			
-			  	rx_state =7;
-
-			  }
-			  else if(gl_tMsg.copy_cmd_flag==0xFF){
-			      gl_tMsg.cmd_notice= gl_tMsg.usData[rx_data_counter];
-				  rx_data_counter++;
-			      rx_state =4;
-
-
-			  }
-			  else{
-			  	 gl_tMsg.execuite_cmd_notice=gl_tMsg.usData[rx_data_counter];
-				  rx_data_counter++;
-				  rx_state =4;
-				 
-
-			  	}
-
-
-		  break;
-
-		   case 4: //rx is cmmand and notice (new version is frame end "0xFE")
-			  gl_tMsg.usData[rx_data_counter]=data;
-			 
-			  if(gl_tMsg.usData[rx_data_counter]==0){//older version is frame command "0x00"
-			         rx_data_counter++;
-					 gl_tMsg.rx_data_flag = 0;
-					 rx_state =5; //older version 
-
-              }
-			  else if(gl_tMsg.copy_cmd_flag==0xFF){ //copy command or notice execuite 
-                  gl_tMsg.execuite_cmd_notice=gl_tMsg.usData[rx_data_counter];
-				  rx_data_counter++;
-			      rx_state =5; //older version 
-
-
-			  }
-			  else if(gl_tMsg.usData[rx_data_counter]==0xFE){ //new verson protocol is frame end "0xFE"
-
-			          rx_data_counter++;
-					  gl_tMsg.rx_data_flag = 0;
-					  rx_state =6; //new version 
-
-
-			  }
-			  else{
-			  	rx_state =0;
-			    rx_data_counter=0;
-                 gl_tMsg.usData[0]=0;
-				 gl_tMsg.usData[1]=0;
-				 gl_tMsg.usData[2]=0;
-				 gl_tMsg.usData[3]=0;
-				 gl_tMsg.usData[4]=0;
-			  }
-
-		  break;
-
-
-		  
-		case 5: //old version is frame end "0xFE"
-			  gl_tMsg.usData[rx_data_counter]=data;
-			 
-			  if(gl_tMsg.usData[rx_data_counter]==0xFE){//new version id frame end 
-			         rx_data_counter++;
-					 rx_state =6; //new version 
-
-              }
-			  else{
-			  	rx_state =0;
-			    rx_data_counter=0;
-			     gl_tMsg.usData[0]=0;
-				 gl_tMsg.usData[1]=0;
-				 gl_tMsg.usData[2]=0;
-				 gl_tMsg.usData[3]=0;
-				 gl_tMsg.usData[4]=0;
-			  
-			  }
-
-		  break;
-	
-
-		  case 6: //BCC CHECK CODE ,receive success 
-			  
-		  	 gl_tMsg.usData[rx_data_counter]=data;
-			 gl_tMsg.bcc_check_code=gl_tMsg.usData[rx_data_counter];
-		     gl_tMsg.total_data_length = rx_data_counter+1;
-			// memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
-          
-			
-			
-			//gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, (gl_tMsg.total_data_length-1));
-	        //if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
-			 rx_data_counter=0;
-		     rx_state = 0;
-			gl_tMsg.usData[0]=0;
-			gl_tMsg.usData[1]=0;
-	         gl_tMsg.usData[6]=0;
-			 gpro_t.decoder_success_flag=1;
-		     //continue; // 使用 continue 立即跳过下面所有代码，回到 while(1) 顶部
-			 //freertos_decoder_isr_handler();
-			
-
-
-
-		  break;
-
-		  case 7://calculate receive data length.
-
-		      gl_tMsg.usData[rx_data_counter]=data;
-			  gl_tMsg.data_length = gl_tMsg.usData[rx_data_counter];
-			  rx_data_counter++;
-			
-		      if(gl_tMsg.data_length > 0){ //0x0F -> is receive data .
-		         gl_tMsg.rc_data_length =0;
-			  	rx_state =8;
-
-			  }
-			  else{
-			  	
-				 rx_data_counter =0;
-		         rx_state =0;
-				 gl_tMsg.usData[0]=0;
-				 gl_tMsg.usData[1]=0;
-				 gl_tMsg.usData[2]=0;
-				 gl_tMsg.usData[3]=0;
-				 gl_tMsg.usData[4]=0;
-
-			  	}
-
-
-
-		  break;
-
-
-		  
-
-		  case 8: //receive is data of length.
-		  	 
-			 gl_tMsg.usData[rx_data_counter]=data;
-			
-			 gl_tMsg.rx_data[gl_tMsg.rc_data_length++]= gl_tMsg.usData[rx_data_counter];
-		      rx_data_counter++;
-			 
-			 if(gl_tMsg.rc_data_length >=gl_tMsg.data_length){
-                
-			      rx_state =5;
-             }
-			 else rx_state = 8;
-		  	
-		  break;
-
-		}
-	   #else 
-	   switch(rx_state){
-	  
-		   case 0:
-			if(data == FRAME_HEADER){
-			 gl_tMsg.usData[rx_data_counter]=data;
-			  rx_data_counter++;
-			  rx_state =1;
-	
-			}
-			break;
-	
-			case 1:
-			  if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
-				 gl_tMsg.usData[rx_data_counter]=data;
-				  rx_data_counter++;
-				
-				  rx_state =2;
-			  }
-			  else{
-				  rx_state =0;
-				  rx_data_counter=0;
-		 
-			  }
-	
-			break;
-	
-			case 2: //rx command or notice or oxFF --> copy command or notice .
-				gl_tMsg.usData[rx_data_counter]=data;
-			    rx_data_counter++;
-//			    if(data == 0xA5){
-//				   rx_state =0;
-
-//				   rx_data_counter=0;
-//				   gl_tMsg.usData[0]=0;
-//				   gl_tMsg.usData[1]=0;
-
-
-//				}
-//				else 
-
-				if(data==0xFE && rx_data_counter>2){ //older version is copy command or notice "0xFF"
-				   
-				    rx_state =3;
-	
-	              
-				}
-				
-				
-	
-			break;
-	
-			case 3: //rx excuite command and notice or data 
-			   
-				gl_tMsg.usData[rx_data_counter]=data;
-				rx_data_counter++;
-
-			    rx_numbers =rx_data_counter;
-			
-				 
-			
-				gpro_t.decoder_success_flag=1;
-				rx_data_counter=0;
-			 
-				
-	           rx_state =0;
-				  
-	
-	
-			break;
-	
-			
-	
-	
-		  }
-
-
-	   #endif 
-}
-#endif 
-
-
-
-
 /**
   * @brief This function handles USART1 global interrupt 
   * @param
@@ -565,12 +255,14 @@ void USART1_IRQHandler(void)
   
 		  // 写入环形缓冲区
 		  ring_buffer_write(&uart1_rx_ring, uart1_rx_buf, dma_len);
+		  memcpy(rx_inputBuf,uart1_rx_buf,dma_len);
           rx_frame_tc = 1;
-		  semaphore_isr();
+		  
 		  // 重启 DMA
 		  LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
 		  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, UART1_RX_BUF_SIZE);
 		  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
+		  semaphore_isr();
 	  }
   
    #endif 
@@ -597,7 +289,7 @@ void decoder_handler(void)
 	//while(rx_frame_tc==1)//while(ring_buffer_has_data(&uart1_rx_ring))
 	{
 	
-	       memcpy(rx_inputBuf,uart1_rx_buf,dma_len);
+	      // memcpy(rx_inputBuf,uart1_rx_buf,dma_len);
 		   S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
 	       //uint8_t ch = ring_buffer_read_byte(&uart1_rx_ring); 
 		   //S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
@@ -608,8 +300,8 @@ void decoder_handler(void)
 	}
 
    if (LL_USART_IsActiveFlag_ORE(USART1)) LL_USART_ClearFlag_ORE(USART1);
-   if (LL_USART_IsActiveFlag_FE(USART1))  LL_USART_ClearFlag_FE(USART1);
-   if (LL_USART_IsActiveFlag_NE(USART1))  LL_USART_ClearFlag_NE(USART1);
+  // if (LL_USART_IsActiveFlag_FE(USART1))  LL_USART_ClearFlag_FE(USART1);
+  // if (LL_USART_IsActiveFlag_NE(USART1))  LL_USART_ClearFlag_NE(USART1);
 
 }
 
