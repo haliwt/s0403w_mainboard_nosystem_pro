@@ -294,6 +294,8 @@ void decoder_handler(void)
 	     
 		   S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
 
+		   memset(rx_inputBuf,0,20);
+
             // 重启 DMA
 		  LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
 		  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, UART1_RX_BUF_SIZE);

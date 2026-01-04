@@ -34,9 +34,7 @@ S03Frame_t frame;
 
 static S03_State_e s_state = S03_STATE_WAIT_HEADER;
 
-static uint16_t    s_index = 0;
-
-static uint16_t    s_total_len_without_bcc = 0;  // 头到尾（含尾）长度
+//static uint16_t    s_total_len_without_bcc = 0;  // 头到尾（含尾）长度
 
 
 
@@ -222,18 +220,16 @@ void S03_Frame_Dispatch(const S03Frame_t f)
   
        if(frame.cmd_type == 0xFF){// 举例：应答
                
-            parse_recieve_copy_data_handler(f);
+          parse_recieve_copy_data_handler(f);
            // S03_Handle_Ack(f);
         }
         else{
           
-            receive_cmd_or_notice_handler(f);
-                 
+          receive_cmd_or_notice_handler(f);
                  
         }
 
 }
-
 /**********************************************************************
     *
     *Function Name:void receive_data_from_display(uint8_t *pdata,uint8_t len)
@@ -256,25 +252,17 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
 
      break;
 
-     
-   
-
-	 
      case power_on_off: 
 
          
         if(frame.func_code == 0x01){ //open
 
-		        buzzer_sound();//buzzer_sound_fun();
-	            SendWifiData_Answer_Cmd(0x01,0x01);
-	            vTaskDelay(pdMS_TO_TICKS(50));
-	          
-	            gpro_t.process_run_step=0;
-	           	gpro_t.gpower_on = power_on;
-
-			
-  
-
+	        buzzer_sound();//buzzer_sound_fun();
+            SendWifiData_Answer_Cmd(0x01,0x01);
+            vTaskDelay(pdMS_TO_TICKS(50));
+          
+            gpro_t.process_run_step=0;
+           	gpro_t.gpower_on = power_on;
         }
         else if(frame.func_code == 0x0){ //close 
 
