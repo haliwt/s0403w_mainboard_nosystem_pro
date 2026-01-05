@@ -550,22 +550,9 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
 	  case 0x1A: //receive from display board set temperature value .
 
       case 0x19:
-	   if(gpro_t.soft_version ==1){
-	      // gctl_t.set_temperature_flag = 1; 
-	     
-	       gctl_t.set_temperature_value = frame.data[0]  ;
-		   gctl_t.ptc_on_off_flag =0;
-		   gctl_t.set_temp_first_closeptc=0;
-		   gctl_t.rx_set_temp_flag =0;
-		   
-	
-		   
-	       if(wifi_link_net_state()==1){
-	            MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-			      vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
-	        }
-	   }
-	   else{
+
+	      if(frame.data[0] > 19 && frame.data[0] < 41){
+	  
 	      gctl_t.set_temperature_value = frame.data[0] ;
 
 	      if(wifi_link_net_state()==1){
@@ -573,8 +560,8 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
 			      vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
 	        }
 
-
-	   }
+	      }
+	   
 
         
       break;
@@ -809,8 +796,8 @@ void disp_protocol_bytehandler(uint8_t *pdbuf)
 {
 
    S03_Protocol_ByteHandler(pdbuf,0);
-  
-   S03_Protocol_ByteHandler(pdbuf,frame.frame_length);
+   
+ //  S03_Protocol_ByteHandler(pdbuf,frame.frame_length);
    
    
 

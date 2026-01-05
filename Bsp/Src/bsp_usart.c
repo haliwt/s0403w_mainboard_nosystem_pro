@@ -293,7 +293,7 @@ void decoder_handler(void)
 	
 	     
 		 
-          memcpy(rx_inputBuf,uart1_rx_buf,20);
+          memcpy(rx_inputBuf,uart1_rx_buf,dma_len);
           // 重启 DMA
 		  LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
 		  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, UART1_RX_BUF_SIZE);
