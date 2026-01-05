@@ -100,11 +100,6 @@
 
 
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
-extern uint8_t inputBuf[12];
-
-
-
-
 
 
 typedef enum{

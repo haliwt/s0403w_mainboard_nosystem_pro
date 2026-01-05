@@ -17,11 +17,15 @@
 uint16_t dma_len;
 
 
+/* 假设定义 */
+//#define UART1_RX_BUF_SIZE  256
+uint8_t rx_buf[2][UART1_RX_BUF_SIZE]; // 真正的双缓冲区
+uint8_t active_buf = 0;               // 当前使用的缓冲区索引
 
 
-typedef void (*Usart1RxCallback)(uint8_t data);
+//typedef void (*Usart1RxCallback)(uint8_t data);
 
-static Usart1RxCallback usart1_rx_cb = NULL;  //定义一个全局静态函数指针
+//static Usart1RxCallback usart1_rx_cb = NULL;  //定义一个全局静态函数指针
 
 //static void usart1_isr_callback_handler(uint8_t data);
 
@@ -39,102 +43,6 @@ typedef struct
 
 uint8_t uart1_ring_buffer[UART1_RING_SIZE]; 
 ring_buffer_t uart1_rx_ring;
-
-
-//初始化函数
-void ring_buffer_init(ring_buffer_t *rb, uint8_t *buf, uint8_t size)
-{
-    rb->buffer = buf;
-    rb->size = size;
-    rb->head = 0;
-    rb->tail = 0;
-}
-/**
-	*@brief
-	*@note
-	*@param
-	*@rtrval 
-**/
-void ring_buffer_write(ring_buffer_t *rb, uint8_t *data, uint8_t len)
-{
-
-    uint8_t i, next;
-	for(i = 0; i < len; i++)
-    {
-        next = (rb->head + 1) % rb->size;
-
-        // 缓冲区满了（丢弃最旧数据）
-        if(next == rb->tail)
-        {
-            rb->tail = (rb->tail + 1) % rb->size;
-        }
-
-        rb->buffer[rb->head] = data[i];
-        rb->head = next;
-    }
-}
-
-/**
-	*@brief  读取环形缓冲器
-	*@note
-	*@param
-	*@rtrval 
-**/
-uint8_t ring_buffer_read_byte(ring_buffer_t *rb)
-{
-    if(rb->head == rb->tail)
-        return 0; // 空
-
-    uint8_t ch = rb->buffer[rb->tail];
-    rb->tail = (rb->tail + 1) % rb->size;
-
-    return ch;
-}
-
-/**
-	*@brief //提供注册接口
-	*@note
-	*@param
-**/
-void usart1_register_rx_callback(Usart1RxCallback cb)
-{
-   usart1_rx_cb = cb;
-
-}
-/**
-	*@brief 判断是否有数据
-	*@note
-	*@param
-**/
-uint8_t ring_buffer_has_data(ring_buffer_t *rb)
-{
-    return (rb->head != rb->tail);
-}
-
-/**
-	*@brief  回调函数
-	*@note
-	*@param
-**/
-void usart1_invoke_callback(uint8_t data)
-{
-   if(usart1_rx_cb !=NULL){
-
-       usart1_rx_cb(data);
-   }
-
-
-}
-
-
-void callback_register_usart1_rx(void)
-{
-
-   //usart1_register_rx_callback(usart1_isr_callback_handler);
-
-}
-
-
 
 uint8_t uart1_rx_buf[UART1_RX_BUF_SIZE];
 volatile uint8_t uart1_rx_head = 0;
@@ -213,7 +121,7 @@ typedef struct Msg
 
 MSG_T   gl_tMsg; 
 
-uint8_t inputBuf[12];
+
 uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 
 uint8_t rx_numbers;
@@ -223,6 +131,100 @@ uint8_t rx_numbers;
 //static void parse_recieve_copy_data_handler(void);
 
 
+
+
+//初始化函数
+void ring_buffer_init(ring_buffer_t *rb, uint8_t *buf, uint8_t size)
+{
+    rb->buffer = buf;
+    rb->size = size;
+    rb->head = 0;
+    rb->tail = 0;
+}
+/**
+	*@brief
+	*@note
+	*@param
+	*@rtrval 
+**/
+void ring_buffer_write(ring_buffer_t *rb, uint8_t *data, uint8_t len)
+{
+
+    uint8_t i, next;
+	for(i = 0; i < len; i++)
+    {
+        next = (rb->head + 1) % rb->size;
+
+        // 缓冲区满了（丢弃最旧数据）
+        if(next == rb->tail)
+        {
+            rb->tail = (rb->tail + 1) % rb->size;
+        }
+
+        rb->buffer[rb->head] = data[i];
+        rb->head = next;
+    }
+}
+
+/**
+	*@brief  读取环形缓冲器
+	*@note
+	*@param
+	*@rtrval 
+**/
+uint8_t ring_buffer_read_byte(ring_buffer_t *rb)
+{
+    if(rb->head == rb->tail)
+        return 0; // 空
+
+    uint8_t ch = rb->buffer[rb->tail];
+    rb->tail = (rb->tail + 1) % rb->size;
+
+    return ch;
+}
+
+/**
+	*@brief //提供注册接口
+	*@note
+	*@param
+**/
+//void usart1_register_rx_callback(Usart1RxCallback cb)
+//{
+//   usart1_rx_cb = cb;
+
+//}
+/**
+	*@brief 判断是否有数据
+	*@note
+	*@param
+**/
+uint8_t ring_buffer_has_data(ring_buffer_t *rb)
+{
+    return (rb->head != rb->tail);
+}
+
+/**
+	*@brief  回调函数
+	*@note
+	*@param
+**/
+//void usart1_invoke_callback(uint8_t data)
+//{
+//   if(usart1_rx_cb !=NULL){
+
+//       usart1_rx_cb(data);
+//   }
+
+
+//}
+
+
+void callback_register_usart1_rx(void)
+{
+
+   //usart1_register_rx_callback(usart1_isr_callback_handler);
+
+}
 volatile uint8_t rx_data_counter=0;
 /**
   * @brief This function handles USART1 global interrupt 
@@ -255,7 +257,7 @@ void USART1_IRQHandler(void)
           //dma_len = LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
 		  // 写入环形缓冲区
 		 // ring_buffer_write(&uart1_rx_ring, uart1_rx_buf, dma_len);
-		  memcpy(rx_inputBuf,uart1_rx_buf,dma_len);
+		  memcpy(rx_inputBuf,uart1_rx_buf,20);
      
 		  
 		  // 重启 DMA
@@ -290,11 +292,12 @@ void decoder_handler(void)
 	//while(rx_frame_tc==1)//while(ring_buffer_has_data(&uart1_rx_ring))
 	
 	
-        
-	     
-		   S03_Protocol_ByteHandler(rx_inputBuf); // 每个字节丢进状态机
+         
+	       disp_protocol_bytehandler(rx_inputBuf);
+		  // S03_Protocol_ByteHandler(rx_inputBuf,0); // 每个字节丢进状态机
 
 		   memset(rx_inputBuf,0,20);
+		  
 
             // 重启 DMA
 		  LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);

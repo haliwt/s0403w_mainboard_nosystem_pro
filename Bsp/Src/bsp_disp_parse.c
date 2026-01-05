@@ -1,6 +1,6 @@
 #include "bsp.h"
 
-#define S03_MAX_DATA_LEN   8
+#define S03_MAX_DATA_LEN   4
 //#define S03_HEADER_MAIN    0x5A
 #define S03_HEADER_DISPLAY 0xA5 //display board of head 
 #define S03_TAIL           0xFE
@@ -16,6 +16,7 @@ typedef struct
     uint8_t data[S03_MAX_DATA_LEN]; // 数据区
     uint8_t tail;        // 帧尾 0xFE
     uint8_t bcc;         // BCC 校验
+    uint8_t frame_length;
 } S03Frame_t;
 
 
@@ -34,17 +35,12 @@ S03Frame_t frame;
 
 static S03_State_e s_state = S03_STATE_WAIT_HEADER;
 
-//static uint16_t    s_total_len_without_bcc = 0;  // 头到尾（含尾）长度
-
-
-
-
-
 static void receive_cmd_or_notice_handler(const S03Frame_t  pd);
 
 static void parse_recieve_copy_data_handler(const S03Frame_t  pd);
 
 static void S03_Frame_Dispatch(const S03Frame_t f);
+static void S03_Protocol_ByteHandler(uint8_t *chdata,uint8_t len);
 
 
 /*****************************************************************************
@@ -77,14 +73,14 @@ static uint8_t s03_calc_bcc(const uint8_t *buf, uint16_t len)
 	*Return Ref:NO
 	*
 *******************************************************************************/
-void S03_Protocol_ByteHandler(uint8_t *pdch)
+void S03_Protocol_ByteHandler(uint8_t *pdch,uint8_t len)
 {
   uint8_t recv_bcc,calc_bcc ;
 
 
 	
    
-            if(pdch[0] == S03_HEADER_DISPLAY && pdch[1]==0x01)
+            if(pdch[0+len] == S03_HEADER_DISPLAY && pdch[1+len]==0x01)
             {
                
                 s_state = S03_STATE_CMD_TYPE;
@@ -99,48 +95,70 @@ void S03_Protocol_ByteHandler(uint8_t *pdch)
 
           if(s_state ==S03_STATE_CMD_TYPE){
 
-		     frame.cmd_type = pdch[2]; 
+		     frame.cmd_type = pdch[2+len]; 
              if(frame.cmd_type == 0xFF){
-                 frame.copy_type = pdch[3];
-                 frame.func_code = pdch[4];
-			     S03_Frame_Dispatch(frame);
+                 frame.copy_type = pdch[3+len];
+                 frame.func_code = pdch[4+len];
+			     if(frame.func_code == 0x0F){
+                      frame.data_len = pdch[5+len];
+					  if(frame.data_len==1){
+
+                         frame.data[0]= pdch[6+len];
+						 frame.tail = pdch[7+len];
+					      recv_bcc = pdch[8+len];
+						 frame.frame_length = 9;
+
+					  }
+
+
+				 }
+				 else{
+				 	frame.data_len = pdch[5+len];//frame.data_len=0;
+				    frame.tail = pdch[6+len];//0xFE
+					recv_bcc = pdch[7+len];
+					frame.frame_length = 8;
+			        S03_Frame_Dispatch(frame);
+				 }
 				 return ;
              }
 			 else{
 
-                frame.func_code = pdch[3]; 
+                frame.func_code = pdch[3+len]; 
 		        if(frame.func_code ==0x0F){
-					frame.data_len = pdch[4];//数据的长度
+					frame.data_len = pdch[4+len];//数据的长度
 					if(frame.data_len >0){
 		            if( frame.data_len== 1)  // 0~4头信息 + N 数据
 		            {
-		                frame.data[0] = pdch[5]; //第一个数据
-						frame.tail  = pdch[6];
-						 recv_bcc = pdch[7];
+		                frame.data[0] = pdch[5+len]; //第一个数据
+						frame.tail  = pdch[6+len];
+						 recv_bcc = pdch[7+len];
 						 s_state = S03_STATE_BCC;
+						 frame.frame_length = 8;
 						 if(frame.tail == 0xFE){
 						    S03_Frame_Dispatch(frame);
 						 }
 						 return;
 		            }
 					else if(frame.data_len == 2){
-		                 frame.data[0] = pdch[5]; //第一个数据
-		                 frame.data[1] = pdch[6]; //第二个数据
-		                 frame.tail = pdch[7];
-						 recv_bcc = pdch[8];
+		                 frame.data[0] = pdch[5+len]; //第一个数据
+		                 frame.data[1] = pdch[6+len]; //第二个数据
+		                 frame.tail = pdch[7+len];
+						 recv_bcc = pdch[8+len];
 						 s_state = S03_STATE_BCC;
+						 frame.frame_length = 9;
 						 if(frame.tail == 0xFE){
 						   S03_Frame_Dispatch(frame);
 						 }
 						 return;
 		            }
 					else if(frame.data_len == 3){
-		                frame.data[0] = pdch[5]; //第一个数据
-		                frame.data[1]=  pdch[6]; //第一个数据
-		                frame.data[2] = pdch[7]; //第三个数据
-		                frame.tail   = pdch[8] ;
-						 recv_bcc = pdch[9];
+		                frame.data[0] = pdch[5+len]; //第一个数据
+		                frame.data[1]=  pdch[6+len]; //第一个数据
+		                frame.data[2] = pdch[7+len]; //第三个数据
+		                frame.tail   = pdch[8+len] ;
+						recv_bcc = pdch[9+len];
 						 s_state = S03_STATE_BCC;
+						 frame.frame_length = 10;
 						 if(frame.tail == 0xFE){
 						     S03_Frame_Dispatch(frame);
 						 }
@@ -155,8 +173,10 @@ void S03_Protocol_ByteHandler(uint8_t *pdch)
 
 
 				}
-				 frame.data_len = pdch[4];
-				 frame.tail = pdch[5] ;
+				 frame.data_len = pdch[4+len];
+				 frame.tail = pdch[5+len] ;
+				 recv_bcc = pdch[6+len];
+				 frame.frame_length = 7;
 				 if(frame.data_len == 0 && frame.tail == 0xFE){
 				    S03_Frame_Dispatch(frame);
 					return ;
@@ -528,6 +548,7 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
 
 	  case 0x1A: //receive from display board set temperature value .
 
+      case 0x19:
 	   if(gpro_t.soft_version ==1){
 	      // gctl_t.set_temperature_flag = 1; 
 	     
@@ -789,5 +810,13 @@ static void parse_recieve_copy_data_handler(const S03Frame_t f)
     
         }
  
+
+}
+
+void disp_protocol_bytehandler(uint8_t *pdbuf)
+{
+
+   S03_Protocol_ByteHandler(pdbuf,0);
+   S03_Protocol_ByteHandler(pdbuf,frame.frame_length);
 
 }
