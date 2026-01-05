@@ -17,6 +17,7 @@ typedef struct
     uint8_t tail;        // 帧尾 0xFE
     uint8_t bcc;         // BCC 校验
     uint8_t frame_length;
+	uint8_t frame_one_frame;
 } S03Frame_t;
 
 
@@ -75,9 +76,9 @@ static uint8_t s03_calc_bcc(const uint8_t *buf, uint16_t len)
 *******************************************************************************/
 void S03_Protocol_ByteHandler(uint8_t *pdch,uint8_t len)
 {
-  uint8_t recv_bcc,calc_bcc ;
+     uint8_t recv_bcc,calc_bcc ;
 
-
+ 
 	
    
             if(pdch[0+len] == S03_HEADER_DISPLAY && pdch[1+len]==0x01)
@@ -503,7 +504,7 @@ static void receive_cmd_or_notice_handler(const S03Frame_t f)
      break;
 
      case buzzer_sound_s: //buzzer sound command 
-
+          
           buzzer_sound();
 		  vTaskDelay(pdMS_TO_TICKS(5));
      break;
@@ -793,30 +794,24 @@ static void parse_recieve_copy_data_handler(const S03Frame_t f)
 		case 0x30: //phone power off 
 
 		  if(frame.func_code  == 0x00){
-			           //gpro_t.gpower_on = power_off;
-					   //gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
-					   //powerOffFanRun_flag = 1;
-					   gpro_t.phone_power_on_flag = 0; //ack_app_power_off;
-					
-
-               
-
-		    }
+	           //gpro_t.gpower_on = power_off;
+			   //gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
+			   //powerOffFanRun_flag = 1;
+			   gpro_t.phone_power_on_flag = 0; //ack_app_power_off;
+		  }
 
 		break;
 
-        
-    
-    
         }
- 
-
 }
 
 void disp_protocol_bytehandler(uint8_t *pdbuf)
 {
 
    S03_Protocol_ByteHandler(pdbuf,0);
+  
    S03_Protocol_ByteHandler(pdbuf,frame.frame_length);
+   
+   
 
 }

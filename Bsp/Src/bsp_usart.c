@@ -19,7 +19,7 @@ uint16_t dma_len;
 
 /* 假设定义 */
 //#define UART1_RX_BUF_SIZE  256
-uint8_t rx_buf[2][UART1_RX_BUF_SIZE]; // 真正的双缓冲区
+uint8_t rx_buf[UART1_RX_BUF_SIZE]; // 真正的双缓冲区
 uint8_t active_buf = 0;               // 当前使用的缓冲区索引
 
 
@@ -29,7 +29,7 @@ uint8_t active_buf = 0;               // 当前使用的缓冲区索引
 
 //static void usart1_isr_callback_handler(uint8_t data);
 
-uint8_t rx_inputBuf[20];
+uint8_t rx_inputBuf[UART1_RX_BUF_SIZE];
 uint8_t rx_frame_tc;
 
 
@@ -257,7 +257,7 @@ void USART1_IRQHandler(void)
           //dma_len = LL_DMA_GetDataLength(DMA1, LL_DMA_CHANNEL_2);
 		  // 写入环形缓冲区
 		 // ring_buffer_write(&uart1_rx_ring, uart1_rx_buf, dma_len);
-		  memcpy(rx_inputBuf,uart1_rx_buf,20);
+		//  memcpy(rx_inputBuf,uart1_rx_buf,20);
      
 		  
 		  // 重启 DMA
@@ -291,21 +291,24 @@ void decoder_handler(void)
    // static uint8_t  decoder_copy ;
 	//while(rx_frame_tc==1)//while(ring_buffer_has_data(&uart1_rx_ring))
 	
-	
-         
-	       disp_protocol_bytehandler(rx_inputBuf);
-		  // S03_Protocol_ByteHandler(rx_inputBuf,0); // 每个字节丢进状态机
-
-		   memset(rx_inputBuf,0,20);
-		  
-
-            // 重启 DMA
+	     
+		 
+          memcpy(rx_inputBuf,uart1_rx_buf,20);
+          // 重启 DMA
 		  LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_2);
 		  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_2, UART1_RX_BUF_SIZE);
 		  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
+   
+	      disp_protocol_bytehandler(rx_inputBuf);
+		  // S03_Protocol_ByteHandler(rx_inputBuf,0); // 每个字节丢进状态机
+
+		  // memset(rx_inputBuf,0,20);
+	       
+
+         
 		   rx_frame_tc=0;
 		    // 重启 DMA
-		 
+	       	
 	     
 
 	
