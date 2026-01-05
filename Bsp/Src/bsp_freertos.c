@@ -80,6 +80,7 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
 
 
 uint8_t power_on_sound_flag ;
+uint16_t taskMsg_counter;
 
 /**********************************************************************************************************
 *
@@ -133,7 +134,7 @@ static void vTaskMsgPro(void *pvParameters)
            wifi_run_handler();
         
 		//  waiting_ack_handler();
-     
+        taskMsg_counter++;
         vTaskDelay(1000);//500
 		
 		}
@@ -150,7 +151,7 @@ static void vTaskMsgPro(void *pvParameters)
  static void vTaskStart(void *pvParameters)
  {
     BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为300ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(200); /* 设置最大等待时间为300ms */
 	
 	 while(1)
 	 {
@@ -204,7 +205,7 @@ void AppTaskCreate (void)
 	xHandleTaskMsgPro = xTaskCreateStatic(
 			vTaskMsgPro,			/* 任务函数 */
 			"vTaskMsgPro",			/* 任务名 */
-			256,					/* 栈大小（word） */
+			128,					/* 栈大小（word） */
 			NULL,					/* 参数 */
 			2,						/* 优先级 */
 			xTaskMsgProStack,		/* 栈数组 */
@@ -295,21 +296,8 @@ static void power_run_handler(void)
             link_wifi_to_tencent_handler(); //detected ADC of value 
             ai_mode_display_fun();
 
-			//ack_handler();
-            if(gpro_t.process_run_step > 10){
-				gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
-            }
-		    else if(gpro_t.answer_buzzer_flag > 1){
-				if(gpro_t.answer_buzzer_flag == 1)gpro_t.answer_buzzer_flag =0;
-				//if(gpro_t.stopTwoHours_flag > 1)gpro_t.stopTwoHours_flag=0;//WT.EDIT 2025.10.29
-				
-            }
-			else if(gpro_t.answer_buzzer_flag == 1){ //WT.EDIT 2025.07.28 
-				gpro_t.answer_buzzer_flag =0;
 
-				SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
-				vTaskDelay(pdMS_TO_TICKS(100));
-		   	}
+            
 		  break;
 
 		  

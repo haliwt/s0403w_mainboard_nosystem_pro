@@ -609,7 +609,7 @@ void Json_Parse_Command_Fun(void)
 		  ptc_recoder_flag =1;
           gctl_t.gTimer_senddata_panel=8;  
 		  gctl_t.ptc_on_off_flag = 0;
-		  gctl_t.set_temp_first_closeptc =0;
+
 		  gctl_t.rx_set_temp_flag =0;
 
 
@@ -634,7 +634,7 @@ void Json_Parse_Command_Fun(void)
 	    
          gctl_t.gTimer_senddata_panel=8;
 		 gctl_t.ptc_on_off_flag = 1;
-		 gctl_t.set_temp_first_closeptc =0;
+	
 		 gctl_t.rx_set_temp_flag =0;
 	
      	 gctl_t.gDry=0;
@@ -771,7 +771,7 @@ void Json_Parse_Command_Fun(void)
 			SendWifiData_To_Data(0x3A, gctl_t.set_temperature_value); //smart phone set temperature value .
 			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(10);//HAL_Delay(10);
 			
-			gctl_t.set_temp_first_closeptc = 0;
+	
 			gctl_t.rx_set_temp_flag =0;
 			 gctl_t.app_timer_power_on_flag = 0;
           

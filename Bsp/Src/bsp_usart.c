@@ -100,26 +100,26 @@ typedef enum {
 
 
 
-typedef struct Msg
-{
+//typedef struct Msg
+//{
     
-	uint8_t   cmd_notice;
-	uint8_t   execuite_cmd_notice;
-	uint8_t   copy_cmd_flag;
-	uint8_t   rx_data_flag;	
-    uint8_t   bcc_check_code;
-	uint8_t   check_code_hex;
-    uint8_t   receive_data_length;
-    uint8_t   data_length;
-	uint8_t   rc_data_length;
-	uint8_t   total_data_length;
-	uint8_t   rx_data[4];
-	uint8_t   usData[12];
-	uint8_t   desData[12];
+//	uint8_t   cmd_notice;
+//	uint8_t   execuite_cmd_notice;
+//	uint8_t   copy_cmd_flag;
+//	uint8_t   rx_data_flag;	
+//    uint8_t   bcc_check_code;
+//	uint8_t   check_code_hex;
+//    uint8_t   receive_data_length;
+//    uint8_t   data_length;
+//	uint8_t   rc_data_length;
+//	uint8_t   total_data_length;
+//	uint8_t   rx_data[4];
+//	uint8_t   usData[12];
+//	uint8_t   desData[12];
 
-}MSG_T;
+//}MSG_T;
 
-MSG_T   gl_tMsg; 
+//MSG_T   gl_tMsg; 
 
 
 uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];

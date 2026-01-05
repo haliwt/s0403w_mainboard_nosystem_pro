@@ -82,7 +82,7 @@ typedef struct _RUN_T{
 
    uint8_t response_wifi_signal_label;
   uint8_t ptc_on_off_flag ;
-   uint8_t set_temp_first_closeptc ;
+  
 
  //fan:
     
@@ -160,7 +160,7 @@ extern uint8_t powerOffFanRun_flag ;
 //void main_function_detected_handler(uint8_t cmd);
 
 
-void set_temperature_compare_value_fun(void);
+//void set_temperature_compare_value_fun(void);
 
 void ai_mode_display_fun(void);
 

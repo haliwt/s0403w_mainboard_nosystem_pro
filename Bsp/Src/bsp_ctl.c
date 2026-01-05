@@ -11,7 +11,7 @@ uint8_t powerOffFanRun_flag ;
 
 
 
-uint8_t set_temp_first_closeptc  ;
+
 
 
 
@@ -39,6 +39,7 @@ void SystemReset(void)
     *Return Ref: NO
     *
 ************************************************************************/
+#if 0
  void set_temperature_compare_value_fun(void)
 {
 
@@ -176,7 +177,7 @@ void SystemReset(void)
   }
 
 } 
-
+#endif 
 
 /**********************************************************************
     *
