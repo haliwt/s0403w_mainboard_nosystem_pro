@@ -625,14 +625,16 @@ static void receive_cmd_or_notice_handler(void)
               PTC_SetHigh();
               
 		      gctl_t.gTimer_senddata_panel=7;//at once run ptc function.
-          }
+          
       
-         }
+         
           SendWifiData_Answer_Cmd(0x02,0x01); //
           vTaskDelay(pdMS_TO_TICKS(50)); 
 		
           gctl_t.gDry = 1;
 		  ptc_recoder_flag = 1;
+		 
+	
 		  if(ptc_tx_default != gpro_t.ptc_switch_flag){
 		  	  gpro_t.ptc_switch_flag++;
 		  	  ptc_tx_default = gpro_t.ptc_switch_flag;
@@ -645,6 +647,16 @@ static void receive_cmd_or_notice_handler(void)
 		    gctl_t.ptc_on_off_flag =0; //WT.EDIT 2025.12.19
 
 		  }
+
+		 }
+		 else{
+		  gctl_t.gDry =0;
+	      PTC_SetLow();
+		  ptc_recoder_flag = 0;
+
+
+
+		 }
   
       
 	      
@@ -670,7 +682,7 @@ static void receive_cmd_or_notice_handler(void)
 		  }
 
        }
-       
+     }
 
      break;
 

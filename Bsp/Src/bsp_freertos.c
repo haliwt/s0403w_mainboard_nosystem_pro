@@ -121,7 +121,7 @@ static void vTaskMsgPro(void *pvParameters)
            wifi_run_handler();
         
 		  
-
+           decoder_handler();
 
 		//  waiting_ack_handler();
      
@@ -144,7 +144,7 @@ static void vTaskMsgPro(void *pvParameters)
 	 while(1)
 	 {
 	    decoder_handler();
-		vTaskDelay(10);
+		vTaskDelay(20);
 
 	 }
 
