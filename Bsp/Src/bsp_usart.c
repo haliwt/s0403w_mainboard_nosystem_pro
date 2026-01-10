@@ -587,7 +587,7 @@ static void receive_cmd_or_notice_handler(void)
 
 		        buzzer_sound();//buzzer_sound_fun();
 	            SendWifiData_Answer_Cmd(0x01,0x01);
-	            vTaskDelay(pdMS_TO_TICKS(50));
+	            vTaskDelay(pdMS_TO_TICKS(100));
 	            wifi_link_counter=0;
 	            gpro_t.process_run_step=0;
 	           	gpro_t.gpower_on = power_on;
@@ -603,7 +603,7 @@ static void receive_cmd_or_notice_handler(void)
 
               SendWifiData_Answer_Cmd(0x01,0x02); //power off .
 
-              vTaskDelay(pdMS_TO_TICKS(50)); 
+              vTaskDelay(pdMS_TO_TICKS(100)); 
               wifi_link_counter=0;
              
              
@@ -614,6 +614,41 @@ static void receive_cmd_or_notice_handler(void)
         }
 
      break;
+
+	 case 0x30:
+
+	   if(gl_tMsg.execuite_cmd_notice  == 0x01){ //open
+
+		      
+	            SendWifiData_Answer_Cmd(0x30,0x01);
+	            vTaskDelay(pdMS_TO_TICKS(100));
+	            wifi_link_counter=0;
+	            gpro_t.process_run_step=0;
+	           	gpro_t.gpower_on = power_on;
+
+			
+  
+
+       }
+       else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
+
+		
+			
+
+              SendWifiData_Answer_Cmd(0x30,0x02); //power off .
+
+              vTaskDelay(pdMS_TO_TICKS(100)); 
+              wifi_link_counter=0;
+             
+             
+             gpro_t.power_off_run_step=1;
+             gpro_t.gpower_on = power_off;
+			 
+		     
+        }
+
+
+	 break;
 
      case ptc_on_off: //PTC key of command .
 
@@ -836,6 +871,8 @@ static void receive_cmd_or_notice_handler(void)
 
 
 	  case 0x1A: //receive from display board set temperature value .
+
+	  case 0x19: //write set temperature value .data.2026.01.06
 
 	   if(gpro_t.soft_version ==1){
 	      // gctl_t.set_temperature_flag = 1; 
