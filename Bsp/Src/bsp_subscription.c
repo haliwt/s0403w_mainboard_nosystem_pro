@@ -670,7 +670,7 @@ void Json_Parse_Command_Fun(void)
 	  case ANION_ON_ITEM: //plasma 
 	  	if(gpro_t.gpower_on ==power_on){
             MqttData_Publish_SetPlasma(1);
-			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 		
               gctl_t.gPlasma=1;
               gctl_t.gTimer_senddata_panel=8;

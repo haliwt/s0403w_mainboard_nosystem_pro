@@ -221,14 +221,14 @@ static void usart1_isr_callback_handler(uint8_t data)
 	 break;
 
 	 case 1:
-	    // if(gpro_t.decoder_success_flag==0){
+	     if(gpro_t.decoder_success_flag==0){
 		 	
 		   rx_data_counter++;
            gl_tMsg.usData[rx_data_counter]=data;
 		  if(gl_tMsg.usData[rx_data_counter]==0xFE){
 		      rx_state = 2;
 		  }
-	     //}
+	     }
 		 
      break;
 			 
@@ -245,19 +245,6 @@ static void usart1_isr_callback_handler(uint8_t data)
 			   gl_tMsg.bcc_check_code = data;
 
                display_board_xtask_notice();
-
-	
-
-
-		 
-
-//		 if(gl_tMsg.usData[rx_data_counter]==0xFE && gl_tMsg.rx_end_code == 0 && rx_data_counter >3){
-
-//		    gl_tMsg.rx_end_code =1;
-
-//		 }
-
-	 
 
 	 break;
 
