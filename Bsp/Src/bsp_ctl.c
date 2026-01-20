@@ -39,6 +39,7 @@ void SystemReset(void)
     *Return Ref: NO
     *
 ************************************************************************/
+#if 0
  void set_temperature_compare_value_fun(void)
 {
 
@@ -177,7 +178,7 @@ void SystemReset(void)
 
 } 
 
-
+#endif 
 /**********************************************************************
     *
     *Functin Name: void copy_cmd_notice_handler(void)
@@ -216,11 +217,13 @@ void ai_mode_display_fun(void)
 	if(gctl_t.mode_ai_switch_flag == 1 && wifi_link_net_state()==1){
 	gctl_t.mode_ai_switch_flag=0;
 	if(gctl_t.gModel ==1){
-	   MqttData_Publish_SetState(1);
+	   MqttData_Publish_AitState(1);
+	   vTaskDelay(200);
 
 	}
 	else if(gctl_t.gModel ==2){
-	  MqttData_Publish_SetState(2);
+	  MqttData_Publish_AitState(2);
+	  vTaskDelay(200);
 	
 	}
 	}

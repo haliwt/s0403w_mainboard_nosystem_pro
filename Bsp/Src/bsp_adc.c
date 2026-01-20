@@ -53,20 +53,16 @@ void adc_detected_hundler(void)
 
 	   if(fan_detect_voltage < 420){
 
-//	      if(fan_detect_voltage > 370 && fan_detect_voltage < 400){
-// 
 
-//		  }
-//		  else{
 		  	  counter_error ++;
 			  if(counter_error > 5){
 			      gpro_t.fan_warning_flag=1;
 				  gctl_t.ptc_on_off_flag = 1;
 			      gctl_t.gDry =0;
-				  ptc_recoder_flag = 0; //WT.EDIT 2025.11.17
+				 
 				  PTC_SetLow();
 			  }
-		  //}
+		  
 
 	   }
 	   else{
@@ -214,7 +210,7 @@ void fan_warning_sound(void)
    
 		   gctl_t.ptc_on_off_flag = 1;
 		   gctl_t.gDry =0;
-		    ptc_recoder_flag = 0; //WT.EDIT 2025.11.17
+		
 		    PTC_SetLow();
 
 

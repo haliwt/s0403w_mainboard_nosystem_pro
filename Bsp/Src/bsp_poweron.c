@@ -54,7 +54,7 @@ void power_on_handler(void)
         /*this works two hours reference start -WT.EDIT 2025.08.11*/
 
 
-        gpro_t.two_hours_state = 0;
+      
 		 gpro_t.stopTwoHours_flag =0;
 		/*end */
        
@@ -112,9 +112,9 @@ void power_on_handler(void)
      }
 	 
 
-      counter_two_hours = 0;
-      gpro_t.gTimer_check_twohours = 0;
-	  gpro_t.gTimer_twohours_seconds_counter = 0;
+
+    
+	 
 	  gpro_t.process_run_step= 6;
 
 	 break;
@@ -154,7 +154,7 @@ void power_on_handler(void)
 			 gctl_t.first_link_tencent_cloud_flag++;
 
             Subscriber_Data_FromCloud_Handler();
-    	  
+    	    vTaskDelay(pdMS_TO_TICKS(200));
 	    }
 		
 		   SendWifiData_To_Data(0x1F,0x01);
@@ -175,12 +175,9 @@ void power_on_handler(void)
 		
      }
 
-	 older_works_run_two_hours_state();
+	 works_run_two_hours_state();
 
-		
-
-
-     gpro_t.process_run_step= 9;
+	gpro_t.process_run_step= 9;
   break;
 
 
@@ -237,11 +234,10 @@ void ActionEvent_Handler(void)
 
    if(gpro_t.stopTwoHours_flag ==1) return ; //WT.EDIT 2025.10.29
    
-   if( ptc_recoder_flag==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
+   if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 
-       
-		 gctl_t.gDry =1;
+      
 		  PTC_SetHigh();
         
 
@@ -257,9 +253,9 @@ void ActionEvent_Handler(void)
 		
 	  }
 	}
-	else if(ptc_recoder_flag ==0){
+	else if(gctl_t.gDry ==0){
 		
-	    gctl_t.gDry =0;
+	  
 		PTC_SetLow();
 		if(ptc_default!=gpro_t.ptc_switch_flag && wifi_link_net_state()==1){
 			gpro_t.ptc_switch_flag++;
@@ -371,12 +367,12 @@ void smartphone_timer_power_on_and_normal_handler(void)
 
 
 
-			if(ptc_recoder_flag ==1){//if(gctl_t.gDry==1){
+		   if(gctl_t.gDry==1){
               
 				SendWifiData_To_Cmd(0x02,0x01);
 				vTaskDelay(pdMS_TO_TICKS(50));
 			}
-			else if(ptc_recoder_flag ==0){
+			else if(gctl_t.gDry ==0){
 					gctl_t.gDry=0;
                     
 					SendWifiData_To_Cmd(0x02,0x0);
@@ -385,9 +381,9 @@ void smartphone_timer_power_on_and_normal_handler(void)
 			}
 
 		     gctl_t.set_wind_speed_value =100;
-	         gpro_t.two_hours_cp_counter =0;//WT.EDIT 2025.11.10
+	      
 		     MqttData_Publish_Update_Data();
-		    // vTaskDelay(pdMS_TO_TICKS(200));
+		     vTaskDelay(pdMS_TO_TICKS(200));
 
 			
 	 
@@ -448,7 +444,7 @@ void power_off_handler(void)
 		
 	
 	  
-        gpro_t.two_hours_state = 0;
+  
 	    gpro_t.stopTwoHours_flag=0;
 
 		  gctl_t.ptc_warning =0;
@@ -461,16 +457,7 @@ void power_off_handler(void)
          gctl_t.set_temperature_flag = 0; 
 		 fan_detect_voltage=1000;
 
-		   counter_two_hours = 0;
-           gpro_t.gTimer_check_twohours = 0;
-		   gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
-		  
-	
-   
-          gpro_t.two_hours_cp_counter=0;
-		
-
-          SetPowerOff_ForDoing();
+	      SetPowerOff_ForDoing();
 		  gpro_t.power_off_run_step = 2;
        
       break;
@@ -588,7 +575,7 @@ void every_power_on_run(void)
      // gctl_t.gModel=1;
       gctl_t.gFan = 1;
       gctl_t.gDry = 1;
-      ptc_recoder_flag =1; //WT.EDIT 2025.11.17
+  
 	 
       //g_dry_open_flag =1;
       gctl_t.gPlasma =1;       //"é„1¤7?é‘„1¤7?"
@@ -601,7 +588,7 @@ void every_power_on_run(void)
 	  gpro_t.ultrasonic_switch_flag++;
 	  gpro_t.plasma_switch_flag++;
 
-	  gpro_t.two_hours_cp_counter=0;
+	
       PLASMA_SetHigh();
       ultrasonic_open();   //ultrasnoic ON 
       PTC_SetHigh();

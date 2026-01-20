@@ -1,6 +1,6 @@
 #include "bsp.h"
 
-uint8_t ptc_recoder_flag ;
+
 
 
 
@@ -9,7 +9,7 @@ uint8_t ptc_recoder_flag ;
 
 void ptc_update_wifi_data(void)
 {
- if(ptc_recoder_flag ==1){//if( gctl_t.gDry==1){
+  if( gctl_t.gDry==1){
    if(gpro_t.fan_warning_flag ==0 && gpro_t.ptc_warning ==0 &&	gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 	   
 		
@@ -17,19 +17,19 @@ void ptc_update_wifi_data(void)
 		
 		   if(wifi_link_net_state()==1){ 
 			   MqttData_Publish_SetPtc(0x01);
-			   //vTaskDelay(pdMS_TO_TICKS(200));
+			   vTaskDelay(pdMS_TO_TICKS(200));
 		   }
 		   
 	   
 	   }
    }
-   else if(ptc_recoder_flag ==0){
-	   gctl_t.gDry =0;
+   else if(gctl_t.gDry ==0){
+	  
 
 	   PTC_SetLow();
 	    if(wifi_link_net_state()==1){ 
 			   MqttData_Publish_SetPtc(0x0);
-			  // vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 		   }
 	   }
  }

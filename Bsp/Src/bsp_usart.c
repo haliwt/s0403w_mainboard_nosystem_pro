@@ -18,9 +18,16 @@ typedef void (*Usart1RxCallback)(uint8_t data);
 
 static Usart1RxCallback usart1_rx_cb = NULL;  //定义一个全局静态函数指针
 
+static void usart1_invoke_callback(uint8_t data);
+
+
 static void usart1_isr_callback_handler(uint8_t data);
+static void parse_recieve_copy_data(uint8_t *pddata);
+
 
 uint8_t rx_inputBuf[12];
+uint8_t check_bcc_code;
+
 
 //提供注册接口
 void usart1_register_rx_callback(Usart1RxCallback cb)
@@ -55,28 +62,6 @@ volatile uint8_t uart1_rx_tail = 0;
 volatile uint8_t rx_state;
 
 
-
-typedef enum ack_sig{
-
-  ack_null,
-  ack_power_on=1 ,
-  ack_power_off=2,
-  ack_wifi_on=3,
-  ack_ptc_on=4,
-  ack_ptc_off=5,
-  ack_plasma_on=6,
-  ack_plasma_off=7,
-  ack_ultra_on=8,
-  ack_ultra_off=9,
-  //wifi cmd
-
-  ack_app_power_on=10,
-  ack_app_power_off=11,
-  ack_app_timer_power_on=12,
-  
-  
-
-}ack_e;
 
 typedef enum{
 
@@ -136,6 +121,8 @@ typedef struct Msg
     uint8_t   data_length;
 	uint8_t   rc_data_length;
 	uint8_t   total_data_length;
+    uint8_t   rx_end_code;
+	uint8_t   rx_total_numbers;
 	uint8_t   rx_data[4];
 	uint8_t   usData[12];
 	uint8_t   desData[12];
@@ -147,16 +134,18 @@ MSG_T   gl_tMsg;
 uint8_t inputBuf[1];
 uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
 
-uint8_t rx_numbers;
+
+static void usart1_protocol_state_machine(uint8_t *pdata);
 
 static void receive_cmd_or_notice_handler(void);
 
 static void parse_recieve_copy_data_handler(void);
 
 
+
 volatile uint8_t rx_data_counter=0;
 
-
+uint8_t parse_exit_flag,parse_decoder_flag;
 /********************************************************************************
 	**
 	*Function Name:void usart1_isr_callback_handler(void)
@@ -167,298 +156,116 @@ volatile uint8_t rx_data_counter=0;
 *******************************************************************************/
 static void usart1_isr_callback_handler(uint8_t data)
 {
-       
-	#if 0    
-       switch(rx_state){
-	
-         case 0:
-	      if(data == FRAME_HEADER){
-	   	   gl_tMsg.usData[rx_data_counter]=data;
-		    rx_data_counter++;
-		    rx_state =1;
+   #if 0    
+	switch(rx_state){
 
-	      }
-		  break;
-
-		  case 1:
-		    if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
-	   	       gl_tMsg.usData[rx_data_counter]=data;
-		       
-			   if(gl_tMsg.usData[rx_data_counter]==0x80){ //new version is copy command or notice 0x80
-			   	 rx_data_counter++;
-			   	 gl_tMsg.copy_cmd_flag=0x80;
-			   	}
-			   else{
-			   	 rx_data_counter++;
-			   	 gl_tMsg.copy_cmd_flag=0;
-		         rx_state =2;
-			   	}
-
-	         }
-			 else{
-			    rx_state =0;
-			    rx_data_counter=0;
-			    gl_tMsg.usData[0]=0;
-			    gl_tMsg.usData[1]=0;
-            }
-
-		  break;
-
-		  case 2: //rx command or notice or oxFF --> copy command or notice .
-		      gl_tMsg.usData[rx_data_counter]=data;
+	case 0:
+		if(data == FRAME_HEADER){
+			rx_data_counter=0;
+			gl_tMsg.usData[rx_data_counter]=data;
 			
-		      if(gl_tMsg.usData[rx_data_counter]==0xFF){ //older version is copy command or notice "0xFF"
-			  	gl_tMsg.copy_cmd_flag=0xFF;
-			    rx_data_counter++;
-
-		      }
-			  else{
-			  	gl_tMsg.copy_cmd_flag=0;
-			  	gl_tMsg.cmd_notice= gl_tMsg.usData[rx_data_counter];
-			    rx_data_counter++;
-			  }
-			  rx_state =3;
-
-
-		  break;
-
-		  case 3: //rx excuite command and notice or data 
-		     
-		      gl_tMsg.usData[rx_data_counter]=data;
-			
-		      if(gl_tMsg.usData[rx_data_counter]==0x0F){ //0x0F -> is receive data .
-				 rx_data_counter++;
-			
-			  	rx_state =7;
-
-			  }
-			  else if(gl_tMsg.copy_cmd_flag==0xFF){
-			      gl_tMsg.cmd_notice= gl_tMsg.usData[rx_data_counter];
-				  rx_data_counter++;
-			      rx_state =4;
-
-
-			  }
-			  else{
-			  	 gl_tMsg.execuite_cmd_notice=gl_tMsg.usData[rx_data_counter];
-				  rx_data_counter++;
-				  rx_state =4;
-				 
-
-			  	}
-
-
-		  break;
-
-		   case 4: //rx is cmmand and notice (new version is frame end "0xFE")
-			  gl_tMsg.usData[rx_data_counter]=data;
-			 
-			  if(gl_tMsg.usData[rx_data_counter]==0){//older version is frame command "0x00"
-			         rx_data_counter++;
-					 gl_tMsg.rx_data_flag = 0;
-					 rx_state =5; //older version 
-
-              }
-			  else if(gl_tMsg.copy_cmd_flag==0xFF){ //copy command or notice execuite 
-                  gl_tMsg.execuite_cmd_notice=gl_tMsg.usData[rx_data_counter];
-				  rx_data_counter++;
-			      rx_state =5; //older version 
-
-
-			  }
-			  else if(gl_tMsg.usData[rx_data_counter]==0xFE){ //new verson protocol is frame end "0xFE"
-
-			          rx_data_counter++;
-					  gl_tMsg.rx_data_flag = 0;
-					  rx_state =6; //new version 
-
-
-			  }
-			  else{
-			  	rx_state =0;
-			    rx_data_counter=0;
-                 gl_tMsg.usData[0]=0;
-				 gl_tMsg.usData[1]=0;
-				 gl_tMsg.usData[2]=0;
-				 gl_tMsg.usData[3]=0;
-				 gl_tMsg.usData[4]=0;
-			  }
-
-		  break;
-
-
-		  
-		case 5: //old version is frame end "0xFE"
-			  gl_tMsg.usData[rx_data_counter]=data;
-			 
-			  if(gl_tMsg.usData[rx_data_counter]==0xFE){//new version id frame end 
-			         rx_data_counter++;
-					 rx_state =6; //new version 
-
-              }
-			  else{
-			  	rx_state =0;
-			    rx_data_counter=0;
-			     gl_tMsg.usData[0]=0;
-				 gl_tMsg.usData[1]=0;
-				 gl_tMsg.usData[2]=0;
-				 gl_tMsg.usData[3]=0;
-				 gl_tMsg.usData[4]=0;
-			  
-			  }
-
-		  break;
-	
-
-		  case 6: //BCC CHECK CODE ,receive success 
-			  
-		  	 gl_tMsg.usData[rx_data_counter]=data;
-			 gl_tMsg.bcc_check_code=gl_tMsg.usData[rx_data_counter];
-		     gl_tMsg.total_data_length = rx_data_counter+1;
-			// memcpy(gl_tMsg.desData,gl_tMsg.usData,(gl_tMsg.total_data_length+1));
-          
-			
-			
-			//gl_tMsg.check_code_hex = bcc_check(gl_tMsg.usData, (gl_tMsg.total_data_length-1));
-	        //if(gl_tMsg.check_code_hex == gl_tMsg.bcc_check_code){
-			 rx_data_counter=0;
-		     rx_state = 0;
-			gl_tMsg.usData[0]=0;
-			gl_tMsg.usData[1]=0;
-	         gl_tMsg.usData[6]=0;
-			 gpro_t.decoder_success_flag=1;
-		     //continue; // 使用 continue 立即跳过下面所有代码，回到 while(1) 顶部
-			 //freertos_decoder_isr_handler();
-			
-
-
-
-		  break;
-
-		  case 7://calculate receive data length.
-
-		      gl_tMsg.usData[rx_data_counter]=data;
-			  gl_tMsg.data_length = gl_tMsg.usData[rx_data_counter];
-			  rx_data_counter++;
-			
-		      if(gl_tMsg.data_length > 0){ //0x0F -> is receive data .
-		         gl_tMsg.rc_data_length =0;
-			  	rx_state =8;
-
-			  }
-			  else{
-			  	
-				 rx_data_counter =0;
-		         rx_state =0;
-				 gl_tMsg.usData[0]=0;
-				 gl_tMsg.usData[1]=0;
-				 gl_tMsg.usData[2]=0;
-				 gl_tMsg.usData[3]=0;
-				 gl_tMsg.usData[4]=0;
-
-			  	}
-
-
-
-		  break;
-
-
-		  
-
-		  case 8: //receive is data of length.
-		  	 
-			 gl_tMsg.usData[rx_data_counter]=data;
-			
-			 gl_tMsg.rx_data[gl_tMsg.rc_data_length++]= gl_tMsg.usData[rx_data_counter];
-		      rx_data_counter++;
-			 
-			 if(gl_tMsg.rc_data_length >=gl_tMsg.data_length){
-                
-			      rx_state =5;
-             }
-			 else rx_state = 8;
-		  	
-		  break;
+			rx_state =1;
 
 		}
-	   #else 
-	   switch(rx_state){
-	  
-		   case 0:
-			if(data == FRAME_HEADER){
-			 gl_tMsg.usData[rx_data_counter]=data;
-			  rx_data_counter++;
-			  rx_state =1;
-	
-			}
-			break;
-	
-			case 1:
-			  if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
-				 gl_tMsg.usData[rx_data_counter]=data;
-				  rx_data_counter++;
-				
-				  rx_state =2;
-			  }
-			  else{
-				  rx_state =0;
-				  rx_data_counter=0;
-		 
-			  }
-	
-			break;
-	
-			case 2: //rx command or notice or oxFF --> copy command or notice .
-				gl_tMsg.usData[rx_data_counter]=data;
-			    rx_data_counter++;
-//			    if(data == 0xA5){
-//				   rx_state =0;
+	break;
 
-//				   rx_data_counter=0;
-//				   gl_tMsg.usData[0]=0;
-//				   gl_tMsg.usData[1]=0;
+	case 1:
+		if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
+			rx_data_counter++;
+			gl_tMsg.usData[rx_data_counter]=data;
+		
 
+			rx_state =2;
+		}
+		else{
+			rx_state =0;
+			rx_data_counter=0;
 
-//				}
-//				else 
+		}
 
-				if(data==0xFE && rx_data_counter>2){ //older version is copy command or notice "0xFF"
-				   
-				    rx_state =3;
-	
-	              
-				}
-				
-				
-	
-			break;
-	
-			case 3: //rx excuite command and notice or data 
-			   
-				gl_tMsg.usData[rx_data_counter]=data;
-				rx_data_counter++;
+	break;
 
-			    rx_numbers =rx_data_counter;
-			
-				 
-			
-				gpro_t.decoder_success_flag=1;
-				rx_data_counter=0;
-			 
-				
-	           rx_state =0;
-				  
-	
-	
-			break;
-	
-			
-	
-	
+	case 2: //rx command or notice or oxFF --> copy command or notice .
+		rx_data_counter++;
+		gl_tMsg.usData[rx_data_counter]=data;
+		
+
+		if(data==0xFE && rx_data_counter>4){ //older version is copy command or notice "0xFF"
+
+			rx_state =3;
+		}
+	break;
+
+	case 3: //rx excuite command and notice or data 
+        rx_data_counter++;
+		//gl_tMsg.usData[rx_data_counter]=data;
+		gl_tMsg.bcc_check_code = data;
+		rx_state =0;
+		gl_tMsg.rx_total_numbers =rx_data_counter;
+		rx_data_counter=0;
+		gpro_t.decoder_success_flag=1;
+		display_board_xtask_notice();
+		
+	break;
+	}
+	#else 
+	switch(rx_state){
+
+	 case 0:
+		if(data == FRAME_HEADER){
+			rx_data_counter=0;
+			gl_tMsg.usData[rx_data_counter]=data;
+			rx_state =1;
+
+		}
+	 break;
+
+	 case 1:
+	    // if(gpro_t.decoder_success_flag==0){
+		 	
+		   rx_data_counter++;
+           gl_tMsg.usData[rx_data_counter]=data;
+		  if(gl_tMsg.usData[rx_data_counter]==0xFE){
+		      rx_state = 2;
 		  }
+	     //}
+		 
+     break;
+			 
+	 case 2:
+		       rx_data_counter++;
+	           gl_tMsg.usData[rx_data_counter]=data;
+	           rx_state = 0;
+               gl_tMsg.rx_total_numbers = rx_data_counter;
+
+			   gl_tMsg.rx_end_code = 0;
+			   
+		       gpro_t.decoder_success_flag=1;
+
+			   gl_tMsg.bcc_check_code = data;
+
+               display_board_xtask_notice();
+
+	
 
 
-	   #endif 
+		 
+
+//		 if(gl_tMsg.usData[rx_data_counter]==0xFE && gl_tMsg.rx_end_code == 0 && rx_data_counter >3){
+
+//		    gl_tMsg.rx_end_code =1;
+
+//		 }
+
+	 
+
+	 break;
+
+	 }
+
+	#endif 
+
+
 }
 /********************************************************************************
 	**
@@ -468,135 +275,31 @@ static void usart1_isr_callback_handler(uint8_t data)
 	*Return Ref:NO
 	*
 *******************************************************************************/
-uint8_t parse_exit_flag,parse_decoder_flag;
-
-void usart1_protocol_state_machine(void)
+static void usart1_protocol_state_machine(uint8_t *pdata)
 {
-  
 
-
-   uint8_t i;
-   memcpy(rx_inputBuf,gl_tMsg.usData,rx_numbers);
-
-   parse_decoder_flag=1;
-
-   while(parse_decoder_flag==1){
-	
-        if(rx_inputBuf[2]==0xFF){ //copy command 
-
-		     gl_tMsg.copy_cmd_flag = 0xFF;
-			  
-		     gl_tMsg.cmd_notice = rx_inputBuf[3];
-		
-		
-		     gl_tMsg.execuite_cmd_notice = rx_inputBuf[4];
-			
-		  
-			 parse_exit_flag =1;
-
-			 rx_data_counter=0;
-			
-			 
-		 }
-		 else{
-		 	gl_tMsg.copy_cmd_flag = 0;
-			gl_tMsg.cmd_notice = rx_inputBuf[2];
-            //gl_tMsg.usData[rx_data_counter] = inputBuf[3];
-          
-           if(inputBuf[3]==0x0F){ //is data frame ,don't is command 
-
-               gl_tMsg.data_length =rx_inputBuf[4]; //receive data of length
-               gl_tMsg.execuite_cmd_notice=0;
-               for(i=0;i<gl_tMsg.data_length;i++){
-		          rx_data_counter++;
-               
-			      gl_tMsg.rx_data[i] = rx_inputBuf[4+rx_data_counter];
-         
-                 
-               }
-			   rx_data_counter=0;
-   
-			    parse_exit_flag=1;
-			
-		 
-           }
-		   else if(inputBuf[3]!=0x0F){
-                gl_tMsg.execuite_cmd_notice =  rx_inputBuf[3];
-				 rx_data_counter=0;
-				
-                parse_exit_flag=1;
-		
-		  
-			 
-
-            }
-		  
-
-		 }
-
-   if(parse_exit_flag==1){
-   	
-   
-   if(gl_tMsg.copy_cmd_flag == 0){
  
-	  receive_cmd_or_notice_handler();
-	   
+  static uint8_t ptc_on_default =0xff, ptc_off_default = 0xff;
+   switch(pdata[2]){
 
-   }
-   else{
+   case 0:
 
-        parse_recieve_copy_data_handler();
-	
-   
+   break;
 
-   }
-     parse_exit_flag++;
-	parse_decoder_flag=0;
-
-   }
-   }
-
-}
-
-/**********************************************************************
-    *
-    *Function Name:void receive_data_from_display(uint8_t *pdata,uint8_t len)
-    *Function: receive usart touchkey of command 
-    *Input Ref:NO
-    *Return Ref:NO
-    *
-**********************************************************************/
-static void receive_cmd_or_notice_handler(void)
-{
-
-   static uint8_t wifi_link_counter,ptc_tx_default=0xff;
-   static uint8_t plasma_tx_default =0xff, sonic_tx_default = 0xff;
-   	switch(gl_tMsg.cmd_notice){
-
-   
-
-     case 0:
-
-
-     break;
-
-     case power_on_off: 
+   case power_on_off: 
 
          
-        if(gl_tMsg.execuite_cmd_notice  == 0x01){ //open
+        if(pdata[3] == 0x01){ //open
 
 		        buzzer_sound();//buzzer_sound_fun();
 	            SendWifiData_Answer_Cmd(0x01,0x01);
 	            vTaskDelay(pdMS_TO_TICKS(100));
-	            wifi_link_counter=0;
+	         
 	            gpro_t.process_run_step=0;
 	           	gpro_t.gpower_on = power_on;
 
-			
-  
-
-        }
-        else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
+		 }
+        else if(pdata[3] == 0x0){ //close 
 
 		
 			  buzzer_sound();
@@ -604,8 +307,8 @@ static void receive_cmd_or_notice_handler(void)
               SendWifiData_Answer_Cmd(0x01,0x02); //power off .
 
               vTaskDelay(pdMS_TO_TICKS(100)); 
-              wifi_link_counter=0;
-             
+      
+         
              
              gpro_t.power_off_run_step=1;
              gpro_t.gpower_on = power_off;
@@ -615,197 +318,108 @@ static void receive_cmd_or_notice_handler(void)
 
      break;
 
-	 case 0x30:
+	  case ptc_on_off: //PTC key of command .
 
-	   if(gl_tMsg.execuite_cmd_notice  == 0x01){ //open
-
-		      
-	            SendWifiData_Answer_Cmd(0x30,0x01);
-	            vTaskDelay(pdMS_TO_TICKS(100));
-	            wifi_link_counter=0;
-	            gpro_t.process_run_step=0;
-	           	gpro_t.gpower_on = power_on;
-
-			
-  
-
-       }
-       else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
-
-		
-			
-
-              SendWifiData_Answer_Cmd(0x30,0x02); //power off .
-
-              vTaskDelay(pdMS_TO_TICKS(100)); 
-              wifi_link_counter=0;
-             
-             
-             gpro_t.power_off_run_step=1;
-             gpro_t.gpower_on = power_off;
-			 
-		     
-        }
-
-
-	 break;
-
-     case ptc_on_off: //PTC key of command .
-
-     if(gl_tMsg.execuite_cmd_notice  == 0x01 && gpro_t.gpower_on == power_on){//phone_cmd_power
+       if(pdata[3] == 0x01 && gpro_t.gpower_on == power_on){//phone_cmd_power
 
 	      buzzer_sound();
+		  gctl_t.gDry = 1;
+	
+	     gctl_t.ptc_on_off_flag=0;
 		 if(gpro_t.stopTwoHours_flag==0){//two hours have a rest ten minutes .
          if(gpro_t.ptc_warning ==0 && gpro_t.fan_warning_flag ==0){ //PTC warning flag
+             
               PTC_SetHigh();
-              
-		      gctl_t.gTimer_senddata_panel=7;//at once run ptc function.
-          
-      
-         
-          SendWifiData_Answer_Cmd(0x02,0x01); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
+             
+           SendWifiData_Answer_Cmd(0x02,0x01); //
+           vTaskDelay(pdMS_TO_TICKS(50)); 
 		
-          gctl_t.gDry = 1;
-		  ptc_recoder_flag = 1;
-		 
-	
-		  if(ptc_tx_default != gpro_t.ptc_switch_flag){
-		  	  gpro_t.ptc_switch_flag++;
-		  	  ptc_tx_default = gpro_t.ptc_switch_flag;
-	          
-
-		  }
-		  
-		  if(gctl_t.app_timer_power_on_flag==1){
-		  	gctl_t.app_timer_power_on_flag=0;
-		    gctl_t.ptc_on_off_flag =0; //WT.EDIT 2025.12.19
-
-		  }
+           }
 
 		 }
-		 else{
-		  gctl_t.gDry =0;
-	      PTC_SetLow();
-		  ptc_recoder_flag = 0;
-
-
-
-		 }
-  
-      
-	      
-       }
-       else if(gl_tMsg.execuite_cmd_notice  == 0x0 && gpro_t.gpower_on == power_on){
+	   }
+       else if(pdata[3]== 0x0 && gpro_t.gpower_on == power_on){
 	   
 		 
           buzzer_sound();
           gctl_t.gDry =0;
 	      PTC_SetLow();
-		  ptc_recoder_flag = 0;
+		
+		  gctl_t.ptc_on_off_flag =1;
           SendWifiData_Answer_Cmd(0x02,0x0); //
           vTaskDelay(pdMS_TO_TICKS(50)); 
      
-       
-         gctl_t.gTimer_senddata_panel=7; //at once run ptc function.
-		 gctl_t.app_timer_power_on_flag=0;
-		 if(ptc_tx_default != gpro_t.ptc_switch_flag){
-		  	  gpro_t.ptc_switch_flag++;
-		  	  ptc_tx_default = gpro_t.ptc_switch_flag;
-	          
-
-		  }
-
        }
-     }
+      break;
 
-     break;
-
+	  
      case plasma_on_off: //PLASMA ACTIVE OPEN OR CLOSE
+   
+		  if(pdata[3]== 0x01){
+			 
+			buzzer_sound();
+			
+			 gctl_t.gPlasma = 1;
+			 if(gpro_t.stopTwoHours_flag==0){
+				 PLASMA_SetHigh() ;
+   
+			}
 
-        if(gl_tMsg.execuite_cmd_notice == 0x01){
-           
-          buzzer_sound();
-          SendWifiData_Answer_Cmd(0x03,0x01); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
-           
-           gctl_t.gPlasma = 1;
-		   if(gpro_t.stopTwoHours_flag==0){
-               PLASMA_SetHigh() ;
 
+			SendWifiData_Answer_Cmd(0x03,0x01); //
+			vTaskDelay(pdMS_TO_TICKS(50)); 
+			 
 		  }
-		   
-		   if(plasma_tx_default != gpro_t.plasma_switch_flag){
-		   	    gpro_t.plasma_switch_flag++;
-		      	plasma_tx_default = gpro_t.plasma_switch_flag;
-		        
-            }
-           
-          
-        }
-        else if(gl_tMsg.execuite_cmd_notice  == 0x0){
-           buzzer_sound();
-          SendWifiData_Answer_Cmd(0x03,0x0); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
-           
-           gctl_t.gPlasma = 0;
-		   PLASMA_SetLow();
-		     if(plasma_tx_default != gpro_t.plasma_switch_flag){
-		   	    gpro_t.plasma_switch_flag++;
-		      	plasma_tx_default = gpro_t.plasma_switch_flag;
-		        
-            }
-         
-        
-          PLASMA_SetLow();
+		  else if(pdata[3]  == 0x0){
+			 buzzer_sound();
+			
+			 
+			 gctl_t.gPlasma = 0;
+			 PLASMA_SetLow();
 
-        }
-
-
-     break;
-
-
-      case 0x04: //ultrasonic  ACTIVE OPEN OR CLOSE
-
-        if(gl_tMsg.execuite_cmd_notice  == 0x01){  //open 
-          
-          gctl_t.gUlransonic =1;
-
-		  if(gpro_t.stopTwoHours_flag==0){
-               ultrasonic_open();
-
-		  }
-		  if(sonic_tx_default != gpro_t.ultrasonic_switch_flag){
-                 gpro_t.ultrasonic_switch_flag++;
-		         sonic_tx_default = gpro_t.ultrasonic_switch_flag;
-
-		  }
-          SendWifiData_Answer_Cmd(0x04,0x01); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
-
-        }
-        else if(gl_tMsg.execuite_cmd_notice  == 0x0){ //close 
-
-          gctl_t.gUlransonic = 0;
-
-		  ultrasonic_close();
+			SendWifiData_Answer_Cmd(0x03,0x0); //
+			vTaskDelay(pdMS_TO_TICKS(50)); 
+			  
 		  
-          if(sonic_tx_default != gpro_t.ultrasonic_switch_flag){
-                 gpro_t.ultrasonic_switch_flag++;
-		         sonic_tx_default = gpro_t.ultrasonic_switch_flag;
-
 		  }
-          SendWifiData_Answer_Cmd(0x04,0x0); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
+   
+   
+	break;
 
-        }
+	   
+   	case 0x04: //ultrasonic	ACTIVE OPEN OR CLOSE
+   
+		  if(pdata[3]  == 0x01){  //open 
+			
+			gctl_t.gUlransonic =1;
+   
+			if(gpro_t.stopTwoHours_flag==0){
+				 ultrasonic_open();
+   
+			}
+			
+			SendWifiData_Answer_Cmd(0x04,0x01); //
+			vTaskDelay(pdMS_TO_TICKS(50)); 
+   
+		  }
+		  else if(pdata[3] == 0x0){ //close 
+   
+			gctl_t.gUlransonic = 0;
+   
+			ultrasonic_close();
+			
+			SendWifiData_Answer_Cmd(0x04,0x0); //
+			vTaskDelay(pdMS_TO_TICKS(50)); 
+   
+		  }
+   
+   
+    break;
 
+	
+     case  wifi_link: // link wifi command
 
-     break;
-
-      case  wifi_link: // link wifi command
-
-       if(gl_tMsg.execuite_cmd_notice == 0x01){  // link wifi 
+       if(pdata[3] == 0x01){  // link wifi 
         
         
           gpro_t.link_net_step =0;
@@ -816,7 +430,7 @@ static void receive_cmd_or_notice_handler(void)
 		  
           gctl_t.gTimer_linkTencentCounter=0; //total times is 120s
           SendWifiData_Answer_Cmd(0x05,0x01); //WT.EDIT 2024.12.28
-          vTaskDelay(pdMS_TO_TICKS(10));
+          vTaskDelay(pdMS_TO_TICKS(100));
 
       
         }
@@ -824,192 +438,156 @@ static void receive_cmd_or_notice_handler(void)
 
      break;
 
-     case buzzer_sound_s: //buzzer sound command 
+	  case buzzer_sound_s: //buzzer sound command 
 
           buzzer_sound();
-		  //vTaskDelay(pdMS_TO_TICKS(5));
+		 
      break;
 
-	 case 0x07: //AI command
-	  if(gl_tMsg.execuite_cmd_notice == 0x02){
-	       buzzer_sound();
+
+	  case 0x16 : //buzzer sound command with answer .
+
+        buzzer_sound();
+        
+         SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+
+		  vTaskDelay(pdMS_TO_TICKS(100));
+		  
+       break;
+
+      case 0x27: //AI command without buzzer sound
+	  case 0x17: //AI notice
+	  
+	  if(pdata[3] == 0x02){
+	 
 		
           gctl_t.gModel=2;
           gctl_t.mode_ai_switch_flag =1;
-          SendWifiData_Answer_Cmd(0x07,0x02); //
-          vTaskDelay(pdMS_TO_TICKS(100)); 
+        
+		  
+	      if(wifi_link_net_state()==1){
+	          MqttData_Publish_AitState(2);
+			   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+	       }
         
           
        }
-       else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
+       else if(pdata[3] == 0x01){ //AI mode 
        
-	
-         buzzer_sound();
-         gctl_t.gModel=1;
+	     gctl_t.gModel=1;
 	     gctl_t.mode_ai_switch_flag =1;
-         SendWifiData_Answer_Cmd(0x07,0x01); //
-         vTaskDelay(pdMS_TO_TICKS(100)); 
+         if(wifi_link_net_state()==1){
+	         MqttData_Publish_AitState(1);
+			 vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+	      }
 		 
        }
 
 
 	 break;
 
-     case 0x16 : //buzzer sound command with answer .
+	  case 0x19: //works 2 hours ,then have a rest 10 minutes ->notice 
 
-        buzzer_sound();
-        
+	    if(pdata[3]==1){ // recach 2 hours 
 
-		  gpro_t.answer_buzzer_flag = 1;//WT.EDIT 2025.07.28 
+           gpro_t.stopTwoHours_flag=1;
+		   gctl_t.gTimer_fan_run_one_minute = 0;
+		    PTC_SetLow();
+			PLASMA_SetHigh() ;
+            ultrasonic_close();
+			
+		}
+		else if(pdata[3]==0){
+
+              if(gctl_t.gDry ==1 && gctl_t.ptc_on_off_flag==0) PTC_SetHigh();
+			  if(gctl_t.gPlasma==1)PLASMA_SetHigh();
+			  if(gctl_t.gUlransonic==1) ultrasonic_open();
+		}
+	   
+
+	  break;
 
 
-          SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
+	  case 0x1B: //write set temperature value .data.2026.01.06
+      case 0x2A:
 
-		  vTaskDelay(pdMS_TO_TICKS(100));
-		  
-       break;
-
-
-	  case 0x1A: //receive from display board set temperature value .
-
-	  case 0x19: //write set temperature value .data.2026.01.06
-
-	   if(gpro_t.soft_version ==1){
+	   if(pdata[4]==0x01){
 	      // gctl_t.set_temperature_flag = 1; 
-	     
-	       gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
+	       if(pdata[5] >19 && pdata[5] < 41){
+	       gctl_t.set_temperature_value = pdata[5] ;
 		   gctl_t.ptc_on_off_flag =0;
-		   gctl_t.set_temp_first_closeptc=0;
-		   gctl_t.rx_set_temp_flag =0;
-		   
-	
-		   
-	       if(wifi_link_net_state()==1){
-	            MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-			      vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+
+		   if(wifi_link_net_state()==1){
+	           MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
+			   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
 	        }
-	   }
-	   else{
-	      gctl_t.set_temperature_value = gl_tMsg.rx_data[0]  ;
-
-	      if(wifi_link_net_state()==1){
-	            MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-			      vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
-	        }
-
-
-	   }
-
+	       }
+	   
+	    }
+   	
         
       break;
 
+
 	  
-	 case 0x1C: //display board to send time of value for two hours stop have a rest.
-				//no sound is notice
-			   if(gl_tMsg.rx_data[0]== 0x78 &&  gpro_t.soft_version ==1){ //2 hours 
-	 
-                  gpro_t.stopTwoHours_flag = 1;
-				  SendWifiData_Answer_Cmd(0x1C,0x01); //WT.EDIT 2025.07.28
-                  vTaskDelay(pdMS_TO_TICKS(100));
-				  
-				  #if DEBUG_FLAG
-
-				  printf("rx_stopTwo_Hours_flag = 1 !!!!\r\n");
-
-				  #endif 
-
-                 
-			 
-			   }
-			   else if(gl_tMsg.rx_data[0]== 0x0A && gpro_t.soft_version ==1){ //10mintues
-                 gpro_t.stopTwoHours_flag =0;
-				
-			     SendWifiData_Answer_Cmd(0x1C,0x0); //WT.EDIT 2025.07.28
-                 vTaskDelay(pdMS_TO_TICKS(100));
-			      #if DEBUG_FLAG
-
-				  printf("rx_stopTwo_Hours_flag = 0 @@@@@\r\n");
-
-				  #endif 
-				 ActionEvent_Handler();
-			     
-				
-				 
-			  }
-	 
-	 break;
-
-     
-
-     case 0x22: //PTC notice don't buzzer sound
-        if(gl_tMsg.execuite_cmd_notice== 0x01){
-        gctl_t.gDry = 1;
-		ptc_recoder_flag =1 ;//WT.EDIT 2025.11.17
-		gpro_t.ptc_switch_flag ++;
-		
-		
-        if(gpro_t.stopTwoHours_flag ==0){
-              PTC_SetHigh();
-        }
-		if(wifi_link_net_state()==1){ 
-			MqttData_Publish_SetPtc(0x01);
+     case 0x1C: // is time data: hours,minutes,sencodes.
+		   
+		  if(pdata[4]==0x03){ 
+         
+		       
 			
-		}
+			
+		   
+			
+		 }
 
-		 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
-         vTaskDelay(pdMS_TO_TICKS(100));
-		
-   
-			#if DEBUG_FLAG
+	break;
 
-			//  printf("disp_gDry = %d\r\n",gctl_t.gDry);
 
-			#endif 
-          
+	case 0x22: //PTC ON OR OFF by compare temperature value .
+        if(pdata[3]== 0x01){
+
+		if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
+		   gctl_t.gDry = 1;
+
+		   if(ptc_on_default != gctl_t.gDry){
+              ptc_on_default = gctl_t.gDry;
+		      PTC_SetHigh();
+	        
+			 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
+	         vTaskDelay(pdMS_TO_TICKS(100));
+			 if(wifi_link_net_state()==1){ 
+				  MqttData_Publish_SetPtc(0x01);
+				  vTaskDelay(200);
+				
+			  }
+		  }
+	  } 
       }
-      else if(gl_tMsg.execuite_cmd_notice== 0x0){
+      else if(pdata[3]== 0x0){
         
           gctl_t.gDry =0;
-		  ptc_recoder_flag =0 ;
-	
-          PTC_SetLow();
-          gpro_t.ptc_switch_flag++;
-		  
 
+	      if(ptc_off_default != gctl_t.gDry){
+              ptc_off_default = gctl_t.gDry;
+	       PTC_SetLow();
+        
 		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
            vTaskDelay(pdMS_TO_TICKS(100));
 
 		  
 		  if(wifi_link_net_state()==1){ 
 			MqttData_Publish_SetPtc(0x0);
-			
+			vTaskDelay(200);
 		  }
          
-		  	
-			#if DEBUG_FLAG
-
-			//  printf("disp_gDry = %d\r\n",gctl_t.gDry);
-
-			#endif 
+	      }
 			 
       }
    
      break;
 
-     case 0x27: //AI command without buzzer sound
-
-	    if(gl_tMsg.execuite_cmd_notice == 0x02){
-		 
-	          gctl_t.gModel=2;
-			  gctl_t.mode_ai_switch_flag =1;
-		}
-	    else if(gl_tMsg.execuite_cmd_notice == 0x01){ //AI mode 
-	        gctl_t.gModel=1;
-		    gctl_t.mode_ai_switch_flag =1; 
-		}
-    break;
-
-     case 0xF0: //software version difference older and new sotfware 
+	 case 0xF0: //software version difference older and new sotfware 
       
             gpro_t.soft_version = gl_tMsg.rx_data[0];
 	 
@@ -1022,12 +600,17 @@ static void receive_cmd_or_notice_handler(void)
 			 
 		
 
-	 break;
+    break;
 
-	
-    }
 
-	
+	case 0xFF: //copy comand or notice or data.
+
+	       parse_recieve_copy_data(pdata) ;
+
+	break;
+
+	}
+
 }
 /**********************************************************************
 	*
@@ -1037,126 +620,38 @@ static void receive_cmd_or_notice_handler(void)
 	*Return Ref:NO
 	*
 **********************************************************************/
-static void parse_recieve_copy_data_handler(void)
+static void parse_recieve_copy_data(uint8_t *pddata)
 {
 
+    switch(pddata[3]){
     
-     switch(gl_tMsg.cmd_notice){
-    
-        case ack_null:
+       case 0:
     
     
-        break;
-    
-        case 0x10: //power on or off notice .--older version 
-            
-          if(gl_tMsg.execuite_cmd_notice == 0x01){
-		  	 if(gpro_t.gpower_on == power_on){
-               gpro_t.copy_cmd_notice_buff[1] =COPY_OK;
-		  	 }
-			 else{ 
-             	gpro_t.copy_cmd_notice_buff[1] =COPY_NG;
-				gpro_t.gTimer_timer_start_counter = 0;//start_timer(0);
+       break;
 
-			 }
-            
-          }
-          else if(gl_tMsg.execuite_cmd_notice == 0){
-             if(gpro_t.gpower_on == power_off)
-                gpro_t.copy_cmd_notice_buff[1] =COPY_OK;
-			 else 
-             	 gpro_t.copy_cmd_notice_buff[1] =COPY_NG;
-                 gpro_t.gTimer_timer_start_counter = 0;//start_timer(0);
-          }
-                    
-         
-        break;
-    
-        case 0x012 ://ptc open or close
-    
-          
-          if(gl_tMsg.execuite_cmd_notice == 0x01){
+	   case 0x01:
 
-		     if(ptc_recoder_flag ==1)//if(gctl_t.gDry ==1)
-               gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
-			else if(ptc_recoder_flag ==0){
-			  gpro_t.copy_cmd_notice_buff[2] =COPY_NG;
-			  gpro_t.gTimer_timer_start_counter = 0;
-			}
-            
-          }
-          else if(gl_tMsg.execuite_cmd_notice == 0){
-            if(ptc_recoder_flag ==0){//if(gctl_t.gDry ==0){
-                gpro_t.copy_cmd_notice_buff[2] =COPY_OK;
-            }
-			else if(ptc_recoder_flag == 1){
-			  gpro_t.copy_cmd_notice_buff[2] =COPY_NG;
-			  gpro_t.gTimer_timer_start_counter = 0;
-			 }
-          }
-    
-    
-        break;
+	     if(pddata[4] == 0x01){ //open
 
-		case 0x31: //phone power on 
-		  if(gl_tMsg.execuite_cmd_notice == 0x01){
-           
-             //gctl_t.ptc_warning =0;
-			
-	        ///gpro_t.fan_warning_flag =0;
-	        //gpro_t.power_off_run_step=1;
-	        //powerOffFanRun_flag = 1;
-	
-			//gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
-			gpro_t.phone_power_on_flag = 0; //ack_app_power_on;
-	     
+		    gpro_t.process_run_step=0;
+	        gpro_t.gpower_on = power_on;
 
-		   }
+		 }
+        else if(pddata[4] == 0x0){ //close 
 
-		break;
+		   gpro_t.power_off_run_step=1;
+           gpro_t.gpower_on = power_off;
+			 
+		}
+	   
 
-		case 0x30: //phone power off 
+	   break;
 
-		  if(gl_tMsg.execuite_cmd_notice == 0x00){
-			           //gpro_t.gpower_on = power_off;
-					   //gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
-					   //powerOffFanRun_flag = 1;
-					   gpro_t.phone_power_on_flag = 0; //ack_app_power_off;
-					
-
-               
-
-		    }
-
-		break;
-
-        case ack_app_timer_power_on:
-
-          
-
-        break;
-    
-        case ack_wifi_on:
-    
-         
-    
-    
-        break;
-    
-        case ack_ptc_on:
-    
-    
-        break;
-    
-        case ack_ptc_off:
-    
-        break;
-    
-    
-        }
- 
-
-}
+	   
+    }
+      
+ }
 
 /**
   * @brief This function handles USART1 global interrupt 
@@ -1170,11 +665,9 @@ void USART1_IRQHandler(void)
   // static uint8_t rx_flag;
    if(LL_USART_IsActiveFlag_RXNE_RXFNE(USART1)){
    
-      //LL_USART_ClearFlag_RXNE(USART1);
+     
       data = LL_USART_ReceiveData8(USART1);
-      //usart1_isr_callback_handler(data);
-       //  usart1_invoke_callback(data);
-       usart1_isr_callback_handler(data);
+      usart1_isr_callback_handler(data);
 
      
 
@@ -1197,14 +690,10 @@ void USART1_IRQHandler(void)
 **/
 void decoder_handler(void)
 {
-if(gpro_t.decoder_success_flag==1){
-	
-	gpro_t.decoder_success_flag++;
-	
-	usart1_protocol_state_machine();
-	
-
-		
-}
+    gpro_t.decoder_success_flag=0;
+	check_bcc_code = bcc_check(gl_tMsg.usData,gl_tMsg.rx_total_numbers);
+	if(check_bcc_code == gl_tMsg.bcc_check_code){
+		usart1_protocol_state_machine(gl_tMsg.usData);
+    }
 }
 

@@ -9,7 +9,7 @@
 #define PTC_SetLow()       LL_GPIO_ResetOutputPin(RELAY_GPIO_Port,RELAY_Pin)//do{RELAY_GPIO_Port->BSRR = (uint32
 
 
-extern uint8_t ptc_recoder_flag ;
+
 
 
 

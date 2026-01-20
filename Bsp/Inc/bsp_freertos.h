@@ -8,6 +8,7 @@ void freeRTOS_Handler(void);
 
 
 
+void display_board_xtask_notice(void);
 
 
 

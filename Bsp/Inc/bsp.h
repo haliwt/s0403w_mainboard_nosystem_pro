@@ -126,7 +126,8 @@ typedef struct PROCESS_T{
    uint8_t copy_cmd_notice_buff[10];
    //copy command 
 
-   uint8_t two_hours_cp_counter;
+ 
+ 
 
 
    uint8_t get_beijing_flag;
@@ -137,7 +138,7 @@ typedef struct PROCESS_T{
    uint8_t phone_power_on_flag;
    //uint8_t gFan_pwm_duty_level;
    uint8_t answer_buzzer_flag ;
-   uint8_t two_hours_state ;
+ 
 	
 	
      uint8_t ptc_switch_flag;
@@ -171,8 +172,8 @@ typedef struct PROCESS_T{
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
    uint8_t gTimer_timer_start_counter;
-   uint8_t gTimer_check_twohours;
-   uint8_t gTimer_twohours_seconds_counter;
+  
+
   
   
 
