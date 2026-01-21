@@ -26,7 +26,7 @@ static StackType_t xTaskMsgProStack[512];
 
 /* vTaskStart 任务 */
 static StaticTask_t xTaskStartTCB;
-static StackType_t xTaskStartStack[128];
+static StackType_t xTaskStartStack[256];
 
 
 
@@ -207,7 +207,7 @@ void AppTaskCreate (void)
 	xHandleTaskStart = xTaskCreateStatic(
 			vTaskStart, 			/* 任务函数 */
 			"vTaskStart",			/* 任务名 */
-			128,					/* 栈大小（word） */
+			256,					/* 栈大小（word） */
 			NULL,					/* 参数 */
 			2,						/* 优先级 */
 			xTaskStartStack,		/* 栈数组 */
@@ -261,8 +261,9 @@ static void power_run_handler(void)
             ai_mode_display_fun();
 
 			//ack_handler();
-            if(gpro_t.process_run_step > 10){
-				gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
+            if(gpro_t.process_run_step > 10 || gpro_t.stopTwoHours_flag > 1){
+				 if(gpro_t.process_run_step > 10 )gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
+				if(gpro_t.stopTwoHours_flag > 1)gpro_t.stopTwoHours_flag =0;
             }
 		   
 			

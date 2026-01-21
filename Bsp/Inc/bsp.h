@@ -131,7 +131,7 @@ typedef struct PROCESS_T{
 
 
    uint8_t get_beijing_flag;
-   volatile uint8_t stopTwoHours_flag;
+   uint8_t stopTwoHours_flag;
 
    uint8_t receive_copy_cmd ;
    uint8_t send_ack_cmd;
@@ -139,9 +139,9 @@ typedef struct PROCESS_T{
    //uint8_t gFan_pwm_duty_level;
    uint8_t answer_buzzer_flag ;
  
+   uint8_t rx_ptc_flag;
 	
-	
-     uint8_t ptc_switch_flag;
+    
 	 uint8_t ultrasonic_switch_flag;
 	 uint8_t plasma_switch_flag;
     volatile uint8_t process_run_step;
@@ -194,6 +194,10 @@ void wifi_communication_tnecent_handler(void);
 void wifi_auto_detected_link_state(void);
 
 void waiting_ack_handler(void);
+
+
+ uint8_t get_ptc_value(void);
+
 
 
 #endif 

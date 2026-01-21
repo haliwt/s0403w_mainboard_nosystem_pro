@@ -221,14 +221,14 @@ static void usart1_isr_callback_handler(uint8_t data)
 	 break;
 
 	 case 1:
-	     if(gpro_t.decoder_success_flag==0){
+	    // if(gpro_t.decoder_success_flag==0){
 		 	
 		   rx_data_counter++;
            gl_tMsg.usData[rx_data_counter]=data;
 		  if(gl_tMsg.usData[rx_data_counter]==0xFE){
 		      rx_state = 2;
 		  }
-	     }
+	    /// }
 		 
      break;
 			 
@@ -307,10 +307,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 	  case ptc_on_off: //PTC key of command .
 
-       if(pdata[3] == 0x01 && gpro_t.gpower_on == power_on){//phone_cmd_power
+       if(pdata[3] == 0x01 ){//phone_cmd_power
 
 	      buzzer_sound();
-		  gctl_t.gDry = 1;
+		  gpro_t.rx_ptc_flag = 1;
+		  //gctl_t.gDry = 1;
 	
 	     gctl_t.ptc_on_off_flag=0;
 		 if(gpro_t.stopTwoHours_flag==0){//two hours have a rest ten minutes .
@@ -325,11 +326,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 		 }
 	   }
-       else if(pdata[3]== 0x0 && gpro_t.gpower_on == power_on){
+       else if(pdata[3]== 0x0 ){
 	   
 		 
           buzzer_sound();
-          gctl_t.gDry =0;
+          gpro_t.rx_ptc_flag = 0;
+	   
+          //gctl_t.gDry =0;
 	      PTC_SetLow();
 		
 		  gctl_t.ptc_on_off_flag =1;
@@ -435,9 +438,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	  if(pdata[3]== 0x01){
 
 	    gctl_t.ptc_on_off_flag =0;
+		gpro_t.rx_ptc_flag = 1;
 
 		if(gpro_t.stopTwoHours_flag ==0){
-		   gctl_t.gDry = 1;
+		
            PTC_SetHigh();
 	        
 			 SendWifiData_Answer_Cmd(0x12,0x01); //WT.EDIT 2025.07.28
@@ -452,8 +456,8 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
       else if(pdata[3]== 0x0){
 
 	      gctl_t.ptc_on_off_flag =0;
-        
-          gctl_t.gDry =0;
+          gpro_t.rx_ptc_flag = 0;
+          //gctl_t.gDry =0;
 
 	 
 	      PTC_SetLow();
@@ -529,7 +533,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		}
 		else if(pdata[3]==0){
 
-              if(gctl_t.gDry ==1 && gctl_t.ptc_on_off_flag==0) PTC_SetHigh();
+              if(get_ptc_value() ==1 && gctl_t.ptc_on_off_flag==0) PTC_SetHigh();
 			  if(gctl_t.gPlasma==1)PLASMA_SetHigh();
 			  if(gctl_t.gUlransonic==1) ultrasonic_open();
 		}
@@ -542,7 +546,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
       case 0x2A:
 
 	   if(pdata[4]==0x01){
-	      // gctl_t.set_temperature_flag = 1; 
+	      
 	       if(pdata[5] >19 && pdata[5] < 41){
 	       gctl_t.set_temperature_value = pdata[5] ;
 		   gctl_t.ptc_on_off_flag =0;
@@ -562,14 +566,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	  
      case 0x1C: // is time data: hours,minutes,sencodes.
 		   
-		  if(pdata[4]==0x03){ 
-         
-		       
-			
-			
-		   
-			
-		 }
+		 
 
 	break;
 
@@ -578,10 +575,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
         if(pdata[3]== 0x01){
 
 		if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
-		   gctl_t.gDry = 1;
+		   gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
 
-		   if(ptc_on_default != gctl_t.gDry){
-              ptc_on_default = gctl_t.gDry;
+		   if(ptc_on_default != get_ptc_value()){
+              ptc_on_default = get_ptc_value();
 		      PTC_SetHigh();
 	        
 			 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
@@ -596,10 +593,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
       }
       else if(pdata[3]== 0x0){
         
-          gctl_t.gDry =0;
+          gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
 
-	      if(ptc_off_default != gctl_t.gDry){
-              ptc_off_default = gctl_t.gDry;
+	      if(ptc_off_default != get_ptc_value()){
+              ptc_off_default = get_ptc_value();
 	       PTC_SetLow();
         
 		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
@@ -616,6 +613,23 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
       }
    
      break;
+
+	 case 0x6C: //Synchronize local time ->two display board 
+
+	   if(pdata[4]==0x03){ 
+
+		     if(pdata[5] < 24 && pdata[6] < 61 && pdata[7] < 61){
+         
+		      gpro_t.disp_works_hours= pdata[5];
+			 
+			  gpro_t.disp_works_minutes =pdata[6];
+
+			  gpro_t.gTimer_works_time_seconds=pdata[7];
+			
+		     }
+		 }
+
+	 break;
 
 	 case 0xF0: //software version difference older and new sotfware 
       

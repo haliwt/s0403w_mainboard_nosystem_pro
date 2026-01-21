@@ -51,12 +51,8 @@ void power_on_handler(void)
         /*end*/
 		
        
-        /*this works two hours reference start -WT.EDIT 2025.08.11*/
-
-
-      
-		 gpro_t.stopTwoHours_flag =0;
-		/*end */
+        gpro_t.stopTwoHours_flag =0;
+	
        
      
          read_sensorData();//updateDht11_sensorData_toDisp();
@@ -231,19 +227,21 @@ void ActionEvent_Handler(void)
 {
 
    static uint8_t ptc_default =0xff,plasma_default =0xff,ultrasonic_default =0xff;
+ 
 
    if(gpro_t.stopTwoHours_flag ==1) return ; //WT.EDIT 2025.10.29
    
-   if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
+   if(get_ptc_value()==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 
       
 		  PTC_SetHigh();
         
-
-	   if(ptc_default!=gpro_t.ptc_switch_flag && wifi_link_net_state()==1){
-			 gpro_t.ptc_switch_flag++;
-			 ptc_default = gpro_t.ptc_switch_flag;
+      
+	   if(ptc_default!=  get_ptc_value() && wifi_link_net_state()==1){
+		
+			 ptc_default=  get_ptc_value();
+			
 			
 			MqttData_Publish_SetPtc(0x01);
 			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
@@ -253,13 +251,15 @@ void ActionEvent_Handler(void)
 		
 	  }
 	}
-	else if(gctl_t.gDry ==0){
+	else if(get_ptc_value() ==0){
 		
 	  
 		PTC_SetLow();
-		if(ptc_default!=gpro_t.ptc_switch_flag && wifi_link_net_state()==1){
-			gpro_t.ptc_switch_flag++;
-			ptc_default = gpro_t.ptc_switch_flag;
+		
+		if(ptc_default!= get_ptc_value() && wifi_link_net_state()==1){
+			
+			ptc_default = get_ptc_value();
+			
 		
 			MqttData_Publish_SetPtc(0x0);
 			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
@@ -367,13 +367,13 @@ void smartphone_timer_power_on_and_normal_handler(void)
 
 
 
-		   if(gctl_t.gDry==1){
+		   if(get_ptc_value()==1){
               
 				SendWifiData_To_Cmd(0x02,0x01);
 				vTaskDelay(pdMS_TO_TICKS(50));
 			}
-			else if(gctl_t.gDry ==0){
-					gctl_t.gDry=0;
+			else if(get_ptc_value() ==0){
+					
                     
 					SendWifiData_To_Cmd(0x02,0x0);
 					vTaskDelay(pdMS_TO_TICKS(50));
@@ -397,7 +397,7 @@ void SetPowerOff_ForDoing(void)
      gctl_t.set_wind_speed_value =10;
  
     gctl_t.gFan = 0;
-    gctl_t.gDry = 0;
+    gpro_t.rx_ptc_flag = 0;//gctl_t.gDry = 0;
   
 	gctl_t.gPlasma =0;       //"é„1¤7?é‘„1¤7?"
     gctl_t.gUlransonic = 0; // "æ¤¹è¾«æ«„1¤7"
@@ -574,7 +574,8 @@ void every_power_on_run(void)
      
      // gctl_t.gModel=1;
       gctl_t.gFan = 1;
-      gctl_t.gDry = 1;
+      gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
+  
   
 	 
       //g_dry_open_flag =1;
@@ -584,7 +585,7 @@ void every_power_on_run(void)
        gpro_t.process_run_step=0;
 	
 
-	  gpro_t.ptc_switch_flag ++;
+	
 	  gpro_t.ultrasonic_switch_flag++;
 	  gpro_t.plasma_switch_flag++;
 

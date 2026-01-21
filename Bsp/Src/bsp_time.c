@@ -88,7 +88,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
              flag_switch=0;
             wifi_t.get_rx_beijing_time_enable=0;
             Subscriber_Data_FromCloud_Handler();
-            vTaskDelay(pdMS_TO_TICKS(100));//HAL_Delay(200)
+            vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200)
             gpro_t.get_beijing_flag = 1;
 
             
@@ -97,6 +97,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
             flag_switch=0;
             wifi_t.get_rx_beijing_time_enable=0;
             Update_Dht11_Totencent_Value();
+			vTaskDelay(pdMS_TO_TICKS(200));
             gpro_t.get_beijing_flag = 1;
 
          }
@@ -114,7 +115,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
     else{
 	 if(net_t.wifi_link_net_success ==0){
 	    SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
-	    vTaskDelay(pdMS_TO_TICKS(5));
+	    vTaskDelay(pdMS_TO_TICKS(100));
 	 }
      gpro_t.get_beijing_flag = 1;
 
@@ -138,13 +139,13 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
       
                 net_t.linking_tencent_cloud_doing  =0; //receive from tencent command state .
                 SendWifiData_To_Data(0x1F,0x01);
-                vTaskDelay(pdMS_TO_TICKS(10));
+                vTaskDelay(pdMS_TO_TICKS(100));
 
             }
             else{
               
                SendWifiData_To_Data(0x1F,0x0); //0x1F: 0x1=wifi link net is succes ,0x0 = wifi link net is fail
-               vTaskDelay(pdMS_TO_TICKS(10));
+               vTaskDelay(pdMS_TO_TICKS(100));
                gpro_t.get_beijing_flag = 10;
                net_t.linking_tencent_cloud_doing  =1; //receive from tencent command state .
                gpro_t.send_ack_cmd = 1; //ack_wifi_on;
@@ -200,7 +201,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 
     		
     		Get_BeiJing_Time_Cmd();
-    	    vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10//HAL_Delay(20);
+    	    vTaskDelay(pdMS_TO_TICKS(300));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10//HAL_Delay(20);
     	    beijing_step =1;
          
          break;
@@ -212,7 +213,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
         		gpro_t.wifi_rx_data_counter =0;
         		Get_Beijing_Time();
               
-        	    vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10
+        	    vTaskDelay(pdMS_TO_TICKS(300));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10
                 
         	
                 beijing_step =2;

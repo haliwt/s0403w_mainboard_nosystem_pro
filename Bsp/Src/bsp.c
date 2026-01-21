@@ -268,3 +268,9 @@ void waiting_ack_handler(void)
 
 }
 
+
+uint8_t get_ptc_value(void)
+{
+    return gpro_t.rx_ptc_flag;
+}
+

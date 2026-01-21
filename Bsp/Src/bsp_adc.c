@@ -58,8 +58,8 @@ void adc_detected_hundler(void)
 			  if(counter_error > 5){
 			      gpro_t.fan_warning_flag=1;
 				  gctl_t.ptc_on_off_flag = 1;
-			      gctl_t.gDry =0;
-				 
+			      //gctl_t.gDry =0;
+				  gpro_t.rx_ptc_flag = 0;
 				  PTC_SetLow();
 			  }
 		  
@@ -209,7 +209,7 @@ void fan_warning_sound(void)
 
    
 		   gctl_t.ptc_on_off_flag = 1;
-		   gctl_t.gDry =0;
+		   gpro_t.rx_ptc_flag = 0;//gctl_t.gDry =0;
 		
 		    PTC_SetLow();
 
