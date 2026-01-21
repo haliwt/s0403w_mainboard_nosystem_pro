@@ -431,6 +431,49 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		 
      break;
 
+	 case 0x12: //PTC must at once turn on or turn off 
+	  if(pdata[3]== 0x01){
+
+	    gctl_t.ptc_on_off_flag =0;
+
+		if(gpro_t.stopTwoHours_flag ==0){
+		   gctl_t.gDry = 1;
+           PTC_SetHigh();
+	        
+			 SendWifiData_Answer_Cmd(0x12,0x01); //WT.EDIT 2025.07.28
+	         vTaskDelay(pdMS_TO_TICKS(100));
+			 if(wifi_link_net_state()==1){ 
+				  MqttData_Publish_SetPtc(0x01);
+				  vTaskDelay(200);
+				
+			  }
+		  }
+	  } 
+      else if(pdata[3]== 0x0){
+
+	      gctl_t.ptc_on_off_flag =0;
+        
+          gctl_t.gDry =0;
+
+	 
+	      PTC_SetLow();
+        
+		   SendWifiData_Answer_Cmd(0x12,0x0); //WT.EDIT 2025.07.28
+           vTaskDelay(pdMS_TO_TICKS(100));
+
+		  
+		  if(wifi_link_net_state()==1){ 
+			MqttData_Publish_SetPtc(0x0);
+			vTaskDelay(200);
+		  }
+         
+	   }
+			 
+      
+   
+
+	 break;
+
 
 	  case 0x16 : //buzzer sound command with answer .
 
