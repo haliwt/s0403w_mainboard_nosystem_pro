@@ -411,7 +411,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
        if(pdata[3] == 0x01){  // link wifi 
         
-        
+          buzzer_sound();
           gpro_t.link_net_step =0;
 	      net_t.wifi_link_net_success=0;
           gpro_t.wifi_led_fast_blink_flag =1;
