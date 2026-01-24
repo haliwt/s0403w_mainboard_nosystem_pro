@@ -378,9 +378,9 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 	   
    	case 0x04: //ultrasonic	ACTIVE OPEN OR CLOSE
-   
+          
 		  if(pdata[3]  == 0x01){  //open 
-			
+			 buzzer_sound();
 			gctl_t.gUlransonic =1;
    
 			if(gpro_t.stopTwoHours_flag==0){
@@ -393,7 +393,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
    
 		  }
 		  else if(pdata[3] == 0x0){ //close 
-   
+              buzzer_sound();
 			gctl_t.gUlransonic = 0;
    
 			ultrasonic_close();
@@ -429,8 +429,8 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
      break;
 
 	  case buzzer_sound_s: //buzzer sound command 
-
-          buzzer_sound();
+          if(pdata[3] == 0x01)
+            buzzer_sound();
 		 
      break;
 
