@@ -131,11 +131,11 @@ typedef struct _RUN_T{
 	 uint8_t gTimer_senddata_panel;
 	
 	 uint8_t gTimer_fan_run_one_minute;
-     uint8_t gTimer_read_dht11_counter;
+   
 	 uint8_t gTimer_linkTencentCounter;
 	 
-	 uint16_t gTimer_copy_cmd_counter;
-	 uint8_t gTimer_wifi_detected_counter;
+	
+	
 	
 	 uint32_t randomName[1];
 	

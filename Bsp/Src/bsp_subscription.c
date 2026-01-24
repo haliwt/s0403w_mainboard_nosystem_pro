@@ -557,10 +557,10 @@ void Json_Parse_Command_Fun(void)
 	
 			gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
 			//gpro_t.send_ack_cmd = 1; //ack_app_power_on;
-	        gpro_t.gTimer_timer_start_counter=0;
+	     
 			#endif 
 			gpro_t.phone_power_on_flag = 1; //ack_app_power_on;
-	        gpro_t.gTimer_timer_start_counter=0;
+	       
 		    SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
 			vTaskDelay(pdMS_TO_TICKS(100));//osDelay(5);//HAL_Delay(5);
 
@@ -585,10 +585,10 @@ void Json_Parse_Command_Fun(void)
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
            // gpro_t.send_ack_cmd = 1; //ack_app_power_off;
-            gpro_t.gTimer_timer_start_counter=0;
+        
             #endif 
 			gpro_t.phone_power_on_flag = 2; //ack_app_power_on;
-	        gpro_t.gTimer_timer_start_counter=0;
+	
              SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
              vTaskDelay(pdMS_TO_TICKS(100));
 		
@@ -845,7 +845,7 @@ void Json_Parse_Command_Fun(void)
 			   buzzer_temp_on=0;
    
                gpro_t.send_ack_cmd = 1; //ack_app_timer_power_on;
-               gpro_t.gTimer_timer_start_counter=0;
+    
 		         
 
 				
@@ -862,7 +862,7 @@ void Json_Parse_Command_Fun(void)
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
             powerOffFanRun_flag = 1;
             gpro_t.send_ack_cmd = 1; //ack_app_power_off;
-             gpro_t.gTimer_timer_start_counter=0;
+
 	
             SendWifiData_To_Cmd(0x21,0x0); //smart phone is power off
 			vTaskDelay(100);//HAL_Delay(5);

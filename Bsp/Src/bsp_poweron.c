@@ -68,7 +68,7 @@ void power_on_handler(void)
 	else 
 		every_power_on_run();
 
-	read_sensorData();
+	  read_sensorData();
 	
 	 gpro_t.process_run_step= 3;
 	   
@@ -107,20 +107,13 @@ void power_on_handler(void)
 		 vTaskDelay(pdMS_TO_TICKS(100));
      }
 	 
-
-
-    
-	 
-	  gpro_t.process_run_step= 6;
+    gpro_t.process_run_step= 6;
 
 	 break;
 	     
 		
     case 6: //repeat process 
-
-
-     
-	  if(gpro_t.gTimer_update_todisplay > 4){
+		if(gpro_t.gTimer_update_todisplay > 4){
 			gpro_t.gTimer_update_todisplay=0;
 
 			updateDht11_sensorData_toDisp();
@@ -153,14 +146,10 @@ void power_on_handler(void)
     	    vTaskDelay(pdMS_TO_TICKS(200));
 	    }
 		
-		   SendWifiData_To_Data(0x1F,0x01);
+		   SendData_Set_Command(0x1F,0x01);//SendWifiData_To_Data(0x1F,0x01);
            vTaskDelay(pdMS_TO_TICKS(100));
-		 
-	
-	  }
-   
-    
-	 gpro_t.process_run_step=8 ;
+	}
+      gpro_t.process_run_step=8 ;
  break; 
 
 
@@ -202,9 +191,8 @@ void power_on_handler(void)
 		if(gctl_t.app_timer_power_on_flag > 2)gctl_t.app_timer_power_on_flag=0;
 		if( gctl_t.set_temp_first_closeptc > 1)  gctl_t.set_temp_first_closeptc =0;
 	 }
-	   
 
-	   gpro_t.process_run_step= 6;	
+	gpro_t.process_run_step= 6;	
 
    break;
 
@@ -241,15 +229,11 @@ void ActionEvent_Handler(void)
 	   if(ptc_default!=  get_ptc_value() && wifi_link_net_state()==1){
 		
 			 ptc_default=  get_ptc_value();
-			
-			
 			MqttData_Publish_SetPtc(0x01);
 			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 			
 		}
-   	
-		
-	  }
+   	  }
 	}
 	else if(get_ptc_value() ==0){
 		

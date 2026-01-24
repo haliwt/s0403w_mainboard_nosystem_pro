@@ -163,22 +163,18 @@ typedef struct PROCESS_T{
    uint8_t gTimer_get_data_from_tencent_data;
    uint8_t gTimer_link_net_timer_time;
    uint8_t gTimer_dc_power_on_auto_link_net;
-   uint8_t gTimer_publis_dht11_data;
+
    uint8_t gTimer_detect_fan_error;
 
-   uint8_t  gTimer_power_on_auto_link;
+   uint8_t gTimer_power_on_auto_link;
    uint8_t gTimer_update_todisplay;
    uint8_t gTimer_update_tencet_dht11;
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
-   uint8_t gTimer_timer_start_counter;
-  
 
+   
   
   
-
-  
-
 }process_t;
 
 extern process_t gpro_t;
@@ -193,7 +189,7 @@ void wifi_communication_tnecent_handler(void);
 
 void wifi_auto_detected_link_state(void);
 
-void waiting_ack_handler(void);
+
 
 
  uint8_t get_ptc_value(void);
