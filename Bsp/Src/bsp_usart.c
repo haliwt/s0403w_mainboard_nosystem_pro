@@ -434,50 +434,6 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		 
      break;
 
-	 case 0x12: //PTC must at once turn on or turn off 
-	  if(pdata[3]== 0x01){
-
-	    gctl_t.ptc_on_off_flag =0;
-		gpro_t.rx_ptc_flag = 1;
-
-		if(gpro_t.stopTwoHours_flag ==0){
-		
-           PTC_SetHigh();
-	        
-			 SendWifiData_Answer_Cmd(0x12,0x01); //WT.EDIT 2025.07.28
-	         vTaskDelay(pdMS_TO_TICKS(100));
-			 if(wifi_link_net_state()==1){ 
-				  MqttData_Publish_SetPtc(0x01);
-				  vTaskDelay(200);
-				
-			  }
-		  }
-	  } 
-      else if(pdata[3]== 0x0){
-
-	      gctl_t.ptc_on_off_flag =0;
-          gpro_t.rx_ptc_flag = 0;
-          //gctl_t.gDry =0;
-
-	 
-	      PTC_SetLow();
-        
-		   SendWifiData_Answer_Cmd(0x12,0x0); //WT.EDIT 2025.07.28
-           vTaskDelay(pdMS_TO_TICKS(100));
-
-		  
-		  if(wifi_link_net_state()==1){ 
-			MqttData_Publish_SetPtc(0x0);
-			vTaskDelay(200);
-		  }
-         
-	   }
-			 
-      
-   
-
-	 break;
-
 
 	  case 0x16 : //buzzer sound command with answer .
 
@@ -543,25 +499,43 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 
 	  case 0x1B: //write set temperature value .data.2026.01.06
-      case 0x2A:
+	  
+        if(pdata[3]== 0x01){
+		       gctl_t.ptc_on_off_flag =0;
+			   gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
 
-	   if(pdata[4]==0x01){
-	      
-	       if(pdata[5] >19 && pdata[5] < 41){
-	       gctl_t.set_temperature_value = pdata[5] ;
-		   gctl_t.ptc_on_off_flag =0;
-
-		   if(wifi_link_net_state()==1){
-	           MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-			   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
-	        }
-	       }
-	   
-	    }
-   	
+			   if(gpro_t.stopTwoHours_flag ==0){
+			       PTC_SetHigh();
+		        
+				 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
+		         vTaskDelay(pdMS_TO_TICKS(100));
+				 if(wifi_link_net_state()==1){ 
+					  MqttData_Publish_SetPtc(0x01);
+					  vTaskDelay(200);
+					
+				  }
+			   	
+		       } 
+      }
+      else if(pdata[3]== 0x0){
         
-      break;
+          gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
 
+	       PTC_SetLow();
+        
+		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
+           vTaskDelay(pdMS_TO_TICKS(100));
+
+		  
+		  if(wifi_link_net_state()==1){ 
+			MqttData_Publish_SetPtc(0x0);
+			vTaskDelay(200);
+		  }
+         
+	   }
+			 
+      break;
+     
 
 	  
      case 0x1C: // is time data: hours,minutes,sencodes.
@@ -573,23 +547,27 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 	case 0x22: //PTC ON OR OFF by compare temperature value .
         if(pdata[3]== 0x01){
+			if(gctl_t.ptc_on_off_flag == 1){
+			   gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
+	            PTC_SetLow();
 
-		if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
-		   gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
+			}  
+	        else if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
+			  
+			   gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
 
-		   if(ptc_on_default != get_ptc_value()){
-              ptc_on_default = get_ptc_value();
-		      PTC_SetHigh();
-	        
-			 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
-	         vTaskDelay(pdMS_TO_TICKS(100));
-			 if(wifi_link_net_state()==1){ 
-				  MqttData_Publish_SetPtc(0x01);
-				  vTaskDelay(200);
-				
-			  }
-		  }
-	  } 
+			 
+			      PTC_SetHigh();
+		        
+				 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
+		         vTaskDelay(pdMS_TO_TICKS(100));
+				 if(wifi_link_net_state()==1){ 
+					  MqttData_Publish_SetPtc(0x01);
+					  vTaskDelay(200);
+					
+				  }
+			   	
+		       } 
       }
       else if(pdata[3]== 0x0){
         
@@ -597,7 +575,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 	      if(ptc_off_default != get_ptc_value()){
               ptc_off_default = get_ptc_value();
-	       PTC_SetLow();
+	          PTC_SetLow();
         
 		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
            vTaskDelay(pdMS_TO_TICKS(100));
@@ -613,6 +591,43 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
       }
    
      break;
+
+
+	 
+	 case 0x2A: //smart phone or display  board set temperature .receive.
+	 
+		   if(pdata[4]==0x01){
+			  
+			   if(pdata[5] >19 && pdata[5] < 41){
+			   gctl_t.set_temperature_value = pdata[5] ;
+			   gctl_t.ptc_on_off_flag =0;
+			   if(gctl_t.set_temperature_value > gctl_t.gDht11_temperature){
+			
+				   gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
+
+				   if(gpro_t.stopTwoHours_flag ==0){
+				       PTC_SetHigh();
+			        } 
+
+			   }
+			   else{
+				   gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
+
+			       PTC_SetLow();
+		
+
+			   }
+	 
+			   if(wifi_link_net_state()==1){
+				   MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
+				   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+				}
+			  }
+		   
+			}
+		
+			
+	 break;
 
 	 case 0x6C: //Synchronize local time ->two display board 
 
