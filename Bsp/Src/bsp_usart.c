@@ -488,10 +488,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			
 		}
 		else if(pdata[3]==0){
+			  gpro_t.stopTwoHours_flag=0;//WT.EDIT 2026.01.26
 
               if(get_ptc_value() ==1 && gctl_t.ptc_on_off_flag==0) PTC_SetHigh();
 			  if(gctl_t.gPlasma==1)PLASMA_SetHigh();
 			  if(gctl_t.gUlransonic==1) ultrasonic_open();
+			  Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
+			  
 		}
 	   
 

@@ -222,8 +222,7 @@ void ActionEvent_Handler(void)
    if(get_ptc_value()==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
 
-      
-		  PTC_SetHigh();
+      PTC_SetHigh();
         
       
 	   if(ptc_default!=  get_ptc_value() && wifi_link_net_state()==1){
