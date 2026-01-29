@@ -40,6 +40,7 @@ void power_on_handler(void)
 		 gctl_t.ptc_warning =0;
 		 gctl_t.ptc_warning =0;
 	     gpro_t.fan_warning_flag =0;
+		 gpro_t.fan_counter_error =0;
 	
 		 gpro_t.gTimer_detect_fan_error=0;
 		/*end*/

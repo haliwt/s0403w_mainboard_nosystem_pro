@@ -275,6 +275,7 @@ static void power_run_handler(void)
 		  
               gpro_t.process_run_step=0;
 	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
+	          gpro_t.fan_counter_error =0;
 		      power_off_handler();
              break;
           }

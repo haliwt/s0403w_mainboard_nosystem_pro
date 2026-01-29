@@ -21,7 +21,7 @@
 #include "adc.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "bsp.h"
 /* USER CODE END 0 */
 
 /* ADC1 init function */
@@ -64,7 +64,7 @@ void MX_ADC1_Init(void)
 
   LL_DMA_SetChannelPriorityLevel(DMA1, LL_DMA_CHANNEL_3, LL_DMA_PRIORITY_LOW);
 
-  LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_3,LL_DMA_MODE_CIRCULAR); 
+  LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_3,LL_DMA_MODE_CIRCULAR);//is error LL_DMA_MODE_CIRCULAR); 
   //LL_DMA_SetMode(DMA1, LL_DMA_CHANNEL_3,LL_DMA_MODE_NORMAL);
 
   LL_DMA_SetPeriphIncMode(DMA1, LL_DMA_CHANNEL_3, LL_DMA_PERIPH_NOINCREMENT);
@@ -91,7 +91,7 @@ void MX_ADC1_Init(void)
   ADC_InitStruct.Resolution = LL_ADC_RESOLUTION_12B;
   ADC_InitStruct.DataAlignment = LL_ADC_DATA_ALIGN_RIGHT;
   ADC_InitStruct.LowPowerMode = LL_ADC_LP_MODE_NONE;
-//  ADC_InitStruct.SequencerLength = LL_ADC_REG_SEQ_SCAN_ENABLE_2RANKS; // 启用2个通道扫描
+
   LL_ADC_Init(ADC1, &ADC_InitStruct);
   LL_ADC_REG_SetSequencerConfigurable(ADC1, LL_ADC_REG_SEQ_CONFIGURABLE);
 
@@ -115,10 +115,11 @@ void MX_ADC1_Init(void)
    /* Clear flag ADC channel configuration ready */
    LL_ADC_ClearFlag_CCRDY(ADC1);
   ADC_REG_InitStruct.TriggerSource = LL_ADC_REG_TRIG_SOFTWARE;
-  ADC_REG_InitStruct.SequencerLength = LL_ADC_REG_SEQ_SCAN_DISABLE;
+  ADC_REG_InitStruct.SequencerLength = LL_ADC_REG_SEQ_SCAN_DISABLE;// → 单通道模式。
+  //ADC_InitStruct.SequencerLength = LL_ADC_REG_SEQ_SCAN_ENABLE_2RANKS; // 启用2个通道扫描
   ADC_REG_InitStruct.SequencerDiscont = LL_ADC_REG_SEQ_DISCONT_DISABLE;
-  ADC_REG_InitStruct.ContinuousMode = LL_ADC_REG_CONV_SINGLE;
-  ADC_REG_InitStruct.DMATransfer = LL_ADC_REG_DMA_TRANSFER_LIMITED;
+  ADC_REG_InitStruct.ContinuousMode = LL_ADC_REG_CONV_CONTINUOUS;// 连续采样  LL_ADC_REG_CONV_SINGLE;
+  ADC_REG_InitStruct.DMATransfer = LL_ADC_REG_DMA_TRANSFER_UNLIMITED;// ADC 转换无限制转换LL_ADC_REG_DMA_TRANSFER_LIMITED;
   ADC_REG_InitStruct.Overrun = LL_ADC_REG_OVR_DATA_PRESERVED;
   LL_ADC_REG_Init(ADC1, &ADC_REG_InitStruct);
   LL_ADC_SetOverSamplingScope(ADC1, LL_ADC_OVS_DISABLE);
@@ -145,16 +146,27 @@ void MX_ADC1_Init(void)
 
   /** Configure Regular Channel
   */
+  /* 配置通道 IN0 */
   LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1, LL_ADC_CHANNEL_0);
   LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_0, LL_ADC_SAMPLINGTIME_COMMON_1);
   /* USER CODE BEGIN ADC1_Init 2 */
 
-  LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2, LL_ADC_CHANNEL_1);
-  LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_1, LL_ADC_SAMPLINGTIME_COMMON_1);
+ // LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_2, LL_ADC_CHANNEL_1);
+ // LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_1, LL_ADC_SAMPLINGTIME_COMMON_1);
+
+  /* 设置DMA源地址和目的地址 */ 
+	LL_DMA_ConfigAddresses(DMA1, LL_DMA_CHANNEL_3, 
+	                   LL_ADC_DMA_GetRegAddr(ADC1, LL_ADC_DMA_REG_REGULAR_DATA), 
+	                   (uint32_t)adc_buffer, 
+	                   LL_DMA_DIRECTION_PERIPH_TO_MEMORY); 
+  LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, ADC_BUFFER_SIZE); 
+  LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
 
   /* USER CODE END ADC1_Init 2 */
 
   LL_ADC_Enable(ADC1);//WT.EDIT 2025.09.28
+  /* 启动转换 */ 
+  LL_ADC_REG_StartConversion(ADC1);
 
 }
 

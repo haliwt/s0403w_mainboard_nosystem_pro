@@ -8,8 +8,12 @@
 
 #define  FAN_OLDER_VERSION     0 //WT.EDIT 2025.02.20 fan works current is 500mA.
 
+#define ADC_BUFFER_SIZE 1
 
 extern uint16_t fan_detect_voltage;
+
+extern uint16_t adc_buffer[ADC_BUFFER_SIZE]; 
+
 
 
 typedef enum{
