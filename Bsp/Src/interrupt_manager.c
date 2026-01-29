@@ -75,7 +75,7 @@ static void tim17_isr_callback_handler(void)
        gpro_t.gTimer_power_on_first_link_tencent++;
        gpro_t.gTimer_get_data_from_tencent_data++;
        gpro_t.gTimer_dc_power_on_auto_link_net++;
-     
+       
 
 
        gpro_t.gTimer_detect_fan_error++;
@@ -86,6 +86,7 @@ static void tim17_isr_callback_handler(void)
 
         gpro_t.gTimer_poweroff_fan++;
 		gpro_t.gTimer_read_dth11_sensor ++;
+		gpro_t.gTimer_read_dht11_to_disp++;
 		
 	
 	

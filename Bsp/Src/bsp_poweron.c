@@ -193,6 +193,13 @@ void power_on_handler(void)
 		if( gctl_t.set_temp_first_closeptc > 1)  gctl_t.set_temp_first_closeptc =0;
 	 }
 
+    if(gpro_t.gTimer_read_dht11_to_disp >3){
+		gpro_t.gTimer_read_dht11_to_disp=0;
+	   read_sensorData();
+
+    }
+
+
 	gpro_t.process_run_step= 6;	
 
    break;

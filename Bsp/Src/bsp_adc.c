@@ -54,7 +54,9 @@ void adc_detected_hundler(void)
        fan_detect_voltage=(adc_buffer[0] * 3300 )/4095;
        vTaskDelay(100);
 
-	   if(fan_detect_voltage < 150){
+	   if(gpro_t.fan_warning_flag > 1)gpro_t.fan_warning_flag=0;
+
+	   if(fan_detect_voltage < 150  &&  gpro_t.fan_warning_flag==0){
 
 
 		  	gpro_t.fan_counter_error ++;
@@ -71,6 +73,8 @@ void adc_detected_hundler(void)
 	      gpro_t.fan_counter_error =0;
 
 	   }
+
+	   if(gpro_t.fan_counter_error ==0xFE )gpro_t.fan_counter_error =0;
     }
    
    fan_warning_sound();

@@ -26,7 +26,7 @@ static StackType_t xTaskMsgProStack[512];
 
 /* vTaskStart 任务 */
 static StaticTask_t xTaskStartTCB;
-static StackType_t xTaskStartStack[256];
+static StackType_t xTaskStartStack[384];
 
 
 
@@ -207,7 +207,7 @@ void AppTaskCreate (void)
 	xHandleTaskStart = xTaskCreateStatic(
 			vTaskStart, 			/* 任务函数 */
 			"vTaskStart",			/* 任务名 */
-			256,					/* 栈大小（word） */
+			384,					/* 栈大小（word） */
 			NULL,					/* 参数 */
 			2,						/* 优先级 */
 			xTaskStartStack,		/* 栈数组 */

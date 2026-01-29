@@ -61,6 +61,7 @@ void MX_GPIO_Init(void)
 
   #else
      LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_6);
+     LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_7);
   #endif 
 
   /**/
@@ -111,6 +112,7 @@ void MX_GPIO_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 
+   #else
 
   
   GPIO_InitStruct.Pin = LL_GPIO_PIN_7; //FAN CCW
@@ -120,7 +122,7 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  #else
+  
 
   GPIO_InitStruct.Pin = LL_GPIO_PIN_5;  //PLASMA 
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;

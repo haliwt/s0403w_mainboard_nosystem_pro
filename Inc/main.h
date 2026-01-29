@@ -106,9 +106,9 @@ void Error_Handler(void);
 //#define FAN_CW_GPIO_Port        GPIOA
 
 
-
-//#define FAN_CCW_Pin               LL_GPIO_PIN_7
-//#define FAN_CCW_GPIO_Port           GPIOA
+/*older version be used to IC */
+#define FAN_COM_Pin                 LL_GPIO_PIN_7
+#define FAN_COM_GPIO_Port           GPIOA
 
 //
 
