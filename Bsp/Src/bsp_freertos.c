@@ -22,11 +22,11 @@ static void vTaskStart(void *pvParameters);
 
 /* vTaskMsgPro 任务 */
 static StaticTask_t xTaskMsgProTCB;
-static StackType_t xTaskMsgProStack[512];
+static StackType_t xTaskMsgProStack[640];
 
 /* vTaskStart 任务 */
 static StaticTask_t xTaskStartTCB;
-static StackType_t xTaskStartStack[384];
+static StackType_t xTaskStartStack[256];
 
 
 
@@ -197,7 +197,7 @@ void AppTaskCreate (void)
 	xHandleTaskMsgPro = xTaskCreateStatic(
 			vTaskMsgPro,			/* 任务函数 */
 			"vTaskMsgPro",			/* 任务名 */
-			512,					/* 栈大小（word） */
+			640,					/* 栈大小（word） */
 			NULL,					/* 参数 */
 			1,						/* 优先级 */
 			xTaskMsgProStack,		/* 栈数组 */
@@ -207,7 +207,7 @@ void AppTaskCreate (void)
 	xHandleTaskStart = xTaskCreateStatic(
 			vTaskStart, 			/* 任务函数 */
 			"vTaskStart",			/* 任务名 */
-			384,					/* 栈大小（word） */
+			256,					/* 栈大小（word） */
 			NULL,					/* 参数 */
 			2,						/* 优先级 */
 			xTaskStartStack,		/* 栈数组 */

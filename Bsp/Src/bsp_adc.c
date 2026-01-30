@@ -54,6 +54,8 @@ void adc_detected_hundler(void)
        fan_detect_voltage=(adc_buffer[0] * 3300 )/4095;
        vTaskDelay(100);
 
+	   if(gpro_t.fan_counter_error > 10)gpro_t.fan_counter_error =0;
+
 	   if(gpro_t.fan_warning_flag > 1)gpro_t.fan_warning_flag=0;
 
 	   if(fan_detect_voltage < 150  &&  gpro_t.fan_warning_flag==0){
@@ -74,10 +76,12 @@ void adc_detected_hundler(void)
 
 	   }
 
-	   if(gpro_t.fan_counter_error ==0xFE )gpro_t.fan_counter_error =0;
+	   
     }
-   
-   fan_warning_sound();
+   if(gpro_t.fan_warning_flag==1){
+      fan_warning_sound();
+
+   	}
 	
 
 }
@@ -177,8 +181,8 @@ static uint16_t ADC_PTC_ReadVoltage(void)
 
 void fan_warning_sound(void)
 {
-   if(gpro_t.fan_warning_flag == 1 && gpro_t.gTimer_detect_fan_error > 5){
-        gpro_t.gTimer_detect_fan_error =0;
+   if(gpro_t.fan_warning_flag == 1){
+     
 
    
 		   gctl_t.ptc_on_off_flag = 1;

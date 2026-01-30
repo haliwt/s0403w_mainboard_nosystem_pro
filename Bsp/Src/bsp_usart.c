@@ -445,6 +445,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		  
        break;
 
+
+
+	  
+
       case 0x27: //AI command without buzzer sound
 	  case 0x17: //AI notice
 	  
