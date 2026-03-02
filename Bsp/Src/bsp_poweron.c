@@ -13,7 +13,7 @@ void every_power_on_run(void);
 **********************************************************************/
 void power_on_handler(void)
 {
-
+    static uint8_t counter;
     switch(gpro_t.process_run_step){
 
 	case 0: //1
@@ -107,6 +107,7 @@ void power_on_handler(void)
 		  MqttData_Publish_Init();
 		 vTaskDelay(pdMS_TO_TICKS(100));
      }
+	//gpro_t.gTimer_conter_twohours_minutes=0;
 	 
     gpro_t.process_run_step= 6;
 
@@ -116,12 +117,23 @@ void power_on_handler(void)
     case 6: //repeat process 
 		if(gpro_t.gTimer_update_todisplay > 4){
 			gpro_t.gTimer_update_todisplay=0;
-
+            counter++;
 			updateDht11_sensorData_toDisp();
-	     
-		           
+	        vTaskDelay(pdMS_TO_TICKS(100));
+			
+		    if(net_t.wifi_link_net_success ==1 && counter > 1 && gpro_t.soft_version == 0){ //WT.EDIT 2026.02.27
+		       counter =0;
+			   SendWifiData_olderCmd(0x1F,0x01);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+			   vTaskDelay(pdMS_TO_TICKS(100));
+			}
+			else if(net_t.wifi_link_net_success ==0 && counter > 1 && gpro_t.soft_version ==0){ //WT.EDIT 2026.02.27
+		       counter =0;
+			   SendWifiData_olderCmd(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+			   vTaskDelay(pdMS_TO_TICKS(100));
+			}
+			
        }
-      
+
        gpro_t.process_run_step=7 ;
 
 
@@ -199,7 +211,9 @@ void power_on_handler(void)
 
     }
 
-
+    if(gpro_t.rx_ptc_flag >1)gpro_t.rx_ptc_flag=1;//2026.02.27 WT.EDIT
+    if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
+	if(gctl_t.gUlransonic > 1) gctl_t.gUlransonic =1;
 	gpro_t.process_run_step= 6;	
 
    break;

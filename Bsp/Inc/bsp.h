@@ -140,6 +140,7 @@ typedef struct PROCESS_T{
    uint8_t answer_buzzer_flag ;
  
    uint8_t rx_ptc_flag;
+   uint8_t second_disp_flag;
 	
     
 	 uint8_t ultrasonic_switch_flag;
@@ -173,6 +174,7 @@ typedef struct PROCESS_T{
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
    uint8_t gTimer_read_dht11_to_disp;
+  
 
    
   

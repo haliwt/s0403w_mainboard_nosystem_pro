@@ -265,8 +265,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 static void usart1_protocol_state_machine(uint8_t *pdata)
 {
 
- 
-  static uint8_t ptc_on_default =0xff, ptc_off_default = 0xff;
+   static uint8_t ptc_on_default =0xff, ptc_off_default = 0xff;
    switch(pdata[2]){
 
    case 0:
@@ -434,7 +433,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		 
      break;
 
-
+      case 0x11:
+		    gpro_t.second_disp_flag = pdata[3];
+	  break; 
+	  
 	  case 0x16 : //buzzer sound command with answer .
 
         buzzer_sound();
@@ -444,11 +446,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		  vTaskDelay(pdMS_TO_TICKS(100));
 		  
        break;
-
-
-
 	  
-
       case 0x27: //AI command without buzzer sound
 	  case 0x17: //AI notice
 	  
@@ -485,16 +483,25 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	    if(pdata[3]==1){ // recach 2 hours 
 
            gpro_t.stopTwoHours_flag=1;
+		 //  gpro_t.gTimer_conter_twohours_minutes=0;//if don't connect diplay board ,itself counter times
 		   gctl_t.gTimer_fan_run_one_minute = 0;
-		    PTC_SetLow();
-			PLASMA_SetHigh() ;
+		    PTC_SetLow(); //ptc off;
+			vTaskDelay(200);
+			PLASMA_SetLow() ; //plasma turn off.
             ultrasonic_close();
 			
 		}
 		else if(pdata[3]==0){
 			  gpro_t.stopTwoHours_flag=0;//WT.EDIT 2026.01.26
-
-              if(get_ptc_value() ==1 && gctl_t.ptc_on_off_flag==0) PTC_SetHigh();
+             // gpro_t.gTimer_conter_twohours_minutes=0; //2026.02.27 WT.EDIT
+              if(gpro_t.rx_ptc_flag >1)gpro_t.rx_ptc_flag=1;//2026.02.27 WT.EDIT
+              if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
+			  if(gctl_t.gUlransonic > 1) gctl_t.gUlransonic =1;
+              
+              if(gpro_t.rx_ptc_flag ==1 && gctl_t.ptc_on_off_flag==0){
+			  	PTC_SetHigh();
+				vTaskDelay(200);
+              }
 			  if(gctl_t.gPlasma==1)PLASMA_SetHigh();
 			  if(gctl_t.gUlransonic==1) ultrasonic_open();
 			  Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
@@ -645,6 +652,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		      gpro_t.disp_works_hours= pdata[5];
 			 
 			  gpro_t.disp_works_minutes =pdata[6];
+			  //gpro_t.gTimer_conter_twohours_minutes =pdata[6];//WT.EDIT 2026.02.27
 
 			  gpro_t.gTimer_works_time_seconds=pdata[7];
 			
@@ -655,7 +663,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 	 case 0xF0: //software version difference older and new sotfware 
       
-            gpro_t.soft_version = gl_tMsg.rx_data[0];
+            gpro_t.soft_version = pdata[3];
 	 
 				
 			#if DEBUG_FLAG

@@ -35,7 +35,16 @@ uint8_t twoHours_stop_flag;
 ************************************************************************/
 void works_run_two_hours_state(void)
 {
-  
+
+//  if(gpro_t.gTimer_conter_twohours_minutes > 122){ //WT.EDT 2026.02.27
+//  	 gpro_t.gTimer_conter_twohours_minutes=0;
+//	 gctl_t.gTimer_fan_run_one_minute = 0;
+//		    PTC_SetLow();
+//			PLASMA_SetHigh() ;
+//            ultrasonic_close();
+//     gpro_t.stopTwoHours_flag =1  ;  
+
+//  }
    
   if(gpro_t.stopTwoHours_flag ==1){//WT.EDIT 2025.11.19
 

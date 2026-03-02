@@ -153,7 +153,7 @@ void wifi_auto_detected_link_state(void)
          
 
           SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-          vTaskDelay(pdMS_TO_TICKS(5));
+          vTaskDelay(pdMS_TO_TICKS(100));
    }
    
    if(gpro_t.gTimer_power_on_auto_link  > 6 && link_counter_times < 3){
@@ -234,7 +234,7 @@ static void Auto_SmartPhone_TryToLink_TencentCloud(void)
 			net_t.linking_tencent_cloud_doing= 0;
             power_on_login_tencent_cloud_flag++;
             SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-            osDelay(10);
+            osDelay(100);
 	}
     else if(wifi_link_net_state()==0 && power_on_login_tencent_cloud_flag ==4){
        power_on_login_tencent_cloud_flag++;

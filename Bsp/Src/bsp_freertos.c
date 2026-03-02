@@ -22,7 +22,7 @@ static void vTaskStart(void *pvParameters);
 
 /* vTaskMsgPro 任务 */
 static StaticTask_t xTaskMsgProTCB;
-static StackType_t xTaskMsgProStack[640];
+static StackType_t xTaskMsgProStack[640];//640
 
 /* vTaskStart 任务 */
 static StaticTask_t xTaskStartTCB;
@@ -276,6 +276,7 @@ static void power_run_handler(void)
               gpro_t.process_run_step=0;
 	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
 	          gpro_t.fan_counter_error =0;
+			  //gpro_t.gTimer_conter_twohours_minutes=0;
 		      power_off_handler();
              break;
           }
