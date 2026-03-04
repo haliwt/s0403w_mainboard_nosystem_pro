@@ -259,6 +259,7 @@ static void power_run_handler(void)
             power_on_handler();
             link_wifi_to_tencent_handler(); //detected ADC of value 
             ai_mode_display_fun();
+			
 
 			//ack_handler();
             if(gpro_t.process_run_step > 10 || gpro_t.stopTwoHours_flag > 1){
@@ -276,6 +277,7 @@ static void power_run_handler(void)
               gpro_t.process_run_step=0;
 	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
 	          gpro_t.fan_counter_error =0;
+			  gpro_t.fan_rx_stop_flag=0;
 			  //gpro_t.gTimer_conter_twohours_minutes=0;
 		      power_off_handler();
              break;

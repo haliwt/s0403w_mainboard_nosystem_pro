@@ -478,6 +478,19 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 	 break;
 
+	 case 0x18: //WT.EDIT 2026.03.02
+         if(pdata[3]==1){ // recach 2 hours fan stop
+               gpro_t.fan_rx_stop_flag =1 ;
+			   gpro_t.stopTwoHours_flag=1;
+               FAN_Stop();
+         }
+		 else{
+            gpro_t.fan_rx_stop_flag = 0;
+		    Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
+        }
+
+	 break;
+
 	  case 0x19: //works 2 hours ,then have a rest 10 minutes ->notice 
 
 	    if(pdata[3]==1){ // recach 2 hours 
@@ -485,6 +498,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
            gpro_t.stopTwoHours_flag=1;
 		 //  gpro_t.gTimer_conter_twohours_minutes=0;//if don't connect diplay board ,itself counter times
 		   gctl_t.gTimer_fan_run_one_minute = 0;
+	
 		    PTC_SetLow(); //ptc off;
 			vTaskDelay(200);
 			PLASMA_SetLow() ; //plasma turn off.
@@ -493,6 +507,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		}
 		else if(pdata[3]==0){
 			  gpro_t.stopTwoHours_flag=0;//WT.EDIT 2026.01.26
+			   gpro_t.fan_rx_stop_flag =0 ;
              // gpro_t.gTimer_conter_twohours_minutes=0; //2026.02.27 WT.EDIT
               if(gpro_t.rx_ptc_flag >1)gpro_t.rx_ptc_flag=1;//2026.02.27 WT.EDIT
               if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
@@ -504,7 +519,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
               }
 			  if(gctl_t.gPlasma==1)PLASMA_SetHigh();
 			  if(gctl_t.gUlransonic==1) ultrasonic_open();
-			  Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
+			 // Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
 			  
 		}
 	   

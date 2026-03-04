@@ -32,6 +32,7 @@ void power_on_handler(void)
 		 gctl_t.set_temperature_flag=0;
 		  gctl_t.set_temp_first_closeptc =0;
 		  gctl_t.rx_set_temp_flag =0;
+		  gpro_t.fan_rx_stop_flag=0;
 
 		 /*end*/
          
@@ -107,7 +108,7 @@ void power_on_handler(void)
 		  MqttData_Publish_Init();
 		 vTaskDelay(pdMS_TO_TICKS(100));
      }
-	//gpro_t.gTimer_conter_twohours_minutes=0;
+	
 	 
     gpro_t.process_run_step= 6;
 
@@ -214,6 +215,7 @@ void power_on_handler(void)
     if(gpro_t.rx_ptc_flag >1)gpro_t.rx_ptc_flag=1;//2026.02.27 WT.EDIT
     if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
 	if(gctl_t.gUlransonic > 1) gctl_t.gUlransonic =1;
+	if(gpro_t.stopTwoHours_flag==0)gpro_t.fan_rx_stop_flag =0;
 	gpro_t.process_run_step= 6;	
 
    break;
@@ -441,6 +443,7 @@ void power_off_handler(void)
 	      vTaskDelay(pdMS_TO_TICKS(10));
           gpro_t.gTimer_poweroff_fan=0;
           gctl_t.gTimer_fan_run_one_minute=0;
+	
        
       
         gctl_t.set_wind_speed_value=10;
@@ -472,7 +475,7 @@ void power_off_handler(void)
        if(wifi_link_net_state() == 1){
 
           MqttData_Publish_PowerOff_Ref(); 
-          //vTaskDelay(pdMS_TO_TICKS(200)); //WT.EDTI 2024.11.19 
+          vTaskDelay(pdMS_TO_TICKS(200)); //WT.EDTI 2024.11.19 
        }
          gpro_t.power_off_run_step = 4;
        break;
@@ -482,7 +485,7 @@ void power_off_handler(void)
           if(gctl_t.ptc_warning == 1){
 		 	
 		  	Publish_Data_Warning(ptc_temp_warning,0);
-		  	//vTaskDelay(pdMS_TO_TICKS(100));
+		  	vTaskDelay(pdMS_TO_TICKS(100));
             
           }
            gpro_t.power_off_run_step = 5;
@@ -491,7 +494,7 @@ void power_off_handler(void)
         case 5:
             if(gctl_t.ptc_warning == 1){
 			Publish_Data_Warning(fan_warning,0);
-			//vTaskDelay(pdMS_TO_TICKS(100));
+			vTaskDelay(pdMS_TO_TICKS(200));
 			
           }
         gpro_t.power_off_run_step = 6;
@@ -587,6 +590,7 @@ void every_power_on_run(void)
       gctl_t.gPlasma =1;       //"é„1¤7?é‘„1¤7?"
       gctl_t.gUlransonic = 1; // "æ¤¹è¾«æ«„1¤7"
       gctl_t.gTimer_fan_run_one_minute=0;
+	
        gpro_t.process_run_step=0;
 	
 
