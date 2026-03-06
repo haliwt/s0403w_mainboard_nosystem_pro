@@ -415,12 +415,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	      net_t.wifi_link_net_success=0;
           gpro_t.wifi_led_fast_blink_flag =1;
           gctl_t.wifi_config_net_lable=wifi_set_restor;
-		  wifi_t.runCommand_order_lable= wifi_link_tencent_cloud;//2 
+		  wifi_t.runCommand_order_lable= wifi_link_tencent_cloud;//2  
+		 
 		  
           gctl_t.gTimer_linkTencentCounter=0; //total times is 120s
           SendWifiData_Answer_Cmd(0x05,0x01); //WT.EDIT 2024.12.28
           vTaskDelay(pdMS_TO_TICKS(100));
-
+         
       
         }
 
@@ -433,9 +434,60 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		 
      break;
 
+	 case 0x10: //power on or off don't sound .
+	     if(pdata[3] == 0x01){ //open
+
+		       
+	            SendWifiData_Answer_Cmd(0x10,0x01);
+	            vTaskDelay(pdMS_TO_TICKS(100));
+	         
+	            gpro_t.process_run_step=0;
+	           	gpro_t.gpower_on = power_on;
+
+		}
+        else if(pdata[3] == 0x0){ //close 
+
+			    PTC_SetLow(); //ptc off;
+				vTaskDelay(200);
+				PLASMA_SetLow() ; //plasma turn off.
+	            ultrasonic_close();
+			
+              SendWifiData_Answer_Cmd(0x10,0x0); //power off .
+
+              vTaskDelay(pdMS_TO_TICKS(100)); 
+      
+             gpro_t.power_off_run_step=1;
+             gpro_t.gpower_on = power_off;
+			 
+		     
+        }
+
+
+	 break;
+
       case 0x11:
 		    gpro_t.second_disp_flag = pdata[3];
 	  break; 
+
+	  case 0x12:
+	  	 if(pdata[3]==1){ // recach 2 hours fan stop
+               
+             gpro_t.power_off_run_step=1;
+             gpro_t.gpower_on = power_off;
+			 
+               FAN_Stop();
+			   PTC_SetLow(); //ptc off;
+			   vTaskDelay(200);
+			    PLASMA_SetLow() ; //plasma turn off.
+	           ultrasonic_close();
+         }
+		 else{
+            
+		    Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
+        }
+
+
+	  break;
 	  
 	  case 0x16 : //buzzer sound command with answer .
 
@@ -482,6 +534,8 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
          if(pdata[3]==1){ // recach 2 hours fan stop
                gpro_t.fan_rx_stop_flag =1 ;
 			   gpro_t.stopTwoHours_flag=1;
+		     
+			   gctl_t.gTimer_senddata_panel=0;
                FAN_Stop();
          }
 		 else{
@@ -497,7 +551,8 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
            gpro_t.stopTwoHours_flag=1;
 		 //  gpro_t.gTimer_conter_twohours_minutes=0;//if don't connect diplay board ,itself counter times
-		   gctl_t.gTimer_fan_run_one_minute = 0;
+		
+		   gctl_t.gTimer_senddata_panel =0;
 	
 		    PTC_SetLow(); //ptc off;
 			vTaskDelay(200);
@@ -508,6 +563,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		else if(pdata[3]==0){
 			  gpro_t.stopTwoHours_flag=0;//WT.EDIT 2026.01.26
 			   gpro_t.fan_rx_stop_flag =0 ;
+		       gctl_t.gTimer_senddata_panel=0;
              // gpro_t.gTimer_conter_twohours_minutes=0; //2026.02.27 WT.EDIT
               if(gpro_t.rx_ptc_flag >1)gpro_t.rx_ptc_flag=1;//2026.02.27 WT.EDIT
               if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
@@ -657,6 +713,8 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		
 			
 	 break;
+
+	 
 
 	 case 0x6C: //Synchronize local time ->two display board 
 

@@ -36,42 +36,22 @@ uint8_t twoHours_stop_flag;
 void works_run_two_hours_state(void)
 {
 
-//  if(gpro_t.gTimer_conter_twohours_minutes > 122){ //WT.EDT 2026.02.27
-//  	 gpro_t.gTimer_conter_twohours_minutes=0;
-//	 gctl_t.gTimer_fan_run_one_minute = 0;
-//		    PTC_SetLow();
-//			PLASMA_SetHigh() ;
-//            ultrasonic_close();
-//     gpro_t.stopTwoHours_flag =1  ;  
 
-//  }
-   
   if(gpro_t.stopTwoHours_flag ==1){//WT.EDIT 2025.11.19
 
-    #if 0
-    if(gctl_t.gTimer_fan_run_one_minute < 61){
-			
-            fan_run_fun(); // SetLevel_Fan_PWMA(10);//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
-     } 
-	 else{
-	 #endif 	
-	 gctl_t.gTimer_fan_run_one_minute =80;
-         //FAN_Stop();
-         PLASMA_SetLow(); //
+   
+          PLASMA_SetLow(); //
          PTC_SetLow();
          ultrasonic_close();
 
-     
-      
-     
-  	}
-    else if(gctl_t.gTimer_senddata_panel >6  && gpro_t.fan_rx_stop_flag ==0 && gpro_t.stopTwoHours_flag ==0){ //300ms
+  }
+  else if(gctl_t.gTimer_senddata_panel >6  && gpro_t.fan_rx_stop_flag ==0 && gpro_t.stopTwoHours_flag ==0){ //300ms
             gctl_t.gTimer_senddata_panel=0;
-            
+          
             ActionEvent_Handler();
-     }
+   }
 
-	 if(gpro_t.fan_rx_stop_flag ==1){
+	if(gpro_t.fan_rx_stop_flag ==1){
                FAN_Stop();
 			  PLASMA_SetLow(); //
             PTC_SetLow();
