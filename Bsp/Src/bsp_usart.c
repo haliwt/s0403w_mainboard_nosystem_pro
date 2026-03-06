@@ -265,7 +265,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 static void usart1_protocol_state_machine(uint8_t *pdata)
 {
 
-   static uint8_t ptc_on_default =0xff, ptc_off_default = 0xff;
+   static uint8_t ptc_on_default =1, ptc_off_default = 0;
    switch(pdata[2]){
 
    case 0:
@@ -437,12 +437,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	 case 0x10: //power on or off don't sound .
 	     if(pdata[3] == 0x01){ //open
 
-		       
+		    if(	gpro_t.gpower_on == power_off){
 	            SendWifiData_Answer_Cmd(0x10,0x01);
 	            vTaskDelay(pdMS_TO_TICKS(100));
 	         
 	            gpro_t.process_run_step=0;
 	           	gpro_t.gpower_on = power_on;
+		    }
 
 		}
         else if(pdata[3] == 0x0){ //close 
@@ -469,9 +470,9 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		    gpro_t.second_disp_flag = pdata[3];
 	  break; 
 
-	  case 0x12:
+	  case 0x12: //powe off fan run one minute stop .
 	  	 if(pdata[3]==1){ // recach 2 hours fan stop
-               
+
              gpro_t.power_off_run_step=1;
              gpro_t.gpower_on = power_off;
 			 
@@ -631,6 +632,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 
 	case 0x22: //PTC ON OR OFF by compare temperature value .
+	  #if 0
         if(pdata[3]== 0x01){
 			if(gctl_t.ptc_on_off_flag == 1){
 			   gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
@@ -639,8 +641,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			}  
 	        else if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
 			  
-			   gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
+			  // gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
+                 if(ptc_on_default != gpro_t.rx_ptc_flag ){
 
+				    gpro_t.rx_ptc_flag = ptc_on_default;
 			 
 			      PTC_SetHigh();
 		        
@@ -653,13 +657,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 				  }
 			   	
 		       } 
+	        }
       }
       else if(pdata[3]== 0x0){
         
           gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
 
-	      if(ptc_off_default != get_ptc_value()){
-              ptc_off_default = get_ptc_value();
+	    
 	          PTC_SetLow();
         
 		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
@@ -671,16 +675,16 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			vTaskDelay(200);
 		  }
          
-	      }
+	  }
 			 
-      }
+      #endif 
    
      break;
 
 
 	 
 	 case 0x2A: //smart phone or display  board set temperature .receive.
-	 
+	   #if 0
 		   if(pdata[4]==0x01){
 			  
 			   if(pdata[5] >19 && pdata[5] < 41){
@@ -688,10 +692,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			   gctl_t.ptc_on_off_flag =0;
 			   if(gctl_t.set_temperature_value > gctl_t.gDht11_temperature){
 			
-				   gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
+			        if(gpro_t.stopTwoHours_flag ==0){
 
-				   if(gpro_t.stopTwoHours_flag ==0){
-				       PTC_SetHigh();
+				        if(ptc_on_default != gpro_t.rx_ptc_flag ){
+							gpro_t.rx_ptc_flag = ptc_on_default;
+				            PTC_SetHigh();
+						    vTaskDelay(200);
+				        }
 			        } 
 
 			   }
@@ -711,7 +718,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		   
 			}
 		
-			
+		#endif 	
 	 break;
 
 	 
