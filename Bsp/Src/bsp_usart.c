@@ -278,12 +278,14 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
          
         if(pdata[3] == 0x01){ //open
 
+		     
+		        gpro_t.process_run_step=0;
+	           	gpro_t.gpower_on = power_on;
 		        buzzer_sound();//buzzer_sound_fun();
 	            SendWifiData_Answer_Cmd(0x01,0x01);
 	            vTaskDelay(pdMS_TO_TICKS(100));
 	         
-	            gpro_t.process_run_step=0;
-	           	gpro_t.gpower_on = power_on;
+	           
 
 		 }
         else if(pdata[3] == 0x0){ //close 
@@ -438,14 +440,17 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	 case 0x10: //power on or off don't sound .
 	     if(pdata[3] == 0x01){ //open
 
-		    if(	gpro_t.gpower_on == power_off){
-				 buzzer_sound();
+		   
+             if(gpro_t.gpower_on == power_off){  
+			 	 buzzer_sound();
+				
+				gpro_t.process_run_step=0;
+	           	gpro_t.gpower_on = power_on;
 	            SendWifiData_Answer_Cmd(0x10,0x01);
 	            vTaskDelay(pdMS_TO_TICKS(100));
 	         
-	            gpro_t.process_run_step=0;
-	           	gpro_t.gpower_on = power_on;
-		    }
+	           
+             }
 
 		}
         else if(pdata[3] == 0x0){ //close 
