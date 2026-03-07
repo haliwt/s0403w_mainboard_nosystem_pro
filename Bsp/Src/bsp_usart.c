@@ -266,7 +266,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 static void usart1_protocol_state_machine(uint8_t *pdata)
 {
 
-   static uint8_t ptc_on_default =1, ptc_off_default = 0;
+   static uint8_t ptc_onoff_default =1;
    switch(pdata[2]){
 
    case 0:
@@ -648,6 +648,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	        else if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
 			  
 			     gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
+			     ptc_onoff_default=1;
                  PTC_SetHigh();
 		        
 				 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
@@ -663,7 +664,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
        else if(pdata[3]== 0x0){
         
           gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
-
+               ptc_onoff_default++;
 	    
 	          PTC_SetLow();
         
@@ -694,8 +695,8 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			
 			        if(gpro_t.stopTwoHours_flag ==0){
 
-				        if(ptc_on_default != gpro_t.rx_ptc_flag ){
-							gpro_t.rx_ptc_flag = ptc_on_default;
+				        if(ptc_onoff_default != gpro_t.rx_ptc_flag ){
+							ptc_onoff_default = gpro_t.rx_ptc_flag;
 				            PTC_SetHigh();
 						    vTaskDelay(100);
 				        }
@@ -703,6 +704,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 			   }
 			   else{
+			   	   ptc_onoff_default++;
 				   gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
 
 			       PTC_SetLow();
