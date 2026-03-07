@@ -28,6 +28,7 @@ static void parse_recieve_copy_data(uint8_t *pddata);
 uint8_t rx_inputBuf[12];
 uint8_t check_bcc_code;
 uint8_t counter_power_flag;
+uint8_t ptc_onoff_default ;
 
 
 //提供注册接口
@@ -266,7 +267,7 @@ static void usart1_isr_callback_handler(uint8_t data)
 static void usart1_protocol_state_machine(uint8_t *pdata)
 {
 
-   static uint8_t ptc_onoff_default =1;
+   
    switch(pdata[2]){
 
    case 0:
@@ -280,10 +281,9 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 		     
 		        gpro_t.process_run_step=0;
-	           	gpro_t.gpower_on = power_on;
 		        buzzer_sound();//buzzer_sound_fun();
 	            SendWifiData_Answer_Cmd(0x01,0x01);
-	            vTaskDelay(pdMS_TO_TICKS(100));
+	            vTaskDelay(pdMS_TO_TICKS(30));
 	         
 	           
 
@@ -293,7 +293,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		      counter_power_flag ++;
 			  buzzer_sound();
 
-              SendWifiData_Answer_Cmd(0x01,0x02); //power off .
+              SendWifiData_Answer_Cmd(0x01,0x0); //power off .
 
               vTaskDelay(pdMS_TO_TICKS(100)); 
       
@@ -440,19 +440,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	 case 0x10: //power on or off don't sound .
 	     if(pdata[3] == 0x01){ //open
 
-		   
-             if(gpro_t.gpower_on == power_off){  
-			 	 buzzer_sound();
-				
-				gpro_t.process_run_step=0;
-	           	gpro_t.gpower_on = power_on;
-	            SendWifiData_Answer_Cmd(0x10,0x01);
-	            vTaskDelay(pdMS_TO_TICKS(100));
+		   gpro_t.process_run_step=0;
+	       gpro_t.gpower_on = power_on;
+	       SendWifiData_Answer_Cmd(0x10,0x01);
+	       vTaskDelay(pdMS_TO_TICKS(100));
 	         
-	           
-             }
-
-		}
+	    }
         else if(pdata[3] == 0x0){ //close 
 
 			    PTC_SetLow(); //ptc off;
@@ -631,25 +624,19 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
      
 
 	  
-     case 0x1C: // is time data: hours,minutes,sencodes.
+    case 0x1C: // is time data: hours,minutes,sencodes.
 		   
-		 
-
 	break;
 
 
 	case 0x22: //PTC ON OR OFF by compare temperature value .
         if(pdata[3]== 0x01){
-			if(gctl_t.ptc_on_off_flag == 1){
-			   gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
-	            PTC_SetLow();
-
-			}  
-	        else if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
+		   if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
 			  
 			     gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
-			     ptc_onoff_default=1;
+			     ptc_onoff_default++;
                  PTC_SetHigh();
+		   	
 		        
 				 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
 		         vTaskDelay(pdMS_TO_TICKS(100));
@@ -658,8 +645,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 					  vTaskDelay(200);
 					
 				  }
-			   	
-		       } 
+		   	}   	
 	   }
        else if(pdata[3]== 0x0){
         
@@ -694,12 +680,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			   if(gctl_t.set_temperature_value > gctl_t.gDht11_temperature){
 			
 			        if(gpro_t.stopTwoHours_flag ==0){
+					  ptc_onoff_default++;
 
-				        if(ptc_onoff_default != gpro_t.rx_ptc_flag ){
-							ptc_onoff_default = gpro_t.rx_ptc_flag;
+				      gpro_t.rx_ptc_flag=1;
 				            PTC_SetHigh();
-						    vTaskDelay(100);
-				        }
+						   
+				        
 			        } 
 
 			   }
