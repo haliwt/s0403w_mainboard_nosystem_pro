@@ -55,10 +55,11 @@ void power_on_handler(void)
        
         gpro_t.stopTwoHours_flag =0;
 	
-       
+         Fan_Full_Speed();//Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
      
          read_sensorData();//updateDht11_sensorData_toDisp();
 		 gpro_t.process_run_step= 1;
+		 
 	break; 
 
 
