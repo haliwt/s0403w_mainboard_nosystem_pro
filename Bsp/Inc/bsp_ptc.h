@@ -15,7 +15,7 @@ void ptc_turn_off(void);
 void ptc_turn_on(void);
 
 
-void ptc_update_wifi_data(void);
+
 
 
 
