@@ -223,7 +223,7 @@ void power_on_handler(void)
 
      default:
 	
-		break;
+	 break;
   }
 }
 
@@ -245,7 +245,7 @@ void ActionEvent_Handler(void)
    if(gpro_t.stopTwoHours_flag ==1) return ; //WT.EDIT 2025.10.29
    
    if(get_ptc_value()==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
-	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 &&  gpro_t.stopTwoHours_flag==0){ //PTC warning flag
+	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 ){ //PTC warning flag
 
       PTC_SetHigh();
         
@@ -336,9 +336,12 @@ void ActionEvent_Handler(void)
  }
 
 /************************************************************************************
+*
+*Function Name:void smartphone_timer_power_on_and_normal_handler(void)
+*
+*
+*
 ************************************************************************************/
-
-
 void smartphone_timer_power_on_and_normal_handler(void)
 {
  
@@ -402,7 +405,7 @@ void smartphone_timer_power_on_and_normal_handler(void)
 void SetPowerOff_ForDoing(void)
 {
    
-     gctl_t.set_wind_speed_value =10;
+    // gctl_t.set_wind_speed_value =10;
  
     gctl_t.gFan = 0;
     gpro_t.rx_ptc_flag = 0;//gctl_t.gDry = 0;
@@ -440,31 +443,33 @@ void power_off_handler(void)
     switch(gpro_t.power_off_run_step){
 
     case 1:
-		  SendWifiData_Answer_Cmd(0x01,0x02); //compatible older version 
-	      vTaskDelay(pdMS_TO_TICKS(10));
+		 
           gpro_t.gTimer_poweroff_fan=0;
          
 	
        
-      
+        //timer timing 
         gctl_t.set_wind_speed_value=10;
 		gctl_t.gModel =1;
 		gctl_t.app_timer_power_on_flag =0;
 		
 	
 	  
-  
-	    gpro_t.stopTwoHours_flag=0;
+         //power off init two hours flag
+	     gpro_t.stopTwoHours_flag=0;
+		 gpro_t.process_run_step=0;
+	     gpro_t.fan_counter_error =0;
+		 gpro_t.fan_rx_stop_flag=0;
 
 		  gctl_t.ptc_warning =0;
-		// gctl_t.fan_warning =0;
+		  gctl_t.fan_warning =0;
        
 		 gctl_t.gTimer_ptc_adc_times=0;
 		 gctl_t.gTimer_fan_adc_times=0;
          gpro_t.process_run_step=0;//gpro_t.process_run_step
           gctl_t.rx_set_temp_flag=0; 
          gctl_t.set_temperature_flag = 0; 
-		 fan_detect_voltage=1000;
+		 fan_detect_voltage=100;
 
 	      SetPowerOff_ForDoing();
 		  gpro_t.power_off_run_step = 2;

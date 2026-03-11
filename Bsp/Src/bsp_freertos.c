@@ -274,10 +274,7 @@ static void power_run_handler(void)
 
           case power_off:
 		  
-              gpro_t.process_run_step=0;
-	          gpro_t.fan_counter_error =0;
-			  gpro_t.fan_rx_stop_flag=0;
-			  //gpro_t.gTimer_conter_twohours_minutes=0;
+          
 		      power_off_handler();
              break;
           }

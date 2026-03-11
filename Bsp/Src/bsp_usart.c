@@ -279,8 +279,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
          
         if(pdata[3] == 0x01){ //open
 
-		     
 		        gpro_t.process_run_step=0;
+				if(gpro_t.soft_version ==0){
+				  gpro_t.gpower_on = power_on;
+
+				}
 		        buzzer_sound();//buzzer_sound_fun();
 	            SendWifiData_Answer_Cmd(0x01,0x01);
 	            vTaskDelay(pdMS_TO_TICKS(30));
@@ -292,15 +295,20 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 		      counter_power_flag ++;
 			  buzzer_sound();
-
-              SendWifiData_Answer_Cmd(0x01,0x0); //power off .
-
-              vTaskDelay(pdMS_TO_TICKS(100)); 
+		     gpro_t.power_off_run_step=1;
+             gpro_t.gpower_on = power_off;
+              if(gpro_t.soft_version ==2){
+                SendWifiData_Answer_Cmd(0x01,0x0); //power off .
+                vTaskDelay(pdMS_TO_TICKS(100)); 
+              }
+              else{
+			    SendWifiData_Answer_Cmd(0x01,0x02); //compatible older version 
+	           vTaskDelay(pdMS_TO_TICKS(100));
+              }
       
          
              
-             gpro_t.power_off_run_step=1;
-             gpro_t.gpower_on = power_off;
+            
 			 
 		     
         }
@@ -448,8 +456,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	    }
         else if(pdata[3] == 0x0){ //close 
 
-			    PTC_SetLow(); //ptc off;
-				vTaskDelay(200);
+			    PTC_SetLow(); //ptc off
 				PLASMA_SetLow() ; //plasma turn off.
 	            ultrasonic_close();
 			
