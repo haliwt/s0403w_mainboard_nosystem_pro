@@ -126,6 +126,13 @@ void Fan_RunSpeed_Fun(void)
 
 }
 
+void fan_full_run(void)
+{
+
+  Fan_Full_Speed();
+
+}
+
 
 /********************************************************
 *
@@ -162,7 +169,14 @@ void tim16_stop_fan_pmw_config(void)
 
 }
 
+//void fan_run(void)
+//{
+//	if(gpro_t.stopTwoHours_flag ==0 && gpro_t.gpower_on==power_on){
+//				 Fan_RunSpeed_Fun();
+//	}
 
+
+//}
 
 
 

@@ -44,7 +44,7 @@ void callback_register_fun(void)
 static void tim17_isr_callback_handler(void)
 {
    static  uint16_t tm0;
- //  static uint8_t tm1;
+
  
 
     tm0 ++ ;
@@ -52,7 +52,8 @@ static void tim17_isr_callback_handler(void)
      
 	 if(tm0 > 999){//10ms *100 = 1000ms =1s
         tm0 =0;
-        
+     
+	   gpro_t.gTimer_twohours_seconds_counter++;
 
         gpro_t.gTimer_link_net_timer_time++;
 	    gctl_t.gTimer_senddata_panel++;
@@ -88,10 +89,10 @@ static void tim17_isr_callback_handler(void)
         gpro_t.gTimer_poweroff_fan++;
 		gpro_t.gTimer_read_dth11_sensor ++;
 		gpro_t.gTimer_read_dht11_to_disp++;
-//        if(tm1 > 59){
-//			tm1=0;	
-//			gpro_t.gTimer_conter_twohours_minutes++;
-//        }
+        if(gpro_t.gTimer_twohours_seconds_counter > 59){
+			gpro_t.gTimer_twohours_seconds_counter=0;	
+			gpro_t.gTimer_conter_twohours_minutes++;
+        }
 	
 	
       }

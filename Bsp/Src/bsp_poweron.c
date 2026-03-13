@@ -3,6 +3,8 @@
 
 static void power_off_stop_fun(void);
 void every_power_on_run(void);
+uint8_t fan_run_one_minute_flag;
+
 /**********************************************************************
 	*
 	*Functin Name: 
@@ -17,6 +19,7 @@ void power_on_handler(void)
     switch(gpro_t.process_run_step){
 
 	case 0: //1
+	     
           gpro_t.power_off_run_step=0;
           /*power on initial reference---start */
          gctl_t.gTimer_senddata_panel=0; //main board function run action.
@@ -28,7 +31,7 @@ void power_on_handler(void)
 		 gctl_t.set_wind_speed_value= 100;
 		
 		 gctl_t.first_link_tencent_cloud_flag=1;
-		 gctl_t.ptc_on_off_flag =0; //WT.EDIT 2025.09.18
+		 gctl_t.ptc_prohibit_on_flag =0; //WT.EDIT 2025.09.18
 		 gctl_t.set_temperature_flag=0;
 		  gctl_t.set_temp_first_closeptc =0;
 		  gctl_t.rx_set_temp_flag =0;
@@ -49,7 +52,9 @@ void power_on_handler(void)
 	
         /*POWER OFF REF-start */
         gpro_t.power_off_run_step = 1;
-        powerOffFanRun_flag =1;
+    
+		gpro_t.gTimer_conter_twohours_minutes=0;
+	    gpro_t.gTimer_twohours_seconds_counter=0;
         /*end*/
 		
        
@@ -58,7 +63,9 @@ void power_on_handler(void)
          Fan_Full_Speed();//Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
      
          read_sensorData();//updateDht11_sensorData_toDisp();
+         fan_run_one_minute_flag=1;
 		 gpro_t.process_run_step= 1;
+		
 		 
 	break; 
 
@@ -98,6 +105,7 @@ void power_on_handler(void)
 
 		 }
 	  read_sensorData();
+	
 
       gpro_t.process_run_step= 4;
 	break;
@@ -110,7 +118,7 @@ void power_on_handler(void)
 		 vTaskDelay(pdMS_TO_TICKS(100));
      }
 	
-	 
+
     gpro_t.process_run_step= 6;
 
 	 break;
@@ -164,6 +172,7 @@ void power_on_handler(void)
 		   SendData_Set_Command(0x1F,0x01);//SendWifiData_To_Data(0x1F,0x01);
            vTaskDelay(pdMS_TO_TICKS(100));
 	}
+    
       gpro_t.process_run_step=8 ;
  break; 
 
@@ -176,7 +185,7 @@ void power_on_handler(void)
      }
 
 	 works_run_two_hours_state();
-
+   
 	gpro_t.process_run_step= 9;
   break;
 
@@ -190,7 +199,7 @@ void power_on_handler(void)
 				gpro_t.gTimer_update_tencet_dht11=0;
 				Update_Dht11_Totencent_Value();
         }
-	  
+	 
        gpro_t.process_run_step= 10; 
 
 
@@ -198,13 +207,14 @@ void power_on_handler(void)
 
   case 10:
 
-     if(gctl_t.set_temperature_flag > 1 || gctl_t.set_temperature_value > 40 || gctl_t.ptc_on_off_flag > 1
-	 	  ||gctl_t.app_timer_power_on_flag > 2 || gctl_t.set_temp_first_closeptc > 1){
+     if(gctl_t.set_temperature_flag > 1 || gctl_t.set_temperature_value > 40 || gctl_t.ptc_prohibit_on_flag > 1
+	 	  ||gctl_t.app_timer_power_on_flag > 2 || gctl_t.set_temp_first_closeptc > 1 || gpro_t.soft_version > 2){
 	 	if(gctl_t.set_temperature_flag > 1)gctl_t.set_temperature_flag =0;
 		if(gctl_t.set_temperature_value > 40 && gctl_t.set_temperature_flag ==0)gctl_t.set_temperature_value =40;
-        if(gctl_t.ptc_on_off_flag > 1)gctl_t.ptc_on_off_flag =0;
+        if(gctl_t.ptc_prohibit_on_flag > 1)gctl_t.ptc_prohibit_on_flag =0;
 		if(gctl_t.app_timer_power_on_flag > 2)gctl_t.app_timer_power_on_flag=0;
 		if( gctl_t.set_temp_first_closeptc > 1)  gctl_t.set_temp_first_closeptc =0;
+		if(gpro_t.soft_version > 2)gpro_t.soft_version = 0 ;
 	 }
 
     if(gpro_t.gTimer_read_dht11_to_disp >3){
@@ -217,6 +227,7 @@ void power_on_handler(void)
     if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
 	if(gctl_t.gUlransonic > 1) gctl_t.gUlransonic =1;
 	if(gpro_t.stopTwoHours_flag==0)gpro_t.fan_rx_stop_flag =0;
+
 	gpro_t.process_run_step= 6;	
 
    break;
@@ -244,7 +255,7 @@ void ActionEvent_Handler(void)
 
    if(gpro_t.stopTwoHours_flag ==1) return ; //WT.EDIT 2025.10.29
    
-   if(get_ptc_value()==1 && gctl_t.ptc_on_off_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_on_off_flag ==0){
+   if(get_ptc_value()==1 && gctl_t.ptc_prohibit_on_flag ==0){//if( gctl_t.gDry==1 && gctl_t.ptc_prohibit_on_flag ==0){
 	if(gpro_t.fan_warning_flag !=1 && gpro_t.ptc_warning !=1 ){ //PTC warning flag
 
       PTC_SetHigh();
@@ -439,11 +450,12 @@ void SetPowerOff_ForDoing(void)
 void power_off_handler(void)
 {
 
-   // static uint8_t fan_run_one_minute_flag;
+   
     switch(gpro_t.power_off_run_step){
 
     case 1:
-		 
+		  SendWifiData_Answer_Cmd(0x01,0x0); //power off .
+          vTaskDelay(pdMS_TO_TICKS(30)); 
           gpro_t.gTimer_poweroff_fan=0;
          
 	
@@ -453,7 +465,8 @@ void power_off_handler(void)
 		gctl_t.gModel =1;
 		gctl_t.app_timer_power_on_flag =0;
 		
-	
+	    gpro_t.gTimer_conter_twohours_minutes=0;
+	    gpro_t.gTimer_twohours_seconds_counter=0;
 	  
          //power off init two hours flag
 	     gpro_t.stopTwoHours_flag=0;
@@ -470,7 +483,9 @@ void power_off_handler(void)
           gctl_t.rx_set_temp_flag=0; 
          gctl_t.set_temperature_flag = 0; 
 		 fan_detect_voltage=100;
-
+         fan_run_one_minute_flag=1;
+		 gpro_t.gTimer_poweroff_fan =0;
+		 
 	      SetPowerOff_ForDoing();
 		  gpro_t.power_off_run_step = 2;
        
@@ -513,6 +528,14 @@ void power_off_handler(void)
         gpro_t.stopTwoHours_flag =0;
        
         power_off_stop_fun();
+
+        if(gpro_t.soft_version == 0){
+			
+			if(gpro_t.gTimer_poweroff_fan > 60 &&  fan_run_one_minute_flag==1){
+                 fan_run_one_minute_flag++;
+                 FAN_Stop();
+			}
+        }
 
 	   if(gpro_t.gTimer_update_todisplay > 3){
 			gpro_t.gTimer_update_todisplay=0;

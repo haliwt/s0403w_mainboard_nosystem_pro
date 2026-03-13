@@ -278,10 +278,15 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
          
         if(pdata[3] == 0x01){ //open
-
+                
 		        gpro_t.process_run_step=0;
+				if(gpro_t.soft_version > 2)gpro_t.soft_version =0;
 				if(gpro_t.soft_version ==0){
-				  gpro_t.gpower_on = power_on;
+				   gpro_t.gpower_on = power_on;
+				   fan_full_run();//WT.EDIT 2026.01.26
+				   PLASMA_SetHigh();
+                   ultrasonic_open();   //ultrasnoic ON 
+                   PTC_SetHigh();
 
 				}
 		        buzzer_sound();//buzzer_sound_fun();
@@ -302,16 +307,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
                 vTaskDelay(pdMS_TO_TICKS(100)); 
               }
               else{
+			  	
 			    SendWifiData_Answer_Cmd(0x01,0x02); //compatible older version 
-	           vTaskDelay(pdMS_TO_TICKS(100));
+	            vTaskDelay(pdMS_TO_TICKS(100));
+			     
               }
       
-         
-             
-            
-			 
-		     
-        }
+       }
 
      break;
 
@@ -320,10 +322,8 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
        if(pdata[3] == 0x01 ){//phone_cmd_power
 
 	      buzzer_sound();
-		  gpro_t.rx_ptc_flag = 1;
-		  //gctl_t.gDry = 1;
-	
-	     gctl_t.ptc_on_off_flag=0;
+		 gpro_t.rx_ptc_flag = 1;
+		 gctl_t.ptc_prohibit_on_flag=0;
 		 if(gpro_t.stopTwoHours_flag==0){//two hours have a rest ten minutes .
          if(gpro_t.ptc_warning ==0 && gpro_t.fan_warning_flag ==0){ //PTC warning flag
              
@@ -342,10 +342,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
           buzzer_sound();
           gpro_t.rx_ptc_flag = 0;
 	   
-          //gctl_t.gDry =0;
+      
 	      PTC_SetLow();
 		
-		  gctl_t.ptc_on_off_flag =1;
+		  gctl_t.ptc_prohibit_on_flag =1;
           SendWifiData_Answer_Cmd(0x02,0x0); //
           vTaskDelay(pdMS_TO_TICKS(50)); 
      
@@ -450,6 +450,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 		   gpro_t.process_run_step=0;
 	       gpro_t.gpower_on = power_on;
+		    fan_full_run();//WT.EDIT 2026.01.26
+		    PLASMA_SetHigh();
+             ultrasonic_open();   //ultrasnoic ON 
+             PTC_SetHigh();
 	       SendWifiData_Answer_Cmd(0x10,0x01);
 	       vTaskDelay(pdMS_TO_TICKS(100));
 	         
@@ -551,7 +555,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
          }
 		 else{
             gpro_t.fan_rx_stop_flag = 0;
-		    Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
+		    fan_full_run();//WT.EDIT 2026.01.26
         }
 
 	 break;
@@ -561,7 +565,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	    if(pdata[3]==1){ // recach 2 hours 
 
            gpro_t.stopTwoHours_flag=1;
-		 //  gpro_t.gTimer_conter_twohours_minutes=0;//if don't connect diplay board ,itself counter times
+	
 	
 		   gctl_t.gTimer_senddata_panel =0;
 	
@@ -574,12 +578,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			  gpro_t.stopTwoHours_flag=0;//WT.EDIT 2026.01.26
 			   gpro_t.fan_rx_stop_flag =0 ;
 		       gctl_t.gTimer_senddata_panel=0;
-             // gpro_t.gTimer_conter_twohours_minutes=0; //2026.02.27 WT.EDIT
+        
               if(gpro_t.rx_ptc_flag >1)gpro_t.rx_ptc_flag=1;//2026.02.27 WT.EDIT
               if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
 			  if(gctl_t.gUlransonic > 1) gctl_t.gUlransonic =1;
               
-              if(gpro_t.rx_ptc_flag ==1 && gctl_t.ptc_on_off_flag==0){
+              if(gpro_t.rx_ptc_flag ==1 && gctl_t.ptc_prohibit_on_flag==0){
 			  	PTC_SetHigh();
 				vTaskDelay(200);
               }
@@ -596,7 +600,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	  case 0x1B: //write set temperature value .data.2026.01.06
 	  
         if(pdata[3]== 0x01){
-		       gctl_t.ptc_on_off_flag =0;
+		       gctl_t.ptc_prohibit_on_flag =0;
 			   gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
 
 			   if(gpro_t.stopTwoHours_flag ==0){
@@ -639,18 +643,21 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 
 	case 0x22: //PTC ON OR OFF by compare temperature value .
-        if(pdata[3]== 0x01){
+        if(pdata[3]== 0x01 && gpro_t.gpower_on == power_on){
+		   
 		   if(gpro_t.stopTwoHours_flag >1 )gpro_t.stopTwoHours_flag=0; //This is be solved bug.
-		   if(gctl_t.ptc_on_off_flag >1)gctl_t.ptc_on_off_flag=0;
-		   if(gctl_t.ptc_on_off_flag ==0 && gpro_t.stopTwoHours_flag ==0){
+		   if(gctl_t.ptc_prohibit_on_flag >1) gctl_t.ptc_prohibit_on_flag=0;
+		   
+		   if(gpro_t.stopTwoHours_flag ==0 && gctl_t.ptc_prohibit_on_flag==0){
 			  
 			     gpro_t.rx_ptc_flag = 1;//gctl_t.gDry = 1;
 			     ptc_onoff_default++;
                  PTC_SetHigh();
 		   	
-		        
-				 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
-		         vTaskDelay(pdMS_TO_TICKS(100));
+		         if(gpro_t.soft_version == 0x02){
+					 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
+			         vTaskDelay(pdMS_TO_TICKS(100));
+		         }
 				 if(ptc_set_wifi !=gpro_t.rx_ptc_flag){
 				 	ptc_set_wifi =gpro_t.rx_ptc_flag;
 					 if(wifi_link_net_state()==1){ 
@@ -661,16 +668,16 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 				 }
 		   	}   	
 	   }
-       else if(pdata[3]== 0x0){
-        
+       else if(pdata[3]== 0x0 && gpro_t.gpower_on == power_on){
+          if(gctl_t.ptc_prohibit_on_flag >1) gctl_t.ptc_prohibit_on_flag=0;
           gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
                ptc_onoff_default++;
 	    
 	          PTC_SetLow();
-        
+         if(gpro_t.soft_version == 0x02){
 		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
            vTaskDelay(pdMS_TO_TICKS(100));
-
+         	}
 		  if(ptc_set_wifi !=gpro_t.rx_ptc_flag){
 				 	ptc_set_wifi =gpro_t.rx_ptc_flag;
 		  if(wifi_link_net_state()==1){ 
@@ -688,23 +695,22 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	 
 	 case 0x2A: //smart phone or display  board set temperature .receive.
 	 
-		   if(pdata[4]==0x01){
+		   if(pdata[4]==0x01 && gpro_t.gpower_on == power_on){
 			  
 			   if(pdata[5] >19 && pdata[5] < 41){
+			   	gctl_t.ptc_prohibit_on_flag = 0;
 			   	if(gpro_t.stopTwoHours_flag >1 )gpro_t.stopTwoHours_flag=0; //This is be solved bug.
 			   gctl_t.set_temperature_value = pdata[5] ;
-			   gctl_t.ptc_on_off_flag =0;
-			   if(gctl_t.set_temperature_value > gctl_t.gDht11_temperature){
+			   gctl_t.ptc_prohibit_on_flag =0;
+			   if(gctl_t.set_temperature_value > gctl_t.gDht11_temperature && gpro_t.stopTwoHours_flag ==0){
 			
-			        if(gpro_t.stopTwoHours_flag ==0){
+			        
 					  ptc_onoff_default++;
-
-				      gpro_t.rx_ptc_flag=1;
-				            PTC_SetHigh();
+                      gpro_t.rx_ptc_flag=1;
+				      PTC_SetHigh();
+					  
 						   
 				        
-			        } 
-
 			   }
 			   else{
 			   	   ptc_onoff_default++;
@@ -740,7 +746,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		      gpro_t.disp_works_hours= pdata[5];
 			 
 			  gpro_t.disp_works_minutes =pdata[6];
-			  //gpro_t.gTimer_conter_twohours_minutes =pdata[6];//WT.EDIT 2026.02.27
+			
 
 			  gpro_t.gTimer_works_time_seconds=pdata[7];
 			

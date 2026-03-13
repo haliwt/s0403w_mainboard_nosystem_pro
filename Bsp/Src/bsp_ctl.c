@@ -7,7 +7,7 @@ _run_t gctl_t;
  uint8_t first_set_ptc_on ,set_temp_first;
 
 
-uint8_t powerOffFanRun_flag ;
+
 
 
 

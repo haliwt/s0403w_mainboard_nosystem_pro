@@ -553,7 +553,7 @@ void Json_Parse_Command_Fun(void)
 			
 	        gpro_t.fan_warning_flag =0;
 	        gpro_t.power_off_run_step=1;
-	        powerOffFanRun_flag = 1;
+	    
 	
 			gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
 			//gpro_t.send_ack_cmd = 1; //ack_app_power_on;
@@ -583,7 +583,7 @@ void Json_Parse_Command_Fun(void)
 			#if 1
             gpro_t.gpower_on = power_off;
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
-            powerOffFanRun_flag = 1;
+     
            // gpro_t.send_ack_cmd = 1; //ack_app_power_off;
         
             #endif 
@@ -609,7 +609,7 @@ void Json_Parse_Command_Fun(void)
 	      gpro_t.rx_ptc_flag = 1;//gctl_t.gDry=1;
 	
           gctl_t.gTimer_senddata_panel=8;  
-		  gctl_t.ptc_on_off_flag = 0;
+		  gctl_t.ptc_prohibit_on_flag = 0;
 		  gctl_t.set_temp_first_closeptc =0;
 		  gctl_t.rx_set_temp_flag =0;
 
@@ -634,7 +634,7 @@ void Json_Parse_Command_Fun(void)
 		 
 	    
          gctl_t.gTimer_senddata_panel=8;
-		 gctl_t.ptc_on_off_flag = 1;
+		 gctl_t.ptc_prohibit_on_flag = 1;
 		 gctl_t.set_temp_first_closeptc =0;
 		 gctl_t.rx_set_temp_flag =0;
 	
@@ -767,7 +767,7 @@ void Json_Parse_Command_Fun(void)
             if( gctl_t.set_temperature_value <20 )  gctl_t.set_temperature_value=20;
             MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
 		//	gctl_t.set_temperature_flag=1; //WT.EDIT 2025.09.18
-			gctl_t.ptc_on_off_flag =0;
+			gctl_t.ptc_prohibit_on_flag =0;
 		
 			SendWifiData_To_Data(0x3A, gctl_t.set_temperature_value); //smart phone set temperature value .
 			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(10);//HAL_Delay(10);
@@ -828,7 +828,7 @@ void Json_Parse_Command_Fun(void)
 		   
 			  gctl_t.app_timer_power_on_flag = 1;
               gpro_t.power_off_run_step=1; // app power on 
-              powerOffFanRun_flag = 1;
+        
 		
 			   MqttData_Publish_SetOpen(1);  
 			   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
@@ -860,7 +860,7 @@ void Json_Parse_Command_Fun(void)
 
             gpro_t.gpower_on = power_off;
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
-            powerOffFanRun_flag = 1;
+           
             gpro_t.send_ack_cmd = 1; //ack_app_power_off;
 
 	

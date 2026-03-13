@@ -81,7 +81,7 @@ typedef struct _RUN_T{
    uint8_t app_timer_power_on_flag ;
 
    uint8_t response_wifi_signal_label;
-  uint8_t ptc_on_off_flag ;
+  uint8_t ptc_prohibit_on_flag ;
    uint8_t set_temp_first_closeptc ;
 
  //fan:
@@ -148,18 +148,6 @@ extern _run_t gctl_t;
 
 //#define CProcessInit(me_) ((me_)->cmdCtr__ =0,(me_)->state__ = IDLE)
 extern uint8_t ReceiveBuffer[1];
-
-
-extern uint8_t powerOffFanRun_flag ;
-
-
-
-
-//void copy_cmd_notice_hanlder(void);
-
-
-//void main_function_detected_handler(uint8_t cmd);
-
 
 
 
