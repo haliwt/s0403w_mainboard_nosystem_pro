@@ -556,6 +556,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		 else{
             gpro_t.fan_rx_stop_flag = 0;
 		    fan_full_run();//WT.EDIT 2026.01.26
+			if(gpro_t.rx_ptc_flag ==1 && gctl_t.ptc_prohibit_on_flag==0){
+			  	PTC_SetHigh();
+				
+             }
+			 if(gctl_t.gPlasma==1)PLASMA_SetHigh();
+			 if(gctl_t.gUlransonic==1) ultrasonic_open();
         }
 
 	 break;
@@ -585,7 +591,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
               
               if(gpro_t.rx_ptc_flag ==1 && gctl_t.ptc_prohibit_on_flag==0){
 			  	PTC_SetHigh();
-				vTaskDelay(200);
+				
               }
 			  if(gctl_t.gPlasma==1)PLASMA_SetHigh();
 			  if(gctl_t.gUlransonic==1) ultrasonic_open();
