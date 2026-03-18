@@ -291,7 +291,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 				}
 		        buzzer_sound();//buzzer_sound_fun();
 	            SendWifiData_Answer_Cmd(0x01,0x01);
-	            vTaskDelay(pdMS_TO_TICKS(30));
+	            vTaskDelay(pdMS_TO_TICKS(50));
 	         
 	           
 
@@ -649,7 +649,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 
 
 	case 0x22: //PTC ON OR OFF by compare temperature value .
-        if(pdata[3]== 0x01 && gpro_t.gpower_on == power_on){
+        if(pdata[3]== 0x01){
 		   
 		   if(gpro_t.stopTwoHours_flag >1 )gpro_t.stopTwoHours_flag=0; //This is be solved bug.
 		   if(gctl_t.ptc_prohibit_on_flag >1) gctl_t.ptc_prohibit_on_flag=0;
@@ -660,10 +660,10 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			     ptc_onoff_default++;
                  PTC_SetHigh();
 		   	
-		         if(gpro_t.soft_version == 0x02){
-					 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
-			         vTaskDelay(pdMS_TO_TICKS(100));
-		         }
+//		         if(gpro_t.soft_version == 0x02){
+//					 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
+//			         vTaskDelay(pdMS_TO_TICKS(100));
+//		         }
 				 if(ptc_set_wifi !=gpro_t.rx_ptc_flag){
 				 	ptc_set_wifi =gpro_t.rx_ptc_flag;
 					 if(wifi_link_net_state()==1){ 
@@ -674,15 +674,17 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 				 }
 		   	}   	
 	   }
-       else if(pdata[3]== 0x0 && gpro_t.gpower_on == power_on){
-          if(gctl_t.ptc_prohibit_on_flag >1) gctl_t.ptc_prohibit_on_flag=0;
-          gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
+       else if(pdata[3]== 0x0){
+	   	 if(gpro_t.stopTwoHours_flag >1 )gpro_t.stopTwoHours_flag=0; //This is be solved bug.
+		 if(gctl_t.ptc_prohibit_on_flag >1) gctl_t.ptc_prohibit_on_flag=0;
+		 
+               gpro_t.rx_ptc_flag =0 ;//gctl_t.gDry =0;
                ptc_onoff_default++;
 	    
 	          PTC_SetLow();
          if(gpro_t.soft_version == 0x02){
-		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
-           vTaskDelay(pdMS_TO_TICKS(100));
+//		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
+//           vTaskDelay(pdMS_TO_TICKS(100));
          	}
 		  if(ptc_set_wifi !=gpro_t.rx_ptc_flag){
 				 	ptc_set_wifi =gpro_t.rx_ptc_flag;

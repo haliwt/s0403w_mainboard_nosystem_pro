@@ -116,7 +116,7 @@ static void vTaskMsgPro(void *pvParameters)
          wifi_run_handler();
 
         
-		 vTaskDelay(20);//100
+		 vTaskDelay(100);//100
 		
 	}
       
