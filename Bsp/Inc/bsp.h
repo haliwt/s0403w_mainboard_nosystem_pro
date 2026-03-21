@@ -58,8 +58,6 @@
 #endif
 #include "bsp_fan.h"
 #include "bsp_ultrasonic.h"
-#include "bsp_disp_parse.h"
-#include "bsp_usart_ack.h"
 
 //wifi files
 #include "bsp_esp8266.h"
@@ -100,6 +98,11 @@
 
 
 extern uint8_t wifi_rx_inputBuf[WIFI_RX_NUMBERS];
+extern uint8_t inputBuf[1];
+
+
+
+
 
 
 typedef enum{
@@ -123,23 +126,23 @@ typedef struct PROCESS_T{
    uint8_t copy_cmd_notice_buff[10];
    //copy command 
 
-   uint8_t two_hours_cp_counter;
+ 
+ 
 
 
    uint8_t get_beijing_flag;
-   volatile uint8_t stopTwoHours_flag;
+   uint8_t stopTwoHours_flag;
 
    uint8_t receive_copy_cmd ;
    uint8_t send_ack_cmd;
    uint8_t phone_power_on_flag;
    //uint8_t gFan_pwm_duty_level;
    uint8_t answer_buzzer_flag ;
-   uint8_t two_hours_state ;
-   uint8_t again_power_off_flag ;
-   
+ 
+   uint8_t rx_ptc_flag;
+   uint8_t second_disp_flag;
 	
-	
-     uint8_t ptc_switch_flag;
+    
 	 uint8_t ultrasonic_switch_flag;
 	 uint8_t plasma_switch_flag;
     volatile uint8_t process_run_step;
@@ -151,6 +154,8 @@ typedef struct PROCESS_T{
    uint8_t fan_warning_flag;
    uint8_t soft_version;
    volatile uint8_t decoder_success_flag; //interrupt be used to flag.
+   uint8_t fan_counter_error ;
+   uint8_t fan_rx_stop_flag;
 
    
    uint8_t disp_works_hours ;    
@@ -161,22 +166,22 @@ typedef struct PROCESS_T{
    uint8_t gTimer_get_data_from_tencent_data;
    uint8_t gTimer_link_net_timer_time;
    uint8_t gTimer_dc_power_on_auto_link_net;
-   uint8_t gTimer_publis_dht11_data;
+
    uint8_t gTimer_detect_fan_error;
 
-   uint8_t  gTimer_power_on_auto_link;
+   uint8_t gTimer_power_on_auto_link;
    uint8_t gTimer_update_todisplay;
    uint8_t gTimer_update_tencet_dht11;
    uint8_t gTimer_poweroff_fan;
    uint8_t gTimer_read_dth11_sensor ;
-   uint8_t gTimer_timer_start_counter;
-   uint8_t gTimer_check_twohours;
-   uint8_t gTimer_twohours_seconds_counter;
-  
-  
-
+   uint8_t gTimer_read_dht11_to_disp;
+   uint8_t gTimer_twohours_seconds_counter;	
+   uint8_t gTimer_conter_twohours_minutes;
   
 
+   
+  
+  
 }process_t;
 
 extern process_t gpro_t;
@@ -191,7 +196,11 @@ void wifi_communication_tnecent_handler(void);
 
 void wifi_auto_detected_link_state(void);
 
-void waiting_ack_handler(void);
+
+
+
+ uint8_t get_ptc_value(void);
+
 
 
 #endif 

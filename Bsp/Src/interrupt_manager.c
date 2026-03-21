@@ -44,14 +44,16 @@ void callback_register_fun(void)
 static void tim17_isr_callback_handler(void)
 {
    static  uint16_t tm0;
+
  
 
     tm0 ++ ;
-       gctl_t.gTimer_copy_cmd_counter++;
+      
      
 	 if(tm0 > 999){//10ms *100 = 1000ms =1s
         tm0 =0;
-		gpro_t.gTimer_twohours_seconds_counter++;
+     
+	   gpro_t.gTimer_twohours_seconds_counter++;
 
         gpro_t.gTimer_link_net_timer_time++;
 	    gctl_t.gTimer_senddata_panel++;
@@ -59,12 +61,12 @@ static void tim17_isr_callback_handler(void)
 
 	   gctl_t.gTimer_fan_adc_times++;
 	  // gctl_t.gTimer_ptc_adc_times++;
-	   gctl_t.gTimer_read_dht11_counter++;
+	  
 
 	
 	  gctl_t.gTimer_linkTencentCounter++;
-	  gctl_t.gTimer_fan_run_one_minute++;
-	  gctl_t.gTimer_wifi_detected_counter++;
+	
+	
 	  //wifi function 
        wifi_t.gTimer_auto_detected_net_state_times ++;
        wifi_t.gTimer_auto_link_net_time++ ;
@@ -75,34 +77,34 @@ static void tim17_isr_callback_handler(void)
        gpro_t.gTimer_power_on_first_link_tencent++;
        gpro_t.gTimer_get_data_from_tencent_data++;
        gpro_t.gTimer_dc_power_on_auto_link_net++;
-     
+       
 
-       gpro_t.gTimer_publis_dht11_data++ ;
+
        gpro_t.gTimer_detect_fan_error++;
-       gpro_t.gTimer_timer_start_counter++;
+     
 	   gpro_t.gTimer_power_on_auto_link++;
 	   gpro_t.gTimer_update_todisplay++;
 	   gpro_t.gTimer_update_tencet_dht11++;
 
-	
-
-	    gpro_t.gTimer_poweroff_fan++;
+        gpro_t.gTimer_poweroff_fan++;
 		gpro_t.gTimer_read_dth11_sensor ++;
-		if(gpro_t.gTimer_twohours_seconds_counter>59){ //WT.EDI 2025.11.17 
+		gpro_t.gTimer_read_dht11_to_disp++;
+        if(gpro_t.gTimer_twohours_seconds_counter > 59){
 			gpro_t.gTimer_twohours_seconds_counter=0;	
-			counter_two_hours++;
-			gpro_t.gTimer_check_twohours++;
-
-		}
-   
+			gpro_t.gTimer_conter_twohours_minutes++;
+        }
 	
+	
+      }
+   
+}	
 	
 		    
 
         
 		
-	}
- }
+	
+ 
 
 
 

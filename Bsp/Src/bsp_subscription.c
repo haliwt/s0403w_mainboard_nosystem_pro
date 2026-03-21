@@ -440,8 +440,8 @@ void Tencent_Cloud_Rx_Handler(void)
 	
 	if(strstr((char *)gpro_t.wifi_rx_data_array,"ptc\":0")){
             if(gpro_t.gpower_on ==power_on){
-				  gctl_t.gDry=0;
-                  ptc_recoder_flag =0;
+				  gpro_t.rx_ptc_flag = 0;//gpro_t.rx_ptc_flag=0;
+                
 	           gctl_t.response_wifi_signal_label = PTC_OFF_ITEM;
 	         
              }
@@ -449,8 +449,8 @@ void Tencent_Cloud_Rx_Handler(void)
     }
     else if(strstr((char *)gpro_t.wifi_rx_data_array,"ptc\":1")){
             if(gpro_t.gpower_on ==power_on){
-	          gctl_t.gDry=1;
-              ptc_recoder_flag =1;
+	          gpro_t.rx_ptc_flag =1;//gpro_t.rx_ptc_flag=1;
+           
 			  gctl_t.response_wifi_signal_label = PTC_ON_ITEM;
 				
             }
@@ -534,7 +534,7 @@ void Json_Parse_Command_Fun(void)
 
  
     static uint8_t wind_hundred, wind_decade,wind_unit,temp_decade,temp_unit;
-	static uint8_t buzzer_temp_on;
+	static uint8_t buzzer_temp_on,phone_power_flag;
     
 
    switch(gctl_t.response_wifi_signal_label){
@@ -546,21 +546,21 @@ void Json_Parse_Command_Fun(void)
 
 	        Publish_Data_ToTencent_Initial_Data();
 		    vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200);
-            
+            phone_power_flag=1;
 
 			#if 1
 			gctl_t.ptc_warning =0;
 			
 	        gpro_t.fan_warning_flag =0;
 	        gpro_t.power_off_run_step=1;
-	        powerOffFanRun_flag = 1;
+	    
 	
 			gpro_t.gpower_on = power_on;//gctl_t.rx_command_tag= POWER_ON;
 			//gpro_t.send_ack_cmd = 1; //ack_app_power_on;
-	        gpro_t.gTimer_timer_start_counter=0;
+	     
 			#endif 
 			gpro_t.phone_power_on_flag = 1; //ack_app_power_on;
-	        gpro_t.gTimer_timer_start_counter=0;
+	       
 		    SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
 			vTaskDelay(pdMS_TO_TICKS(100));//osDelay(5);//HAL_Delay(5);
 
@@ -579,16 +579,16 @@ void Json_Parse_Command_Fun(void)
              if(wifi_link_net_state()==1){  //WT.EDIT 2025.03.27
 		 	MqttData_Publish_SetOpen(0);  
 			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);
-           
+             phone_power_flag=2;
 			#if 1
             gpro_t.gpower_on = power_off;
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
-            powerOffFanRun_flag = 1;
+     
            // gpro_t.send_ack_cmd = 1; //ack_app_power_off;
-            gpro_t.gTimer_timer_start_counter=0;
+        
             #endif 
 			gpro_t.phone_power_on_flag = 2; //ack_app_power_on;
-	        gpro_t.gTimer_timer_start_counter=0;
+	
              SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
              vTaskDelay(pdMS_TO_TICKS(100));
 		
@@ -604,12 +604,13 @@ void Json_Parse_Command_Fun(void)
 	  if(gpro_t.gpower_on ==power_on){
 	    if(gctl_t.ptc_warning ==0){
          MqttData_Publish_SetPtc(0x01);
+		 vTaskDelay(200);
 	
-	      gctl_t.gDry=1;
-		  ptc_recoder_flag =1;
+	      gpro_t.rx_ptc_flag = 1;//gpro_t.rx_ptc_flag=1;
+	
           gctl_t.gTimer_senddata_panel=8;  
-		  gctl_t.ptc_on_off_flag = 0;
-
+		  gctl_t.ptc_prohibit_on_flag = 0;
+		  gctl_t.set_temp_first_closeptc =0;
 		  gctl_t.rx_set_temp_flag =0;
 
 
@@ -633,12 +634,12 @@ void Json_Parse_Command_Fun(void)
 		 
 	    
          gctl_t.gTimer_senddata_panel=8;
-		 gctl_t.ptc_on_off_flag = 1;
-	
+		 gctl_t.ptc_prohibit_on_flag = 1;
+		 gctl_t.set_temp_first_closeptc =0;
 		 gctl_t.rx_set_temp_flag =0;
 	
-     	 gctl_t.gDry=0;
-		 ptc_recoder_flag =0;
+     	 gpro_t.rx_ptc_flag = 0;//gpro_t.rx_ptc_flag=0;
+
 		 PTC_SetLow();
          gctl_t.app_timer_power_on_flag = 0;
 		
@@ -670,7 +671,7 @@ void Json_Parse_Command_Fun(void)
 	  case ANION_ON_ITEM: //plasma 
 	  	if(gpro_t.gpower_on ==power_on){
             MqttData_Publish_SetPlasma(1);
-			//vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
 		
               gctl_t.gPlasma=1;
               gctl_t.gTimer_senddata_panel=8;
@@ -724,7 +725,7 @@ void Json_Parse_Command_Fun(void)
 
       
             gctl_t.gModel=2;
-             MqttData_Publish_SetState(2);
+             MqttData_Publish_AitState(2);
     	     vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
              
     	    SendWifiData_To_Cmd(0x27,0x02);
@@ -742,7 +743,7 @@ void Json_Parse_Command_Fun(void)
 	  	 if(gpro_t.gpower_on ==power_on){
 		
               gctl_t.gModel=1;
-              MqttData_Publish_SetState(1);
+              MqttData_Publish_AitState(1);
     		  vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
             
     		   SendWifiData_To_Cmd(0x27,0x01);
@@ -766,12 +767,12 @@ void Json_Parse_Command_Fun(void)
             if( gctl_t.set_temperature_value <20 )  gctl_t.set_temperature_value=20;
             MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
 		//	gctl_t.set_temperature_flag=1; //WT.EDIT 2025.09.18
-			gctl_t.ptc_on_off_flag =0;
+			gctl_t.ptc_prohibit_on_flag =0;
 		
 			SendWifiData_To_Data(0x3A, gctl_t.set_temperature_value); //smart phone set temperature value .
 			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(10);//HAL_Delay(10);
 			
-	
+			gctl_t.set_temp_first_closeptc = 0;
 			gctl_t.rx_set_temp_flag =0;
 			 gctl_t.app_timer_power_on_flag = 0;
           
@@ -827,7 +828,7 @@ void Json_Parse_Command_Fun(void)
 		   
 			  gctl_t.app_timer_power_on_flag = 1;
               gpro_t.power_off_run_step=1; // app power on 
-              powerOffFanRun_flag = 1;
+        
 		
 			   MqttData_Publish_SetOpen(1);  
 			   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
@@ -844,7 +845,7 @@ void Json_Parse_Command_Fun(void)
 			   buzzer_temp_on=0;
    
                gpro_t.send_ack_cmd = 1; //ack_app_timer_power_on;
-               gpro_t.gTimer_timer_start_counter=0;
+    
 		         
 
 				
@@ -859,15 +860,15 @@ void Json_Parse_Command_Fun(void)
 
             gpro_t.gpower_on = power_off;
             gpro_t.power_off_run_step=1; //WT.EDIT 2025.01.04
-            powerOffFanRun_flag = 1;
+           
             gpro_t.send_ack_cmd = 1; //ack_app_power_off;
-             gpro_t.gTimer_timer_start_counter=0;
+
 	
             SendWifiData_To_Cmd(0x21,0x0); //smart phone is power off
 			vTaskDelay(100);//HAL_Delay(5);
             buzzer_sound();
 			
-	     
+	        phone_power_flag=2;
          
             gctl_t.response_wifi_signal_label = 0xff;
              
@@ -940,15 +941,15 @@ void Parse_Json_Statement(void)
     
      if(strstr((char *)TCMQTTRCVPUB,"ptc\":0")){
 				
-		gctl_t.gDry=0;
-	    ptc_recoder_flag = 0;
+		gpro_t.rx_ptc_flag = 0;//gpro_t.rx_ptc_flag=0;
+	 
            
 				  
 		}
 		else if(strstr((char *)TCMQTTRCVPUB,"ptc\":1")){
 				
-				    gctl_t.gDry=1;
-		            ptc_recoder_flag = 1;
+				    gpro_t.rx_ptc_flag = 1;//gpro_t.rx_ptc_flag=1;
+		           
                  
 				  
 					

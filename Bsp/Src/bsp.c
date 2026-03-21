@@ -9,29 +9,6 @@ static void Auto_InitWifiModule_Hardware(void);
 
 static void Auto_SmartPhone_TryToLink_TencentCloud(void);
 
-//uint8_t counter_flag;
-
-//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-//{
-//  /* USER CODE BEGIN Callback 0 */
-//  static uint16_t tim17_counter;
-//  /* USER CODE END Callback 0 */
-//  if (htim->Instance == TIM14)
-//  {
-//    HAL_IncTick();
-//  }
-//  /* USER CODE BEGIN Callback 1 */
-//  else if (htim->Instance == TIM17)
-//  {
-//    tim17_counter++;
-//	if(tim17_counter>999){
-//		tim17_counter=0;
-//		counter_flag++;
-//	}
-//  }
-
-//  /* USER CODE END Callback 1 */
-//}
 
 uint32_t readFlash_value;
 
@@ -51,6 +28,7 @@ uint8_t bcc_check(const unsigned char *data, int len)
     }
     return bcc;
 }
+
 /**************************************************************************************
 *
 *Function Name:  void bsp_init(void)
@@ -175,7 +153,7 @@ void wifi_auto_detected_link_state(void)
          
 
           SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-          vTaskDelay(pdMS_TO_TICKS(5));
+          vTaskDelay(pdMS_TO_TICKS(100));
    }
    
    if(gpro_t.gTimer_power_on_auto_link  > 6 && link_counter_times < 3){
@@ -183,8 +161,8 @@ void wifi_auto_detected_link_state(void)
 
       link_counter_times =5;
       if(net_t.wifi_link_net_success==0){
-         SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
-         vTaskDelay(pdMS_TO_TICKS(10));
+         SendData_Set_Command(0x1F,0);//SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
+         vTaskDelay(pdMS_TO_TICKS(100));
 
 	  }
 
@@ -256,7 +234,7 @@ static void Auto_SmartPhone_TryToLink_TencentCloud(void)
 			net_t.linking_tencent_cloud_doing= 0;
             power_on_login_tencent_cloud_flag++;
             SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-            osDelay(10);
+            osDelay(100);
 	}
     else if(wifi_link_net_state()==0 && power_on_login_tencent_cloud_flag ==4){
        power_on_login_tencent_cloud_flag++;
@@ -266,27 +244,8 @@ static void Auto_SmartPhone_TryToLink_TencentCloud(void)
 }
 
 
-void waiting_ack_handler(void)
+uint8_t get_ptc_value(void)
 {
-
-    if(gpro_t.phone_power_on_flag == 1 &&  gpro_t.gTimer_timer_start_counter > 1){
-
-		//  gpro_t.phone_power_on_flag --> cancel in files bsp_usart. 
-
-	      gpro_t.gTimer_timer_start_counter=0;
-		   SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
-		vTaskDelay(pdMS_TO_TICKS(10));//osDelay(5);//HAL_Delay(5);
-    }
-	else if(gpro_t.phone_power_on_flag ==2 &&  gpro_t.gTimer_timer_start_counter > 1){
-
-	   // gpro_t.phone_power_on_flag = 1; //ack_app_power_on;
-		gpro_t.gTimer_timer_start_counter=0;
-		SendWifiData_To_Cmd(0x31,0x00); //smart phone is power on
-		vTaskDelay(pdMS_TO_TICKS(10));//osDelay(5);//HAL_Delay(5);
-
-	}
-
-
-
+    return gpro_t.rx_ptc_flag;
 }
 

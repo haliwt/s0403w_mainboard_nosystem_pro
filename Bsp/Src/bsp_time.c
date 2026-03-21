@@ -9,7 +9,7 @@
 uint8_t counter_two_hours;
 
 
-// ??????????????????????? new_works_run_two_hours_state()
+
 typedef enum {
     TWOH_STATE_RUNNING,
     TWOH_STATE_FAN_COOLING,
@@ -24,210 +24,92 @@ uint8_t auto_link_net_flag;
 uint8_t timer_fan_flag;//times_flag;
 uint8_t twoHours_stop_flag;
 
+
 /**********************************************************************
     *
-    *Functin Name: void new_works_run_two_hours_state(void)
+    *Functin Name: void works_run_two_hours_state(void)
     *Function :  
     *Input Ref: NO
     *Return Ref: NO
     *
 ************************************************************************/
-void new_works_run_two_hours_state(void)
+void works_run_two_hours_state(void)
 {
 
-    if(gpro_t.two_hours_state >TWOH_STATE_PAUSED){
-       if(twoHours_stop_flag==0)gpro_t.two_hours_state = TWOH_STATE_RUNNING;
-       else if(twoHours_stop_flag==1 || twoHours_stop_flag==2)gpro_t.two_hours_state = TWOH_STATE_FAN_COOLING;
-	   else if(twoHours_stop_flag==3)gpro_t.two_hours_state = TWOH_STATE_PAUSED;
-   }
+  static uint8_t define_twohours_flag ;
+
+  switch(gpro_t.soft_version ){
+
+   case 0x02:
   
-   if(gctl_t.gDry > 1){
+ 
+  if(gpro_t.stopTwoHours_flag ==1){//WT.EDIT 2025.11.19
+
    
-	   if( ptc_recoder_flag == 0){// //WT.EDIT 2025.11.17)
-		   gctl_t.gDry =0;
-	   }
-	   else if(ptc_recoder_flag == 1) gctl_t.gDry =1;
-   
-	}
-
-  switch(gpro_t.two_hours_state){
-
-    case TWOH_STATE_RUNNING:
-        if(gpro_t.stopTwoHours_flag == 1){ // 119 seconds = 2 hours
-            //close main board fun
-            PLASMA_SetLow(); // 
-            PTC_SetLow();
-            ultrasonic_close();
-			twoHours_stop_flag=1;
-            gctl_t.gTimer_fan_run_one_minute = 0;
-         
-            gpro_t.two_hours_state = TWOH_STATE_FAN_COOLING; // Transition to FAN_COOLING state
-            #if DEBUG_FLAG
-
-		     printf("gpro_t.stopTwoHours_flag = 1 \r\n");
-
-			#endif 
-        }
-//		else if(gctl_t.gTimer_senddata_panel >6){ //300ms
-//				 gctl_t.gTimer_senddata_panel=0;
-//				
-//				 ActionEvent_Handler();
-//		 }
-		  
-		
-        break;
-
-    case TWOH_STATE_FAN_COOLING:
-        if(gctl_t.gTimer_fan_run_one_minute < 61){
-            fan_run_fun(); // SetLevel_Fan_PWMA(10);//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
-             PLASMA_SetLow(); // 
-             PTC_SetLow();
-            ultrasonic_close();
-			twoHours_stop_flag=1;
-			counter_two_hours =0;//WT.EDIT 2025.11.05
-			gpro_t.gTimer_check_twohours =0;
-			gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
-        } 
-		else {
-    
-            FAN_Stop();
-            gpro_t.two_hours_state = TWOH_STATE_PAUSED; // Transition to PAUSED state
-            counter_two_hours =0;//WT.EDIT 2025.11.05
-            twoHours_stop_flag=2;
-			gpro_t.gTimer_check_twohours = 0;
-			gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
-           #if DEBUG_FLAG
-            
-		     printf("two hours state fan one minutes \r\n");
-	
-
-		   #endif 
-        }
-		
-        break;
-
-    case TWOH_STATE_PAUSED:
-
-            FAN_Stop();
-            PLASMA_SetLow(); //
-            PTC_SetLow();
-            ultrasonic_close();
-			gpro_t.ptc_switch_flag++;
-			counter_two_hours =0;//WT.EDIT 2025.11.05
-			twoHours_stop_flag=3;
-			gpro_t.gTimer_check_twohours = 0;
-			gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
-            gpro_t.two_hours_state = TWOH_STATE_RUNNING;
-			#if DEBUG_FLAG
-
-		     printf("two hours state is over\r\n");
-			 printf("gpro_t.stopTwoHours_flag = 0 \r\n");
-
-		   #endif 
-        
-        break;
-
-        default:
-           	
-        break;
+          PLASMA_SetLow(); //
+         PTC_SetLow();
+         ultrasonic_close();
 
   }
-
-  
-}
-/**********************************************************************
-    *
-    *Functin Name: void older_works_run_two_hours_state(void)
-    *Function :  
-    *Input Ref: NO
-    *Return Ref: NO
-    *
-************************************************************************/
-void older_works_run_two_hours_state(void)
-{
-  // static uint8_t twoHours_stop_flag;
-   if(gpro_t.two_hours_state >TWOH_STATE_PAUSED){
-       if(twoHours_stop_flag==0)gpro_t.two_hours_state = TWOH_STATE_RUNNING;
-       else if(twoHours_stop_flag==1 || twoHours_stop_flag==2)gpro_t.two_hours_state = TWOH_STATE_FAN_COOLING;
-	   else if(twoHours_stop_flag==3)gpro_t.two_hours_state = TWOH_STATE_PAUSED;
-   }
-  if(gpro_t.stopTwoHours_flag > 1){//WT.EDIT 2025.11.19
-
-    if(gpro_t.two_hours_state == TWOH_STATE_RUNNING){
-  	     gpro_t.stopTwoHours_flag=0;
-    }
-	else if(gpro_t.two_hours_state == TWOH_STATE_FAN_COOLING){
-	    gpro_t.stopTwoHours_flag=1;
-
-	}
-	else if(twoHours_stop_flag==3){
-	    gpro_t.stopTwoHours_flag=1;
-
-
-	}
-
-  }
-
-	switch(gpro_t.two_hours_state){
-
-    case TWOH_STATE_RUNNING:
-        if(counter_two_hours > TWOH_RUN_DURATION_MIN){ // 119 seconds = 2 hours
-            counter_two_hours = 0;
-            gpro_t.gTimer_check_twohours = 0;
-		    gpro_t.gTimer_twohours_seconds_counter = 0; 
-			twoHours_stop_flag=0;
-
-            PLASMA_SetLow(); //
-            PTC_SetLow();
-            ultrasonic_close();
-            gctl_t.gTimer_fan_run_one_minute = 0;
-            gpro_t.stopTwoHours_flag = 1;
-            gpro_t.two_hours_state = TWOH_STATE_FAN_COOLING; // Transition to FAN_COOLING state
-        }
-		else if(gctl_t.gTimer_senddata_panel >6 &&  gpro_t.stopTwoHours_flag ==0){ //300ms
+  else if(gctl_t.gTimer_senddata_panel >6  && gpro_t.fan_rx_stop_flag ==0 && gpro_t.stopTwoHours_flag ==0){ //300ms
             gctl_t.gTimer_senddata_panel=0;
-            
+          
             ActionEvent_Handler();
-        }
-        break;
+   }
 
-    case TWOH_STATE_FAN_COOLING:
-        if(gctl_t.gTimer_fan_run_one_minute < 61){
-			twoHours_stop_flag=1;
-            fan_run_fun(); // SetLevel_Fan_PWMA(10);//Fan_RunSpeed_Fun();// FAN_CCW_RUN();
-        } else {
-			twoHours_stop_flag=2;
-            FAN_Stop();
-            gpro_t.two_hours_state = TWOH_STATE_PAUSED; // Transition to PAUSED state
-        }
-        break;
-
-    case TWOH_STATE_PAUSED:
-    //??(??)10??
-        if(counter_two_hours > TWOH_PAUSE_DURATION_SEC){ // 10  minutes = 600 seconds
-            counter_two_hours = 0;
-			twoHours_stop_flag=0;
-            gpro_t.gTimer_check_twohours = 0;
-            gctl_t.gTimer_fan_adc_times = 0; // ADC be detected must be run 60s,after be detected ADC
-            gpro_t.stopTwoHours_flag = 0;
-            gpro_t.two_hours_state = TWOH_STATE_RUNNING; // Transition back to RUNNING state
-            gpro_t.gTimer_twohours_seconds_counter = 0; //WT.EDIT 2025.11.17
-            ActionEvent_Handler();
-        }
-        else{
-            twoHours_stop_flag=3;
-            FAN_Stop();
-            PLASMA_SetLow(); //
+	if(gpro_t.fan_rx_stop_flag ==1){
+               FAN_Stop();
+			  PLASMA_SetLow(); //
             PTC_SetLow();
             ultrasonic_close();
-        }
-        break;
 
-       default:
-       
-        break;
 
-  }
+	 }
+
+  	break;
+
+	case 0x0://older version 
+
+	  if(gpro_t.gTimer_conter_twohours_minutes >119 && gpro_t.stopTwoHours_flag ==0){
+			gpro_t.gTimer_conter_twohours_minutes=0;
+	        gpro_t.gTimer_twohours_seconds_counter=0;
+	        gpro_t.stopTwoHours_flag =1;
+			define_twohours_flag =1;
+			PLASMA_SetLow(); //
+            PTC_SetLow();
+            ultrasonic_close();
+	  }
+
+	  if(define_twohours_flag==1)gpro_t.stopTwoHours_flag=1;
+	  else if(define_twohours_flag==2)gpro_t.stopTwoHours_flag=1;
+	  else if(define_twohours_flag==0)gpro_t.stopTwoHours_flag=0;
+	  
+
+	  if(gpro_t.stopTwoHours_flag ==1 && gpro_t.gTimer_conter_twohours_minutes > 0 && define_twohours_flag ==1){
+			  define_twohours_flag++;
+			   gpro_t.gTimer_conter_twohours_minutes=0;
+			   gpro_t.gTimer_twohours_seconds_counter=0;
+
+	          FAN_Stop();
+      }
+      else if(gpro_t.stopTwoHours_flag ==1 && gpro_t.gTimer_conter_twohours_minutes > 10 && define_twohours_flag ==2){
+			  define_twohours_flag=0;
+			  gpro_t.stopTwoHours_flag =0;
+	          gpro_t.gTimer_conter_twohours_minutes=0;
+			  gpro_t.gTimer_twohours_seconds_counter=0;
+
+	          
+      }
+      else if(gctl_t.gTimer_senddata_panel >6  && define_twohours_flag==0 && gpro_t.stopTwoHours_flag ==0){ //300ms
+            gctl_t.gTimer_senddata_panel=0;
+          
+            ActionEvent_Handler();
+      }
+	  
+
+	break;
+
+  	}
 
 }
 
@@ -257,7 +139,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
              flag_switch=0;
             wifi_t.get_rx_beijing_time_enable=0;
             Subscriber_Data_FromCloud_Handler();
-            vTaskDelay(pdMS_TO_TICKS(100));//HAL_Delay(200)
+            vTaskDelay(pdMS_TO_TICKS(200));//HAL_Delay(200)
             gpro_t.get_beijing_flag = 1;
 
             
@@ -266,6 +148,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
             flag_switch=0;
             wifi_t.get_rx_beijing_time_enable=0;
             Update_Dht11_Totencent_Value();
+			vTaskDelay(pdMS_TO_TICKS(200));
             gpro_t.get_beijing_flag = 1;
 
          }
@@ -282,8 +165,8 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
     }
     else{
 	 if(net_t.wifi_link_net_success ==0){
-	    SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
-	    vTaskDelay(pdMS_TO_TICKS(5));
+	    SendData_Set_Command(0x1F,0);//SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
+	    vTaskDelay(pdMS_TO_TICKS(100));
 	 }
      gpro_t.get_beijing_flag = 1;
 
@@ -306,18 +189,18 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
            
       
                 net_t.linking_tencent_cloud_doing  =0; //receive from tencent command state .
-                SendWifiData_To_Data(0x1F,0x01);
-                vTaskDelay(pdMS_TO_TICKS(10));
+                SendData_Set_Command(0x1F,0x01);//SendWifiData_To_Data(0x1F,0x01);
+                vTaskDelay(pdMS_TO_TICKS(100));
 
             }
             else{
               
-               SendWifiData_To_Data(0x1F,0x0); //0x1F: 0x1=wifi link net is succes ,0x0 = wifi link net is fail
-               vTaskDelay(pdMS_TO_TICKS(10));
+               SendData_Set_Command(0x1F,0);//SendWifiData_To_Data(0x1F,0x0); //0x1F: 0x1=wifi link net is succes ,0x0 = wifi link net is fail
+               vTaskDelay(pdMS_TO_TICKS(100));
                gpro_t.get_beijing_flag = 10;
                net_t.linking_tencent_cloud_doing  =1; //receive from tencent command state .
                gpro_t.send_ack_cmd = 1; //ack_wifi_on;
-                gpro_t.gTimer_timer_start_counter=0;
+             
              }
 	
        }
@@ -369,7 +252,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 
     		
     		Get_BeiJing_Time_Cmd();
-    	    vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10//HAL_Delay(20);
+    	    vTaskDelay(pdMS_TO_TICKS(300));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10//HAL_Delay(20);
     	    beijing_step =1;
          
          break;
@@ -381,7 +264,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
         		gpro_t.wifi_rx_data_counter =0;
         		Get_Beijing_Time();
               
-        	    vTaskDelay(pdMS_TO_TICKS(100));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10
+        	    vTaskDelay(pdMS_TO_TICKS(300));//osDelay(100);//HAL_Delay(20); //WT.EDIT .2024.08.10
                 
         	
                 beijing_step =2;
@@ -447,7 +330,7 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
     case 6:
 
   
-       confirm_wifi_link_net_state();
+       //confirm_wifi_link_net_state();
     
 
        wifi_t.gTimer_auto_detected_net_state_times=0;  
@@ -470,16 +353,16 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
             gpro_t.get_beijing_flag = 11;
             net_t.linking_tencent_cloud_doing  =1; //receive from tencent command state .
             gpro_t.wifi_rx_data_counter=0;
-            SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
-            vTaskDelay(pdMS_TO_TICKS(10));
+            SendData_Set_Command(0x1F,0);//SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
+            vTaskDelay(pdMS_TO_TICKS(100));
            
           }
           else{
              wifi_t.soft_ap_config_flag =1; //WE.EIDT 
              net_t.linking_tencent_cloud_doing  =0; //receive from tencent command state .
              gpro_t.get_beijing_flag = 0;
-		     SendWifiData_To_Data(0x1F,0x01); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
-			 vTaskDelay(pdMS_TO_TICKS(10));
+		     SendData_Set_Command(0x1F,0x01);//SendWifiData_To_Data(0x1F,0x01); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
+			 vTaskDelay(pdMS_TO_TICKS(100));
           }
         
        }
@@ -526,13 +409,13 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 
         if(wifi_t.gTimer_auto_link_net_time > 2 && auto_link_net_flag==1){
 
-
             wifi_t.gTimer_auto_link_net_time=0;
             gpro_t.wifi_rx_data_counter=0;
 	        wifi_t.soft_ap_config_flag =1;
              auto_link_net_flag =2;
    
 //	        HAL_UART_Transmit(&huart2, "AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"), 0xffff);//瀵�1�?7?婵绻涢幒?
+            at_send_data("AT+TCMQTTCONN=1,5000,240,0,1\r\n", strlen("AT+TCMQTTCONN=1,5000,240,0,1\r\n"));
             vTaskDelay(pdMS_TO_TICKS(1000));//HAL_Delay(1000);
          
            
@@ -576,14 +459,14 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
             Subscriber_Data_FromCloud_Handler();
             osDelay(200);//HAL_Delay(200);
 
-            SendWifiData_To_Data(0x1F,0x01); //0x1F: wifi link net is succes 
-			vTaskDelay(pdMS_TO_TICKS(10));
+            SendData_Set_Command(0x1F,0x01);//SendWifiData_To_Data(0x1F,0x01); //0x1F: wifi link net is succes 
+			vTaskDelay(pdMS_TO_TICKS(100));
              gpro_t.get_beijing_flag = 0;
 		
          }
          else{
-			 SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
-			 vTaskDelay(pdMS_TO_TICKS(10));
+			 SendData_Set_Command(0x1F,0);//SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
+			 vTaskDelay(pdMS_TO_TICKS(100));
              gpro_t.get_beijing_flag = 10;
          }
 	   

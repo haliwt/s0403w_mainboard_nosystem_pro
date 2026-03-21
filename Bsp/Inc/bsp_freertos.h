@@ -6,9 +6,9 @@
 
 void freeRTOS_Handler(void);
 
-void semaphore_isr(void);
 
 
+void display_board_xtask_notice(void);
 
 
 

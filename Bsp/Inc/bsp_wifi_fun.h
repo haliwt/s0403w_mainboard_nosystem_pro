@@ -45,14 +45,6 @@ typedef struct _WIFI_FUN{
 	uint8_t restart_link_tencent_cloud ;
 	uint8_t received_data_from_tencent_cloud ;
 
-  
-
-   
-
-
-
-	
-
     uint8_t gTimer_auto_detected_net_state_times ;
   
 

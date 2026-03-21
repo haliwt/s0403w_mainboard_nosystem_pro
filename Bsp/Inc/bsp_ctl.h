@@ -81,18 +81,18 @@ typedef struct _RUN_T{
    uint8_t app_timer_power_on_flag ;
 
    uint8_t response_wifi_signal_label;
-  uint8_t ptc_on_off_flag ;
-  
+  uint8_t ptc_prohibit_on_flag ;
+   uint8_t set_temp_first_closeptc ;
 
  //fan:
     
 	 uint8_t  gFan;
     //ptc:
    
-     uint8_t  gDry;
+    // uint8_t  gDry;
 
 	  uint8_t  gUlransonic;
-  uint8_t  gModel;
+      uint8_t  gModel;
 	  uint8_t gPlasma;
 
   uint8_t  mode_ai_switch_flag;
@@ -115,6 +115,7 @@ typedef struct _RUN_T{
  uint8_t  wind_speed_decade;
   uint8_t  wind_speed_unit;
      uint8_t wifi_config_net_lable;
+
     
 	  //ADC
 	  uint8_t ptc_warning;
@@ -130,12 +131,12 @@ typedef struct _RUN_T{
 
 	 uint8_t gTimer_senddata_panel;
 	
-	 uint8_t gTimer_fan_run_one_minute;
-     uint8_t gTimer_read_dht11_counter;
+
+   
 	 uint8_t gTimer_linkTencentCounter;
 	 
-	 uint16_t gTimer_copy_cmd_counter;
-	 uint8_t gTimer_wifi_detected_counter;
+	
+	
 	
 	 uint32_t randomName[1];
 	
@@ -149,18 +150,6 @@ extern _run_t gctl_t;
 extern uint8_t ReceiveBuffer[1];
 
 
-extern uint8_t powerOffFanRun_flag ;
-
-
-
-
-//void copy_cmd_notice_hanlder(void);
-
-
-//void main_function_detected_handler(uint8_t cmd);
-
-
-//void set_temperature_compare_value_fun(void);
 
 void ai_mode_display_fun(void);
 

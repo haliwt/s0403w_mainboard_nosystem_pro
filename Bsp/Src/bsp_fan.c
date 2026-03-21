@@ -99,7 +99,12 @@ void Fan_Two_Speed(void)
 
 
 
+void fan_full_run(void)
+{
 
+  Fan_Full_Speed();
+
+}
 
 
 

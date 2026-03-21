@@ -1,6 +1,4 @@
 #include "bsp.h"
-#include "semphr.h"
-
 
 #define DECODER_BIT_0        (1<< 0)
 
@@ -24,33 +22,23 @@ static void vTaskStart(void *pvParameters);
 
 /* vTaskMsgPro 任务 */
 static StaticTask_t xTaskMsgProTCB;
-static StackType_t xTaskMsgProStack[256];
+static StackType_t xTaskMsgProStack[640];//640
 
 /* vTaskStart 任务 */
 static StaticTask_t xTaskStartTCB;
-static StackType_t xTaskStartStack[128];
-
+static StackType_t xTaskStartStack[256];
 
 
 
 #endif 
 static void AppTaskCreate (void);
-static void AppObjCreate (void);
-/* 静态缓冲区和句柄（文件作用域或模块静态） */ 
-static StaticSemaphore_t xBinarySemaphoreBuffer; 
-static SemaphoreHandle_t xBinarySemaphore = NULL;
-
-
-
+//xTaskCreateStatic()
 
 
 /* 创建任务通信机制 */
 //static void AppObjCreate(void);
 static void power_run_handler(void);
 static void wifi_run_handler(void);
-
-
-//static SemaphoreHandle_t  xSemaphore = NULL;
 
 
 /***********************************************************************************************************
@@ -80,7 +68,6 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
 
 
 uint8_t power_on_sound_flag ;
-uint16_t taskMsg_counter;
 
 /**********************************************************************************************************
 *
@@ -95,7 +82,7 @@ void freeRTOS_Handler(void)
 	   AppTaskCreate();
 	  
 	  /* 创建任务通信机制 */
-	   AppObjCreate();
+	 //  AppObjCreate();
 	  
 	  /* 启动调度，开始执行任�?1�?7?1�?1�?7?7 */
 	   vTaskStartScheduler();
@@ -113,31 +100,25 @@ void freeRTOS_Handler(void)
 static void vTaskMsgPro(void *pvParameters)
 {
   
-	//BaseType_t xResult;
-	//const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 1.?????-?????????50ms */
-   //uint32_t ulValue;
-    
-	
-    while(1)
+	while(1)
     {
 
 		if(power_on_sound_flag==0){
             power_on_sound_flag ++;
             FAN_Stop();  //WT.EDIT.2025.01.03
             buzzer_sound();//buzzer_sound();
-			//printf("buzzer_sound !!!\r\n");
+		
 
         }
       
-	       power_run_handler();
+	     power_run_handler();
        
-           wifi_run_handler();
+         wifi_run_handler();
+
         
-		//  waiting_ack_handler();
-        taskMsg_counter++;
-        vTaskDelay(1000);//500
+		 vTaskDelay(100);//100
 		
-		}
+	}
       
  }
 
@@ -151,17 +132,29 @@ static void vTaskMsgPro(void *pvParameters)
  static void vTaskStart(void *pvParameters)
  {
     BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(200); /* 设置最大等待时间为300ms */
-	
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 设置�?大等待时间为100ms */
+	uint32_t ulValue;
 	 while(1)
 	 {
-        xResult = xSemaphoreTake(xBinarySemaphore, (TickType_t)xMaxBlockTime);
-		if(xResult == pdTRUE){
-			 decoder_handler();
-	    }
+
+       
+		xResult = xTaskNotifyWait(0x00000000,	   
+								  0xFFFFFFFF,   
+								  &ulValue,		  /* 保存ulNotifiedValue到变量ulValue�? */
+								  xMaxBlockTime);  /*  portMAX_DELAY */
+
+		if( xResult == pdPASS ){
+			
+			if((ulValue & DECODER_BIT_0) != 0){
+			   decoder_handler();
+			}
+		}
 	 }
-}
-/**
+
+ }
+ 
+
+ /**
  * @brief  :  void AppTaskCreate (void)�����ݴ����������ȼ�Ϊ�е�
  * @note    �����ڲ�ʹ�ö��н������ݣ����ȳ�ʼ������
  * @param   None
@@ -205,9 +198,9 @@ void AppTaskCreate (void)
 	xHandleTaskMsgPro = xTaskCreateStatic(
 			vTaskMsgPro,			/* 任务函数 */
 			"vTaskMsgPro",			/* 任务名 */
-			128,					/* 栈大小（word） */
+			640,					/* 栈大小（word） */
 			NULL,					/* 参数 */
-			2,						/* 优先级 */
+			1,						/* 优先级 */
 			xTaskMsgProStack,		/* 栈数组 */
 			&xTaskMsgProTCB 		/* TCB */
 	);
@@ -215,32 +208,14 @@ void AppTaskCreate (void)
 	xHandleTaskStart = xTaskCreateStatic(
 			vTaskStart, 			/* 任务函数 */
 			"vTaskStart",			/* 任务名 */
-			128,					/* 栈大小（word） */
+			256,					/* 栈大小（word） */
 			NULL,					/* 参数 */
-			1,						/* 优先级 */
+			2,						/* 优先级 */
 			xTaskStartStack,		/* 栈数组 */
 			&xTaskStartTCB			/* TCB */
 	);
  
 }
-/*
-*********************************************************************************************************
-*	函 数 名: AppObjCreate
-*	功能说明: 创建任务通信机制
-*	形    参: 无
-*	返 回 值: 无
-*********************************************************************************************************
-*/
-static void AppObjCreate (void)
-{
-	/* 创建后信号量处于“空”状态（计数为0） */ 
-	xBinarySemaphore = xSemaphoreCreateBinaryStatic(&xBinarySemaphoreBuffer); 
-	if (xBinarySemaphore == NULL) {
-		/* 创建失败处理 */ 
-	    buzzer_sound();
-	}
-}
-
 /*
 *********************************************************************************************************
 *	函 数 名: AppObjCreate
@@ -266,17 +241,7 @@ static void AppObjCreate (void)
 ////    }
 //}
 
-void semaphore_isr(void)
-{
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	
-	/* 发送同步信号 */
-	xSemaphoreGiveFromISR(xBinarySemaphore, &xHigherPriorityTaskWoken);
 
-	/* 如果xHigherPriorityTaskWoken = pdTRUE，那么退出中断后切到当前最高优先级任务执行 */
-	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-
-}
 /********************************************************************************
 	**
 	*Function Name:static void power_run_handler(void)
@@ -295,19 +260,25 @@ static void power_run_handler(void)
             power_on_handler();
             link_wifi_to_tencent_handler(); //detected ADC of value 
             ai_mode_display_fun();
+			if(gpro_t.stopTwoHours_flag ==0){
+			   Fan_RunSpeed_Fun();
+		    }
 
-
-            
+			//ack_handler();
+            if(gpro_t.process_run_step > 10 || gpro_t.stopTwoHours_flag > 1){
+				 if(gpro_t.process_run_step > 10 )gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
+				 if(gpro_t.stopTwoHours_flag > 1 )gpro_t.stopTwoHours_flag =0;
+            }
+		   
+			
 		  break;
 
 		  
 
           case power_off:
 		  
-              gpro_t.process_run_step=0;
-	          gpro_t.soft_version =0; //WT.EDIT 2025.10.31
+          
 		      power_off_handler();
-			 
              break;
           }
 
@@ -328,7 +299,7 @@ static void wifi_run_handler(void)
 
 		      gpro_t.process_run_step=6;
 			  
- 
+
 		  }
           else if(gpro_t.wifi_led_fast_blink_flag > 1){
 		  	 gpro_t.wifi_led_fast_blink_flag=0;
@@ -345,4 +316,21 @@ static void wifi_run_handler(void)
            }
 
 }
+
+
+void display_board_xtask_notice(void)
+{
+
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+        xTaskNotifyFromISR(xHandleTaskStart,  /* 目标任务 */
+					         DECODER_BIT_0,     /* 设置目标任务事件标志位bit0  */
+					         eSetBits,  /* 将目标任务的事件标志位与BIT_0进行或操作， 将结果赋值给事件标志�? */
+					         &xHigherPriorityTaskWoken);
+
+         /* 如果xHigherPriorityTaskWoken = pdTRUE，那么�??出中断后切到当前�?高优先级任务执行 */
+         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+}
+
 

@@ -54,7 +54,7 @@ void MX_TIM1_Init(void)
   TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM1;
   TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
   TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-  TIM_OC_InitStruct.CompareValue = 20;
+  TIM_OC_InitStruct.CompareValue = 0;
   TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
   TIM_OC_InitStruct.OCNPolarity = LL_TIM_OCPOLARITY_HIGH;
   TIM_OC_InitStruct.OCIdleState = LL_TIM_OCIDLESTATE_LOW;
@@ -156,8 +156,6 @@ void MX_TIM16_Init(void)
   /* USER CODE END TIM16_Init 0 */
 
    /* USER CODE BEGIN TIM16_Init 0 */
-  // LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
-  // LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM16);
   /* USER CODE END TIM16_Init 0 */
 
   LL_TIM_InitTypeDef TIM_InitStruct = {0};

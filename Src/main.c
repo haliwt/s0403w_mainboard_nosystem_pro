@@ -2,9 +2,8 @@
 /***************************************************************************//**
  * data:2025.10.29 modify be testing .
  * modify 2025.10.31 
- * modify 2025.12.26, the as same to older s06 compatible. 
- *
- *
+	
+
 *******************************************************************************/
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -69,6 +68,7 @@ int main(void)
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
+	
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
    HAL_Init(); 

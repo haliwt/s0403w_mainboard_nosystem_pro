@@ -76,7 +76,7 @@ static void Mqtt_Value_update_data(void)
     sg_info.open = 1;
 	if(gctl_t.gModel==0)gctl_t.gModel =1;
 	sg_info.state = gctl_t.gModel;
-	sg_info.ptc  = gctl_t.gDry;
+	sg_info.ptc  = gpro_t.rx_ptc_flag;
     //sg_info.ptc = g_dry_open_flag;
 	sg_info.anion = gctl_t.gPlasma;
 	sg_info.sonic = gctl_t.gUlransonic ;
@@ -422,7 +422,7 @@ void MqttData_Publish_SetUltrasonic(uint8_t datsonic) //超声�?
 
 }
 
-void MqttData_Publish_SetState(uint8_t sdat) //Ai model
+void MqttData_Publish_AitState(uint8_t sdat) //Ai model
 {
    property_topic_publish();
    property_report_SetState(sdat);
