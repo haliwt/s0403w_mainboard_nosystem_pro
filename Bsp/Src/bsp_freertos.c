@@ -301,10 +301,10 @@ static void wifi_run_handler(void)
 			  
 
 		  }
-          else if(gpro_t.wifi_led_fast_blink_flag > 1){
-		  	 gpro_t.wifi_led_fast_blink_flag=0;
+          //else if(gpro_t.wifi_led_fast_blink_flag > 1){
+		  	 //gpro_t.wifi_led_fast_blink_flag=0;
 			
-		  }
+		  //}
 		  
 		  if(gpro_t.wifi_led_fast_blink_flag==0 ){
              wifi_communication_tnecent_handler();//

@@ -561,7 +561,7 @@ void Json_Parse_Command_Fun(void)
 			#endif 
 			gpro_t.phone_power_on_flag = 1; //ack_app_power_on;
 	       
-		    SendWifiData_To_Cmd(0x31,0x01); //smart phone is power on
+		    SendWifiData_To_Cmd(0x20,0x01); //smart phone is power on
 			vTaskDelay(pdMS_TO_TICKS(100));//osDelay(5);//HAL_Delay(5);
 
 	       
@@ -589,7 +589,7 @@ void Json_Parse_Command_Fun(void)
             #endif 
 			gpro_t.phone_power_on_flag = 2; //ack_app_power_on;
 	
-             SendWifiData_To_Cmd(0x31,0x0); //smart phone is power off
+             SendWifiData_To_Cmd(0x20,0x0); //smart phone is power off
              vTaskDelay(pdMS_TO_TICKS(100));
 		
 			buzzer_temp_on=0;
@@ -766,11 +766,12 @@ void Json_Parse_Command_Fun(void)
             if( gctl_t.set_temperature_value > 40)  gctl_t.set_temperature_value=40;
             if( gctl_t.set_temperature_value <20 )  gctl_t.set_temperature_value=20;
             MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
+			vTaskDelay(pdMS_TO_TICKS(200));
 		//	gctl_t.set_temperature_flag=1; //WT.EDIT 2025.09.18
 			gctl_t.ptc_prohibit_on_flag =0;
 		
-			SendWifiData_To_Data(0x3A, gctl_t.set_temperature_value); //smart phone set temperature value .
-			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(10);//HAL_Delay(10);
+			SendWifiData_To_Data(0x2A, gctl_t.set_temperature_value); //smart phone set temperature value .
+			vTaskDelay(pdMS_TO_TICKS(100));//osDelay(10);//HAL_Delay(10);
 			
 			gctl_t.set_temp_first_closeptc = 0;
 			gctl_t.rx_set_temp_flag =0;

@@ -329,8 +329,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
              
               PTC_SetHigh();
              
-           SendWifiData_Answer_Cmd(0x02,0x01); //
-           vTaskDelay(pdMS_TO_TICKS(50)); 
+           //SendWifiData_Answer_Cmd(0x02,0x01); //
+           //vTaskDelay(pdMS_TO_TICKS(50)); 
+            if(net_t.wifi_link_net_success==1){
+					MqttData_Publish_SetPtc(0x01);
+			       vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			}
 		
            }
 
@@ -346,8 +350,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	      PTC_SetLow();
 		
 		  gctl_t.ptc_prohibit_on_flag =1;
-          SendWifiData_Answer_Cmd(0x02,0x0); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
+          //SendWifiData_Answer_Cmd(0x02,0x0); //
+          //vTaskDelay(pdMS_TO_TICKS(50));
+           if(net_t.wifi_link_net_success==1){
+			MqttData_Publish_SetPtc(0x0);
+			vTaskDelay(pdMS_TO_TICKS(200));//osDelay(100);//HAL_Delay(350);
+			}
      
        }
       break;
@@ -366,8 +374,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			}
 
 
-			SendWifiData_Answer_Cmd(0x03,0x01); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			//SendWifiData_Answer_Cmd(0x03,0x01); //
+			//vTaskDelay(pdMS_TO_TICKS(50)); 
+
+			  if(net_t.wifi_link_net_success==1){
+                   MqttData_Publish_SetPlasma(0x01);
+		         vTaskDelay(pdMS_TO_TICKS(200));
+			}
 			 
 		  }
 		  else if(pdata[3]  == 0x0){
@@ -377,8 +390,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			 gctl_t.gPlasma = 0;
 			 PLASMA_SetLow();
 
-			SendWifiData_Answer_Cmd(0x03,0x0); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			//SendWifiData_Answer_Cmd(0x03,0x0); //
+			//vTaskDelay(pdMS_TO_TICKS(50)); 
+			 if(net_t.wifi_link_net_success==1){
+                  MqttData_Publish_SetPlasma(0);
+		         vTaskDelay(pdMS_TO_TICKS(200));
+			}
 			  
 		  
 		  }
@@ -398,8 +415,15 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
    
 			}
 			
-			SendWifiData_Answer_Cmd(0x04,0x01); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			//SendWifiData_Answer_Cmd(0x04,0x01); //
+			//vTaskDelay(pdMS_TO_TICKS(50));
+			 if(net_t.wifi_link_net_success==1){
+			 	
+			 MqttData_Publish_SetUltrasonic(0x01);
+		     vTaskDelay(pdMS_TO_TICKS(200));
+
+			}
+			
    
 		  }
 		  else if(pdata[3] == 0x0){ //close 
@@ -408,8 +432,14 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
    
 			ultrasonic_close();
 			
-			SendWifiData_Answer_Cmd(0x04,0x0); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			//SendWifiData_Answer_Cmd(0x04,0x0); //
+			//vTaskDelay(pdMS_TO_TICKS(50)); 
+			 if(net_t.wifi_link_net_success==1){
+			 	
+			 MqttData_Publish_SetUltrasonic(0x0);
+		     vTaskDelay(pdMS_TO_TICKS(200));
+
+			}
    
 		  }
    
@@ -664,14 +694,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 //					 SendWifiData_Answer_Cmd(0x22,0x01); //WT.EDIT 2025.07.28
 //			         vTaskDelay(pdMS_TO_TICKS(100));
 //		         }
-				 if(ptc_set_wifi !=gpro_t.rx_ptc_flag){
-				 	ptc_set_wifi =gpro_t.rx_ptc_flag;
-					 if(wifi_link_net_state()==1){ 
-						  MqttData_Publish_SetPtc(0x01);
-						  vTaskDelay(200);
+				
+				if(wifi_link_net_state()==1){ 
+					MqttData_Publish_SetPtc(0x01);
+					vTaskDelay(200);
 						
-					  }
-				 }
+				}
+				 
 		   	}   	
 	   }
        else if(pdata[3]== 0x0){
@@ -686,13 +715,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 //		   SendWifiData_Answer_Cmd(0x22,0x0); //WT.EDIT 2025.07.28
 //           vTaskDelay(pdMS_TO_TICKS(100));
          	}
-		  if(ptc_set_wifi !=gpro_t.rx_ptc_flag){
-				 	ptc_set_wifi =gpro_t.rx_ptc_flag;
-		  if(wifi_link_net_state()==1){ 
+		 
+		   if(wifi_link_net_state()==1){ 
 			MqttData_Publish_SetPtc(0x0);
 			vTaskDelay(200);
 		  }
-		  }
+		  
          
 	  }
 	
@@ -823,6 +851,8 @@ static void parse_recieve_copy_data(uint8_t *pddata)
 	   
 
 	   break;
+
+	
 
 	   
     }

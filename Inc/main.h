@@ -82,7 +82,7 @@ void Error_Handler(void);
 #define WIFI_RX_GPIO_Port     GPIOA
 
 //GPIO 
-#define PLASMA_Pin            LL_GPIO_PIN_4
+#define PLASMA_Pin              LL_GPIO_PIN_4 
 #define PLASMA_GPIO_Port        GPIOA
 
 #define FAN_CW_Pin            LL_GPIO_PIN_5
