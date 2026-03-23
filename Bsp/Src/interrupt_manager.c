@@ -44,7 +44,7 @@ void callback_register_fun(void)
 static void tim17_isr_callback_handler(void)
 {
    static  uint16_t tm0;
-
+ 
  
 
     tm0 ++ ;
@@ -52,6 +52,7 @@ static void tim17_isr_callback_handler(void)
      
 	 if(tm0 > 999){//10ms *100 = 1000ms =1s
         tm0 =0;
+	
      
 	   gpro_t.gTimer_twohours_seconds_counter++;
 
@@ -77,6 +78,8 @@ static void tim17_isr_callback_handler(void)
        gpro_t.gTimer_power_on_first_link_tencent++;
        gpro_t.gTimer_get_data_from_tencent_data++;
        gpro_t.gTimer_dc_power_on_auto_link_net++;
+
+	
        
 
 

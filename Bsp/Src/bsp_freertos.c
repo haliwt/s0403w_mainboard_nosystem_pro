@@ -110,6 +110,9 @@ static void vTaskMsgPro(void *pvParameters)
 		
 
         }
+
+
+		
       
 	     power_run_handler();
        
@@ -132,7 +135,7 @@ static void vTaskMsgPro(void *pvParameters)
  static void vTaskStart(void *pvParameters)
  {
     BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 设置�?大等待时间为100ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(10000); /* 设置�?大等待时间为100ms */
 	uint32_t ulValue;
 	 while(1)
 	 {
@@ -265,8 +268,8 @@ static void power_run_handler(void)
 		    }
 
 			//ack_handler();
-            if(gpro_t.process_run_step > 10 || gpro_t.stopTwoHours_flag > 1){
-				 if(gpro_t.process_run_step > 10 )gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
+            if(gpro_t.process_run_step > 13 || gpro_t.stopTwoHours_flag > 1){
+				 if(gpro_t.process_run_step > 13 )gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 				 if(gpro_t.stopTwoHours_flag > 1 )gpro_t.stopTwoHours_flag =0;
             }
 		   

@@ -24,6 +24,7 @@ uint8_t auto_link_net_flag;
 uint8_t timer_fan_flag;//times_flag;
 uint8_t twoHours_stop_flag;
 
+static void set_tempearture_value_fun(void);
 
 /**********************************************************************
     *
@@ -105,6 +106,9 @@ void works_run_two_hours_state(void)
           
             ActionEvent_Handler();
       }
+
+
+	  set_tempearture_value_fun();
 	  
 
 	break;
@@ -479,6 +483,52 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 
 }
 
+/*****************************************/
+static void set_tempearture_value_fun(void)
+{
+   
+	#if 0	   
+	switch(gpro_t.set_temperature_flag)	
+	{
+		case 1:
+			  
+	
+		  if(gctl_t.set_temperature_value > gctl_t.gDht11_temperature && gpro_t.stopTwoHours_flag ==0){
+			
+			        
+					  ptc_onoff_default++;
+                      gpro_t.rx_ptc_flag=1;
+				      PTC_SetHigh();
+					  
+					 SendData_Set_Command(0x1F,0);//SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
+			          vTaskDelay(pdMS_TO_TICKS(100));	   
+				        
+			}
+			 else{
+			   	   ptc_onoff_default++;
+				   gpro_t.rx_ptc_flag =0 ;//gpro_t.rx_ptc_flag =0;
 
+			       PTC_SetLow();
+		
+
+			   }
+
+			   if(ptc_set_wifi !=gpro_t.rx_ptc_flag){
+				 	ptc_set_wifi =gpro_t.rx_ptc_flag;
+				   if(wifi_link_net_state()==1){
+					   MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
+					   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
+					}
+			   	}
+		break;
+
+		case 0:
+
+
+		break;
+	 }
+		   
+	#endif 		
+}
 
 

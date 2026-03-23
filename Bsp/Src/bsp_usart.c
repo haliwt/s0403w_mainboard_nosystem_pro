@@ -732,9 +732,12 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	 case 0x2A: //smart phone or display  board set temperature .receive.
 	 
 		   if(pdata[4]==0x01 && gpro_t.gpower_on == power_on){
+
+		      
 			  
 			   if(pdata[5] >19 && pdata[5] < 41){
 			   	gctl_t.ptc_prohibit_on_flag = 0;
+				//gpro_t.set_temperature_flag =1;
 			   	if(gpro_t.stopTwoHours_flag >1 )gpro_t.stopTwoHours_flag=0; //This is be solved bug.
 			   gctl_t.set_temperature_value = pdata[5] ;
 			   gctl_t.ptc_prohibit_on_flag =0;

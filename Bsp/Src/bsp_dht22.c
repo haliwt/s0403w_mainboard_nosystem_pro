@@ -155,6 +155,7 @@ uint8_t DHT22_Read_TempAndHumidity(DHT22_Data_TypeDef *DHT22_Data)
       raw_temp = -raw_temp;
     }
     DHT22_Data->temperature = raw_temp / 10.0f;
+	vTaskDelay(100);
 
     // 校验和验证
     temp = DHT22_Data->humi_high8bit + DHT22_Data->humi_low8bit + 

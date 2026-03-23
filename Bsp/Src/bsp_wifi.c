@@ -65,7 +65,7 @@ void link_wifi_net_handler(void)
           
         		at_send_data((const uint8_t *)"AT+RST\r\n", strlen("AT+RST\r\n"));
         
-        		vTaskDelay(pdMS_TO_TICKS(3000));//osDelay(1000);
+        		vTaskDelay(pdMS_TO_TICKS(1000));//osDelay(1000);
         		
               gpro_t.link_net_step = 1;
 
@@ -73,7 +73,7 @@ void link_wifi_net_handler(void)
 
             case 1:
                // WIFI_IC_ENABLE();
-             
+               vTaskDelay(pdMS_TO_TICKS(1000));//osDelay(1000);
                at_send_data((const uint8_t *)"AT+CWMODE=3\r\n", strlen("AT+CWMODE=3\r\n"));
                 vTaskDelay(pdMS_TO_TICKS(1000));
                 gctl_t.randomName[0]=HAL_GetUIDw0();
