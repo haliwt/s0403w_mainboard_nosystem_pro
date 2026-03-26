@@ -59,6 +59,7 @@ void power_on_handler(void)
 		
        
         gpro_t.stopTwoHours_flag =0;
+		gpro_t.set_temp_value_success=0;
 	
          Fan_Full_Speed();//Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
      
@@ -238,11 +239,11 @@ void power_on_handler(void)
 
 	 adc_detected_hundler();
 
-	gpro_t.process_run_step= 11;	
+	gpro_t.process_run_step= 12;	
 
    break;
 
-   case 11:
+   case 12:
      	if(gpro_t.stopTwoHours_flag ==0){
 			   Fan_RunSpeed_Fun();
 		}
@@ -507,6 +508,7 @@ void power_off_handler(void)
 		 fan_detect_voltage=100;
          fan_run_one_minute_flag=1;
 		 gpro_t.gTimer_poweroff_fan =0;
+		 gpro_t.set_temp_value_success=0;
 		 
 	      SetPowerOff_ForDoing();
 		  gpro_t.power_off_run_step = 2;
