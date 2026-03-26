@@ -234,6 +234,7 @@ void power_on_handler(void)
     if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
 	if(gctl_t.gUlransonic > 1) gctl_t.gUlransonic =1;
 	if(gpro_t.stopTwoHours_flag==0)gpro_t.fan_rx_stop_flag =0;
+	if(gpro_t.wifi_led_fast_blink_flag > 1)gpro_t.wifi_led_fast_blink_flag=0;
 
 	 adc_detected_hundler();
 

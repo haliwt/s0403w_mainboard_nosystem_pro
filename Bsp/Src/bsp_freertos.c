@@ -21,12 +21,12 @@ static void vTaskStart(void *pvParameters);
 /*------------------ 静态任务内存定义 ------------------*/
 
 /* vTaskMsgPro 任务 */
-static StaticTask_t xTaskMsgProTCB;
-static StackType_t xTaskMsgProStack[640];//640
+//static StaticTask_t xTaskMsgProTCB;
+//static StackType_t xTaskMsgProStack[640];//640
 
 /* vTaskStart 任务 */
 static StaticTask_t xTaskStartTCB;
-static StackType_t xTaskStartStack[256];
+static StackType_t xTaskStartStack[896];//896
 
 
 
@@ -96,20 +96,20 @@ void freeRTOS_Handler(void)
  * @param   None
  * @retval  None
  */
-
+#if 0
 static void vTaskMsgPro(void *pvParameters)
 {
   
 	while(1)
     {
 
-		if(power_on_sound_flag==0){
-            power_on_sound_flag ++;
-            FAN_Stop();  //WT.EDIT.2025.01.03
-            buzzer_sound();//buzzer_sound();
+//		if(power_on_sound_flag==0){
+//            power_on_sound_flag ++;
+//            FAN_Stop();  //WT.EDIT.2025.01.03
+//            buzzer_sound();//buzzer_sound();
 		
 
-        }
+//        }
 
 
 		
@@ -119,12 +119,12 @@ static void vTaskMsgPro(void *pvParameters)
          wifi_run_handler();
 
         
-		 vTaskDelay(100);//100
+		 vTaskDelay(2000);//100
 		
 	}
       
  }
-
+#endif 
  /**
   * @brief	:  static void vTaskStart(void *pvParameters
   * @note	 
@@ -135,12 +135,20 @@ static void vTaskMsgPro(void *pvParameters)
  static void vTaskStart(void *pvParameters)
  {
     BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(10000); /* 设置�?大等待时间为100ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(200); /* 设置�?大等待时间为100ms */
 	uint32_t ulValue;
 	 while(1)
 	 {
 
-       
+
+       	if(power_on_sound_flag==0){
+            power_on_sound_flag ++;
+            FAN_Stop();  //WT.EDIT.2025.01.03
+            buzzer_sound();//buzzer_sound();
+		
+
+        }
+	 
 		xResult = xTaskNotifyWait(0x00000000,	   
 								  0xFFFFFFFF,   
 								  &ulValue,		  /* 保存ulNotifiedValue到变量ulValue�? */
@@ -152,6 +160,13 @@ static void vTaskMsgPro(void *pvParameters)
 			   decoder_handler();
 			}
 		}
+		else{
+         power_run_handler();
+       
+         wifi_run_handler();
+
+		}
+		
 	 }
 
  }
@@ -166,54 +181,24 @@ static void vTaskMsgPro(void *pvParameters)
 void AppTaskCreate (void)
 {
    
-  #if 0
-	xTaskCreate( vTaskWifiPro,		   /* 任务函数	*/
-					"vTaskWifiPro",		   /* 任务�?1�?7?1�?1�?7?7	*/
-					128,				   /* 任务栈大小，单位word，也就是4字节 */
-					NULL,				   /* 任务参数	*/
-					2,					   /* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
-					&xHandleTaskWifiPro );   /* 任务句柄	*/
-
-   #endif 
-
-   #if 0
-
-	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
-                 "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 256,            		/* 任务栈大小，单位word，也就是4字节 */
-                 NULL,           		/* 任务参数  */
-                 2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
-                 &xHandleTaskMsgPro);   /* 任务句柄  */
-
- 
-  
-   xTaskCreate( vTaskStart,     		/* 任务函数  */
-                 "vTaskStart",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 128,            		/* 任务栈大小，单位word，也就是4字节 */
-                 NULL,           		/* 任务参数  */
-                 1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
-                 &xHandleTaskStart );   /* 任务句柄  */
-   #endif 
-
-  
-	/*------------------ 静态任务创建 ------------------*/
+ /*------------------ 静态任务创建 ------------------*/
 	
-	xHandleTaskMsgPro = xTaskCreateStatic(
-			vTaskMsgPro,			/* 任务函数 */
-			"vTaskMsgPro",			/* 任务名 */
-			640,					/* 栈大小（word） */
-			NULL,					/* 参数 */
-			1,						/* 优先级 */
-			xTaskMsgProStack,		/* 栈数组 */
-			&xTaskMsgProTCB 		/* TCB */
-	);
+//	xHandleTaskMsgPro = xTaskCreateStatic(
+//			vTaskMsgPro,			/* 任务函数 */
+//			"vTaskMsgPro",			/* 任务名 */
+//			640,					/* 栈大小（word） */
+//			NULL,					/* 参数 */
+//			2,						/* 优先级 */
+//			xTaskMsgProStack,		/* 栈数组 */
+//			&xTaskMsgProTCB 		/* TCB */
+//	);
 	
 	xHandleTaskStart = xTaskCreateStatic(
 			vTaskStart, 			/* 任务函数 */
 			"vTaskStart",			/* 任务名 */
-			256,					/* 栈大小（word） */
+			896,					/* 栈大小（word） */
 			NULL,					/* 参数 */
-			2,						/* 优先级 */
+			1,						/* 优先级 */
 			xTaskStartStack,		/* 栈数组 */
 			&xTaskStartTCB			/* TCB */
 	);
@@ -268,9 +253,10 @@ static void power_run_handler(void)
 		    }
 
 			//ack_handler();
-            if(gpro_t.process_run_step > 13 || gpro_t.stopTwoHours_flag > 1){
+            if(gpro_t.process_run_step > 13 || gpro_t.stopTwoHours_flag > 1 || gpro_t.soft_version > 2){
 				 if(gpro_t.process_run_step > 13 )gpro_t.process_run_step=6; //WT.EDIT 2025.10.07
 				 if(gpro_t.stopTwoHours_flag > 1 )gpro_t.stopTwoHours_flag =0;
+				 if(gpro_t.soft_version > 2)gpro_t.soft_version =0;
             }
 		   
 			
