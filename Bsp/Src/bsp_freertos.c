@@ -21,12 +21,12 @@ static void vTaskStart(void *pvParameters);
 /*------------------ 静态任务内存定义 ------------------*/
 
 /* vTaskMsgPro 任务 */
-static StaticTask_t xTaskMsgProTCB;
-static StackType_t xTaskMsgProStack[640];//640
+//static StaticTask_t xTaskMsgProTCB;
+//static StackType_t xTaskMsgProStack[640];//640
 
 /* vTaskStart 任务 */
 static StaticTask_t xTaskStartTCB;
-static StackType_t xTaskStartStack[256];
+static StackType_t xTaskStartStack[890];
 
 
 
@@ -96,7 +96,7 @@ void freeRTOS_Handler(void)
  * @param   None
  * @retval  None
  */
-
+#if 0
 static void vTaskMsgPro(void *pvParameters)
 {
   
@@ -121,7 +121,7 @@ static void vTaskMsgPro(void *pvParameters)
 	}
       
  }
-
+#endif 
  /**
   * @brief	:  static void vTaskStart(void *pvParameters
   * @note	 
@@ -132,16 +132,25 @@ static void vTaskMsgPro(void *pvParameters)
  static void vTaskStart(void *pvParameters)
  {
     BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(3000); /* 设置�?大等待时间为100ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 设置�?大等待时间为100ms */
 	uint32_t ulValue;
-	 while(1)
+	while(1)
 	 {
 
        
+	    if(power_on_sound_flag==0){
+            power_on_sound_flag ++;
+            FAN_Stop();  //WT.EDIT.2025.01.03
+            buzzer_sound();//buzzer_sound();
+		
+
+        }
+
+		
 		xResult = xTaskNotifyWait(0x00000000,	   
-								  0xFFFFFFFF,   
-								  &ulValue,		  /* 保存ulNotifiedValue到变量ulValue�? */
-								  xMaxBlockTime);  /*  portMAX_DELAY */
+										  0xFFFFFFFF,	
+										  &ulValue, 	  /* 保存ulNotifiedValue到变量ulValue�? */
+										  xMaxBlockTime);  /*  portMAX_DELAY */
 
 		if( xResult == pdPASS ){
 			
@@ -149,11 +158,17 @@ static void vTaskMsgPro(void *pvParameters)
 			   decoder_handler();
 			}
 		}
+		else{
+
+          power_run_handler();
+       
+           wifi_run_handler();
+		}
 	 }
 
  }
  
-
+ 
  /**
  * @brief  :  void AppTaskCreate (void)�����ݴ����������ȼ�Ϊ�е�
  * @note    �����ڲ�ʹ�ö��н������ݣ����ȳ�ʼ������
@@ -194,7 +209,7 @@ void AppTaskCreate (void)
 
   
 	/*------------------ 静态任务创建 ------------------*/
-	
+	#if 0
 	xHandleTaskMsgPro = xTaskCreateStatic(
 			vTaskMsgPro,			/* 任务函数 */
 			"vTaskMsgPro",			/* 任务名 */
@@ -204,13 +219,13 @@ void AppTaskCreate (void)
 			xTaskMsgProStack,		/* 栈数组 */
 			&xTaskMsgProTCB 		/* TCB */
 	);
-	
+	#endif 
 	xHandleTaskStart = xTaskCreateStatic(
 			vTaskStart, 			/* 任务函数 */
 			"vTaskStart",			/* 任务名 */
-			256,					/* 栈大小（word） */
+			890,					/* 栈大小（word） */
 			NULL,					/* 参数 */
-			2,						/* 优先级 */
+			1,						/* 优先级 */
 			xTaskStartStack,		/* 栈数组 */
 			&xTaskStartTCB			/* TCB */
 	);
