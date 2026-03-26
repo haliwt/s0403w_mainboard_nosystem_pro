@@ -153,9 +153,10 @@ typedef struct PROCESS_T{
    uint8_t ptc_warning ;
    uint8_t fan_warning_flag;
    uint8_t soft_version;
-   volatile uint8_t decoder_success_flag; //interrupt be used to flag.
+   uint8_t decoder_success_flag; //interrupt be used to flag.
    uint8_t fan_counter_error ;
    uint8_t fan_rx_stop_flag;
+   uint8_t set_temp_value_success;
 
    
    uint8_t disp_works_hours ;    
@@ -177,12 +178,10 @@ typedef struct PROCESS_T{
    uint8_t gTimer_read_dht11_to_disp;
    uint8_t gTimer_twohours_seconds_counter;	
    uint8_t gTimer_conter_twohours_minutes;
+   uint8_t gTimer_comparetemp_counter;
   
 
-   
-  
-  
-}process_t;
+ }process_t;
 
 extern process_t gpro_t;
 
