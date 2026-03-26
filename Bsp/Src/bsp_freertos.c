@@ -135,7 +135,7 @@ static void vTaskMsgPro(void *pvParameters)
  static void vTaskStart(void *pvParameters)
  {
     BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(200); /* 设置�?大等待时间为100ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 设置�?大等待时间为100ms */
 	uint32_t ulValue;
 	 while(1)
 	 {

@@ -6,8 +6,23 @@
 #define TWOH_FAN_DURATION_SEC   (60U)             // fan run 1 minute
 #define TWOH_PAUSE_DURATION_SEC 10       // rest 10 minutes
 
+
+#define TEMP_ON_THRESHOLD   38   // 温度低于 38℃ 打开 PTC
+#define TEMP_OFF_THRESHOLD  40   // 温度高于等于 40℃ 关闭 PTC
+//#define TEMP_SAFE_LIMIT     60   // 安全保护温度
+#define DEFAULT_TEMP        40   // 默认温度（未设置时）
+
+typedef enum {
+    PTC_STATE_OFF = 0,
+    PTC_STATE_ON  = 1
+} PTC_State;
+
+static PTC_State ptc_state = PTC_STATE_OFF;
+
+
 uint8_t counter_two_hours;
 
+static void CompareSetAndActualTemperature(void);
 
 
 typedef enum {
@@ -108,7 +123,11 @@ void works_run_two_hours_state(void)
       }
 
 
-	  set_tempearture_value_fun();
+	   if(gpro_t.gTimer_comparetemp_counter > 5){
+	 	gpro_t.gTimer_comparetemp_counter=0;
+	      CompareSetAndActualTemperature();
+	  
+     	}
 	  
 
 	break;
@@ -116,6 +135,81 @@ void works_run_two_hours_state(void)
   	}
 
 }
+
+/**
+*@brief:
+*@notice
+*@param
+*
+*
+**/
+static void CompareSetAndActualTemperature(void)
+{
+
+	// 控制 PTC 加热器开关（带滞后控制）
+	uint8_t real_temp = gctl_t.gDht11_temperature;
+	int8_t target_temp;
+	
+		// 确定目标温度：有设置用设置值，否则默认 40℃
+		if (gpro_t.set_temp_value_success == 1) {
+			target_temp = gctl_t.set_temperature_value;
+		} else {
+			target_temp = DEFAULT_TEMP;
+		}
+	
+		// 安全保护：超过 60℃ 强制关闭
+		if (real_temp >= DEFAULT_TEMP) {
+			   gpro_t.rx_ptc_flag = 0;
+				
+			    PTC_SetLow();
+		        ptc_state = PTC_STATE_OFF;
+				SendData_Set_Command(0x22, 0x00); // close PTC
+				vTaskDelay(50);
+			    
+			return;
+		}
+	
+
+        if(real_temp < target_temp && gctl_t.ptc_prohibit_on_flag ==0){
+
+           gpro_t.rx_ptc_flag= 1;
+		   PTC_SetHigh();
+		   ptc_state = PTC_STATE_ON;
+		   SendData_Set_Command(0x22, 0x01); // open PTC
+
+		   vTaskDelay(50);
+
+
+		}
+        else if (ptc_state == PTC_STATE_OFF) {// 滞后控制逻辑
+			// 当前关闭状态 → 低于 (目标温度 - 2℃) 才打开
+			if (real_temp <= (target_temp - 2)) {
+				
+				gpro_t.rx_ptc_flag  = 1;
+			     PTC_SetHigh();
+				ptc_state = PTC_STATE_ON;
+				SendData_Set_Command(0x22, 0x01); // open PTC
+
+				vTaskDelay(50);
+			}
+		} 
+		else {
+			// 当前开启状态 → 高于等于目标温度才关闭
+			if (real_temp >= target_temp) {
+				
+				 gpro_t.rx_ptc_flag = 0;
+				
+			    PTC_SetLow();
+				ptc_state = PTC_STATE_OFF;
+				SendData_Set_Command(0x22, 0x00); // close PTC
+				vTaskDelay(50);
+			}
+		}
+	
+
+
+}
+
 
 /********************************************************************************
 	*
@@ -483,52 +577,5 @@ void getBeijingTime_cofirmLinkNetState_handler(void)
 
 }
 
-/*****************************************/
-static void set_tempearture_value_fun(void)
-{
-   
-	#if 0	   
-	switch(gpro_t.set_temperature_flag)	
-	{
-		case 1:
-			  
-	
-		  if(gctl_t.set_temperature_value > gctl_t.gDht11_temperature && gpro_t.stopTwoHours_flag ==0){
-			
-			        
-					  ptc_onoff_default++;
-                      gpro_t.rx_ptc_flag=1;
-				      PTC_SetHigh();
-					  
-					 SendData_Set_Command(0x1F,0);//SendWifiData_To_Data(0x1F,0x0); //WT.EDIT 2025.04.02 0x1F: wifi link net is succes 
-			          vTaskDelay(pdMS_TO_TICKS(100));	   
-				        
-			}
-			 else{
-			   	   ptc_onoff_default++;
-				   gpro_t.rx_ptc_flag =0 ;//gpro_t.rx_ptc_flag =0;
-
-			       PTC_SetLow();
-		
-
-			   }
-
-			   if(ptc_set_wifi !=gpro_t.rx_ptc_flag){
-				 	ptc_set_wifi =gpro_t.rx_ptc_flag;
-				   if(wifi_link_net_state()==1){
-					   MqttData_Publis_SetTemp(gctl_t.set_temperature_value);
-					   vTaskDelay(pdMS_TO_TICKS(200));//osDelay(200);//HAL_Delay(350);
-					}
-			   	}
-		break;
-
-		case 0:
-
-
-		break;
-	 }
-		   
-	#endif 		
-}
 
 

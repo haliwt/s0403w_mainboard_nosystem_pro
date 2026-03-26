@@ -238,7 +238,19 @@ void power_on_handler(void)
 
 	 adc_detected_hundler();
 
-	gpro_t.process_run_step= 6;	
+	gpro_t.process_run_step= 11;	
+
+   break;
+
+   case 11:
+     	if(gpro_t.stopTwoHours_flag ==0){
+			   Fan_RunSpeed_Fun();
+		}
+		else if(gpro_t.fan_rx_stop_flag ==1){
+             FAN_Stop();
+
+		}
+       gpro_t.process_run_step= 6; 
 
    break;
 
