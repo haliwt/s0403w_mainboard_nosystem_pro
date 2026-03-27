@@ -97,7 +97,7 @@ void works_run_two_hours_state(void)
             PTC_SetLow();
             ultrasonic_close();
 	  }
-	  else if(gpro_t.stopTwoHours_flag ==1 &&  gpro_t.stopTwoHours_flag ==0){
+	  else if(gpro_t.stopTwoHours_flag ==1 &&  define_twohours_flag ==0){
 	  
 	  	    gpro_t.gTimer_conter_twohours_minutes=0;
 	        gpro_t.gTimer_twohours_seconds_counter=0;
