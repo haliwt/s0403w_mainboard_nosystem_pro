@@ -329,9 +329,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
              
               PTC_SetHigh();
              
-           SendWifiData_Answer_Cmd(0x02,0x01); //
-           vTaskDelay(pdMS_TO_TICKS(50)); 
+             if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetPtc(0x01);
+			    vTaskDelay(200);
 		
+            }
            }
 
 		 }
@@ -346,8 +348,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	      PTC_SetLow();
 		
 		  gctl_t.ptc_prohibit_on_flag =1;
-          SendWifiData_Answer_Cmd(0x02,0x0); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
+          if(net_t.wifi_link_net_success == 1){
+			  MqttData_Publish_SetPtc(0);
+			  vTaskDelay(200);
+		
+           }
      
        }
       break;
@@ -365,26 +370,28 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
    
 			}
 
+		  if(net_t.wifi_link_net_success == 1){
+			  MqttData_Publish_SetPlasma(0x01);
+			vTaskDelay(200);
+			  
+			}
 
-			SendWifiData_Answer_Cmd(0x03,0x01); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
 			 
 		  }
 		  else if(pdata[3]  == 0x0){
 			 buzzer_sound();
 			
-			 
-			 gctl_t.gPlasma = 0;
+			gctl_t.gPlasma = 0;
 			 PLASMA_SetLow();
 
-			SendWifiData_Answer_Cmd(0x03,0x0); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+		   if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetPlasma(0);
+			    vTaskDelay(200);
+		
+            }
 			  
-		  
 		  }
-   
-   
-	break;
+     break;
 
 	   
    	case 0x04: //ultrasonic	ACTIVE OPEN OR CLOSE
@@ -398,9 +405,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
    
 			}
 			
-			SendWifiData_Answer_Cmd(0x04,0x01); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
-   
+			if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetUltrasonic(0x01);
+			    vTaskDelay(200);
+		
+            }
 		  }
 		  else if(pdata[3] == 0x0){ //close 
               buzzer_sound();
@@ -408,8 +417,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
    
 			ultrasonic_close();
 			
-			SendWifiData_Answer_Cmd(0x04,0x0); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetUltrasonic(0);
+			    vTaskDelay(200);
+		
+            }
    
 		  }
    
@@ -502,12 +514,13 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	  break;
 	  
 	  case 0x16 : //buzzer sound command with answer .
+		if(pdata[3] == 0x01)buzzer_sound();
 
-        buzzer_sound();
-        
+	    if(gpro_t.soft_version == 2){
          SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 
-		  vTaskDelay(pdMS_TO_TICKS(100));
+		 vTaskDelay(pdMS_TO_TICKS(50));
+   	    }
 		  
        break;
 	  
