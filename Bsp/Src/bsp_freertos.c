@@ -260,9 +260,7 @@ static void power_run_handler(void)
             power_on_handler();
             link_wifi_to_tencent_handler(); //detected ADC of value 
             ai_mode_display_fun();
-			if(gpro_t.stopTwoHours_flag ==0){
-			   Fan_RunSpeed_Fun();
-		    }
+		
 
 			//ack_handler();
             if(gpro_t.process_run_step > 10 || gpro_t.stopTwoHours_flag > 1){

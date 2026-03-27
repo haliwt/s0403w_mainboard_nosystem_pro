@@ -15,7 +15,7 @@ uint8_t fan_run_one_minute_flag;
 **********************************************************************/
 void power_on_handler(void)
 {
-    static uint8_t counter;
+    static uint8_t counter,sw_flag;
     switch(gpro_t.process_run_step){
 
 	case 0: //1
@@ -59,6 +59,7 @@ void power_on_handler(void)
 		
        
         gpro_t.stopTwoHours_flag =0;
+		gpro_t.set_temp_value_success=0;
 	
          Fan_Full_Speed();//Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
      
@@ -130,16 +131,31 @@ void power_on_handler(void)
             counter++;
 			updateDht11_sensorData_toDisp();
 	        vTaskDelay(pdMS_TO_TICKS(100));
-			
-		    if(net_t.wifi_link_net_success ==1 && counter > 1 && gpro_t.soft_version == 0){ //WT.EDIT 2026.02.27
+
+			 if(net_t.wifi_link_net_success ==1 && counter > 1 && gpro_t.soft_version == 0){ //WT.EDIT 2026.02.27
 		       counter =0;
-			   SendWifiData_olderCmd(0x1F,0x01);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-			   vTaskDelay(pdMS_TO_TICKS(100));
+			   sw_flag = sw_flag ^ 0x01;
+			   if(sw_flag == 1){
+				   SendWifiData_olderCmd(0x1F,0x01);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+				   vTaskDelay(pdMS_TO_TICKS(100));
+			   }
+			   else{
+                SendWifiData_To_Data(0x1F,0x01);
+				vTaskDelay(pdMS_TO_TICKS(100));
+			   }
+			   
 			}
 			else if(net_t.wifi_link_net_success ==0 && counter > 1 && gpro_t.soft_version ==0){ //WT.EDIT 2026.02.27
 		       counter =0;
-			   SendWifiData_olderCmd(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-			   vTaskDelay(pdMS_TO_TICKS(100));
+			    sw_flag = sw_flag ^ 0x01;
+			   if(sw_flag == 1){
+				   SendWifiData_olderCmd(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+				   vTaskDelay(pdMS_TO_TICKS(100));
+			   }
+			   else{
+                 SendWifiData_To_Data(0x1F,0x0);
+				vTaskDelay(pdMS_TO_TICKS(100));
+			   }
 			}
 			
        }
@@ -190,9 +206,17 @@ void power_on_handler(void)
   break;
 
 
-  case 9:
+    case 9:
   	 
-       adc_detected_hundler();
+     if(gpro_t.gTimer_read_dht11_to_disp >3){
+		gpro_t.gTimer_read_dht11_to_disp=0;
+	   read_sensorData();
+
+       }
+	 gpro_t.process_run_step= 10;
+  break;
+
+    case 10:
     
 
 	   if(wifi_link_net_state() ==1 && gpro_t.gTimer_update_tencet_dht11 >5){
@@ -200,12 +224,12 @@ void power_on_handler(void)
 				Update_Dht11_Totencent_Value();
         }
 	 
-       gpro_t.process_run_step= 10; 
+       gpro_t.process_run_step= 11; 
 
 
   break;
 
-  case 10:
+  case 11:
 
      if(gctl_t.set_temperature_flag > 1 || gctl_t.set_temperature_value > 40 || gctl_t.ptc_prohibit_on_flag > 1
 	 	  ||gctl_t.app_timer_power_on_flag > 2 || gctl_t.set_temp_first_closeptc > 1 || gpro_t.soft_version > 2){
@@ -228,9 +252,23 @@ void power_on_handler(void)
 	if(gctl_t.gUlransonic > 1) gctl_t.gUlransonic =1;
 	if(gpro_t.stopTwoHours_flag==0)gpro_t.fan_rx_stop_flag =0;
 
-	gpro_t.process_run_step= 6;	
+	  adc_detected_hundler();
+
+	gpro_t.process_run_step= 12;	
 
    break;
+
+    case 12:
+     	if(gpro_t.stopTwoHours_flag ==0){
+			   Fan_RunSpeed_Fun();
+		}
+		else if(gpro_t.fan_rx_stop_flag ==1){
+             FAN_Stop();
+
+		}
+       gpro_t.process_run_step= 6; 
+
+   break; 
 
      default:
 	
@@ -485,6 +523,7 @@ void power_off_handler(void)
 		 fan_detect_voltage=100;
          fan_run_one_minute_flag=1;
 		 gpro_t.gTimer_poweroff_fan =0;
+		 gpro_t.set_temp_value_success=0;
 		 
 	      SetPowerOff_ForDoing();
 		  gpro_t.power_off_run_step = 2;
