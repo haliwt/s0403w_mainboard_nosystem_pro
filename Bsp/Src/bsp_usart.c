@@ -158,59 +158,7 @@ uint8_t parse_exit_flag,parse_decoder_flag;
 *******************************************************************************/
 static void usart1_isr_callback_handler(uint8_t data)
 {
-   #if 0    
-	switch(rx_state){
-
-	case 0:
-		if(data == FRAME_HEADER){
-			rx_data_counter=0;
-			gl_tMsg.usData[rx_data_counter]=data;
-			
-			rx_state =1;
-
-		}
-	break;
-
-	case 1:
-		if(data == FRAME_NUM || data == FRAME_ACK_NUM || data==FRAME_OLD_NUM){
-			rx_data_counter++;
-			gl_tMsg.usData[rx_data_counter]=data;
-		
-
-			rx_state =2;
-		}
-		else{
-			rx_state =0;
-			rx_data_counter=0;
-
-		}
-
-	break;
-
-	case 2: //rx command or notice or oxFF --> copy command or notice .
-		rx_data_counter++;
-		gl_tMsg.usData[rx_data_counter]=data;
-		
-
-		if(data==0xFE && rx_data_counter>4){ //older version is copy command or notice "0xFF"
-
-			rx_state =3;
-		}
-	break;
-
-	case 3: //rx excuite command and notice or data 
-        rx_data_counter++;
-		//gl_tMsg.usData[rx_data_counter]=data;
-		gl_tMsg.bcc_check_code = data;
-		rx_state =0;
-		gl_tMsg.rx_total_numbers =rx_data_counter;
-		rx_data_counter=0;
-		gpro_t.decoder_success_flag=1;
-		display_board_xtask_notice();
-		
-	break;
-	}
-	#else 
+  
 	switch(rx_state){
 
 	 case 0:
@@ -251,9 +199,6 @@ static void usart1_isr_callback_handler(uint8_t data)
 	 break;
 
 	 }
-
-	#endif 
-
 
 }
 /********************************************************************************
@@ -329,10 +274,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
              
               PTC_SetHigh();
              
-           SendWifiData_Answer_Cmd(0x02,0x01); //
-           vTaskDelay(pdMS_TO_TICKS(50)); 
+            if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetPtc(0x01);
+			    vTaskDelay(200);
 		
-           }
+            }
 
 		 }
 	   }
@@ -346,8 +292,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	      PTC_SetLow();
 		
 		  gctl_t.ptc_prohibit_on_flag =1;
-          SendWifiData_Answer_Cmd(0x02,0x0); //
-          vTaskDelay(pdMS_TO_TICKS(50)); 
+           if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetPtc(0);
+			    vTaskDelay(200);
+		
+            }
      
        }
       break;
@@ -366,8 +315,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			}
 
 
-			SendWifiData_Answer_Cmd(0x03,0x01); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetPlasma(0x01);
+			    vTaskDelay(200);
+		
+            }
 			 
 		  }
 		  else if(pdata[3]  == 0x0){
@@ -377,8 +329,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 			 gctl_t.gPlasma = 0;
 			 PLASMA_SetLow();
 
-			SendWifiData_Answer_Cmd(0x03,0x0); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetPlasma(0);
+			    vTaskDelay(200);
+		
+            }
 			  
 		  
 		  }
@@ -398,8 +353,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
    
 			}
 			
-			SendWifiData_Answer_Cmd(0x04,0x01); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetUltrasonic(0x01);
+			    vTaskDelay(200);
+		
+            }
    
 		  }
 		  else if(pdata[3] == 0x0){ //close 
@@ -408,8 +366,11 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
    
 			ultrasonic_close();
 			
-			SendWifiData_Answer_Cmd(0x04,0x0); //
-			vTaskDelay(pdMS_TO_TICKS(50)); 
+			if(net_t.wifi_link_net_success == 1){
+				MqttData_Publish_SetUltrasonic(0);
+			    vTaskDelay(200);
+		
+            }
    
 		  }
    
@@ -507,7 +468,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
         
          SendWifiData_Answer_Cmd(0x16,0x01); //WT.EDIT 2025.07.28
 
-		  vTaskDelay(pdMS_TO_TICKS(100));
+		  vTaskDelay(pdMS_TO_TICKS(30));
 		  
        break;
 	  
