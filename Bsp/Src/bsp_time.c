@@ -86,7 +86,9 @@ void works_run_two_hours_state(void)
 
 	case 0x0://older version 
 
-	  if(gpro_t.gTimer_conter_twohours_minutes >119 && gpro_t.stopTwoHours_flag ==0){
+	  
+	
+	 if(gpro_t.gTimer_conter_twohours_minutes >119 && gpro_t.stopTwoHours_flag ==0){
 			gpro_t.gTimer_conter_twohours_minutes=0;
 	        gpro_t.gTimer_twohours_seconds_counter=0;
 	        gpro_t.stopTwoHours_flag =1;
@@ -95,7 +97,16 @@ void works_run_two_hours_state(void)
             PTC_SetLow();
             ultrasonic_close();
 	  }
-
+	  else if(gpro_t.stopTwoHours_flag ==1 && gpro_t.stopTwoHours_flag ==0){//which  one first get 
+	       gpro_t.gTimer_twohours_seconds_counter=0;
+			define_twohours_flag =1;
+			PLASMA_SetLow(); //
+            PTC_SetLow();
+            ultrasonic_close();
+	  
+	  }
+      
+	  
 	  if(define_twohours_flag==1)gpro_t.stopTwoHours_flag=1;
 	  else if(define_twohours_flag==2)gpro_t.stopTwoHours_flag=1;
 	  else if(define_twohours_flag==0)gpro_t.stopTwoHours_flag=0;
@@ -141,11 +152,10 @@ void works_run_two_hours_state(void)
 *@notice
 *@param
 *
-*
 **/
 static void CompareSetAndActualTemperature(void)
 {
-
+    if(gpro_t.stopTwoHours_flag ==1) return ;
 	// 控制 PTC 加热器开关（带滞后控制）
 	uint8_t real_temp = gctl_t.gDht11_temperature;
 	int8_t target_temp;
