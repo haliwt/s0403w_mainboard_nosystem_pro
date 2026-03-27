@@ -208,7 +208,15 @@ void power_on_handler(void)
 
   case 9:
   	 
-       adc_detected_hundler();
+     if(gpro_t.gTimer_read_dht11_to_disp >3){
+		gpro_t.gTimer_read_dht11_to_disp=0;
+	   read_sensorData();
+
+       }
+	 gpro_t.process_run_step= 10;
+  break;
+
+  case 10:
     
 
 	   if(wifi_link_net_state() ==1 && gpro_t.gTimer_update_tencet_dht11 >5){
@@ -216,12 +224,12 @@ void power_on_handler(void)
 				Update_Dht11_Totencent_Value();
         }
 	 
-       gpro_t.process_run_step= 10; 
+       gpro_t.process_run_step= 11; 
 
 
   break;
 
-  case 10:
+  case 11:
 
      if(gctl_t.set_temperature_flag > 1 || gctl_t.set_temperature_value > 40 || gctl_t.ptc_prohibit_on_flag > 1
 	 	  ||gctl_t.app_timer_power_on_flag > 2 || gctl_t.set_temp_first_closeptc > 1 || gpro_t.soft_version > 2){
@@ -233,22 +241,20 @@ void power_on_handler(void)
 		if(gpro_t.soft_version > 2)gpro_t.soft_version = 0 ;
 	 }
 
-    if(gpro_t.gTimer_read_dht11_to_disp >3){
-		gpro_t.gTimer_read_dht11_to_disp=0;
-	   read_sensorData();
-
-    }
+   
 
     if(gpro_t.rx_ptc_flag >1)gpro_t.rx_ptc_flag=1;//2026.02.27 WT.EDIT
     if(gctl_t.gPlasma > 1) gctl_t.gPlasma =1;
 	if(gctl_t.gUlransonic > 1) gctl_t.gUlransonic =1;
 	if(gpro_t.stopTwoHours_flag==0)gpro_t.fan_rx_stop_flag =0;
 
-	gpro_t.process_run_step= 11;	
+	  adc_detected_hundler();
+
+	gpro_t.process_run_step= 12;	
 
    break;
 
-   case 11:
+   case 12:
      	if(gpro_t.stopTwoHours_flag ==0){
 			   Fan_RunSpeed_Fun();
 		}
