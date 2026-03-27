@@ -15,7 +15,7 @@ uint8_t fan_run_one_minute_flag;
 **********************************************************************/
 void power_on_handler(void)
 {
-    static uint8_t counter;
+    static uint8_t counter,sw_flag;
     switch(gpro_t.process_run_step){
 
 	case 0: //1
@@ -132,15 +132,30 @@ void power_on_handler(void)
 			updateDht11_sensorData_toDisp();
 	        vTaskDelay(pdMS_TO_TICKS(100));
 			
-		    if(net_t.wifi_link_net_success ==1 && counter > 1 && gpro_t.soft_version == 0){ //WT.EDIT 2026.02.27
+		   if(net_t.wifi_link_net_success ==1 && counter > 1 && gpro_t.soft_version == 0){ //WT.EDIT 2026.02.27
 		       counter =0;
-			   SendWifiData_olderCmd(0x1F,0x01);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-			   vTaskDelay(pdMS_TO_TICKS(100));
+			   sw_flag = sw_flag ^ 0x01;
+			   if(sw_flag == 1){
+				   SendWifiData_olderCmd(0x1F,0x01);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+				   vTaskDelay(pdMS_TO_TICKS(100));
+			   }
+			   else{
+                SendWifiData_To_Data(0x1F,0x01);
+				vTaskDelay(pdMS_TO_TICKS(100));
+			   }
+			   
 			}
 			else if(net_t.wifi_link_net_success ==0 && counter > 1 && gpro_t.soft_version ==0){ //WT.EDIT 2026.02.27
 		       counter =0;
-			   SendWifiData_olderCmd(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
-			   vTaskDelay(pdMS_TO_TICKS(100));
+			    sw_flag = sw_flag ^ 0x01;
+			   if(sw_flag == 1){
+				   SendWifiData_olderCmd(0x1F,0x0);//SendWifiData_To_Cmd(0x1F,0x01); //link wifi order 1 --link wifi net is success.
+				   vTaskDelay(pdMS_TO_TICKS(100));
+			   }
+			   else{
+                 SendWifiData_To_Data(0x1F,0x0);
+				vTaskDelay(pdMS_TO_TICKS(100));
+			   }
 			}
 			
        }
