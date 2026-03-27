@@ -132,7 +132,7 @@ static void vTaskMsgPro(void *pvParameters)
  static void vTaskStart(void *pvParameters)
  {
     BaseType_t xResult;
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(1000); /* 设置�?大等待时间为100ms */
+	const TickType_t xMaxBlockTime = pdMS_TO_TICKS(5000); /* 设置�?大等待时间为100ms */
 	uint32_t ulValue;
 	while(1)
 	 {
@@ -178,37 +178,7 @@ static void vTaskMsgPro(void *pvParameters)
 void AppTaskCreate (void)
 {
    
-  #if 0
-	xTaskCreate( vTaskWifiPro,		   /* 任务函数	*/
-					"vTaskWifiPro",		   /* 任务�?1�?7?1�?1�?7?7	*/
-					128,				   /* 任务栈大小，单位word，也就是4字节 */
-					NULL,				   /* 任务参数	*/
-					2,					   /* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
-					&xHandleTaskWifiPro );   /* 任务句柄	*/
-
-   #endif 
-
-   #if 0
-
-	xTaskCreate( vTaskMsgPro,     		/* 任务函数  */
-                 "vTaskMsgPro",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 256,            		/* 任务栈大小，单位word，也就是4字节 */
-                 NULL,           		/* 任务参数  */
-                 2,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
-                 &xHandleTaskMsgPro);   /* 任务句柄  */
-
- 
-  
-   xTaskCreate( vTaskStart,     		/* 任务函数  */
-                 "vTaskStart",   		/* 任务�?1�?7?1�?1�?7?7    */
-                 128,            		/* 任务栈大小，单位word，也就是4字节 */
-                 NULL,           		/* 任务参数  */
-                 1,              		/* 任务优先�?1�?7?1�?1�?7?7 数�1�?7�?1�?7越小优先级越低，这个跟uCOS相反 */
-                 &xHandleTaskStart );   /* 任务句柄  */
-   #endif 
-
-  
-	/*------------------ 静态任务创建 ------------------*/
+  /*------------------ 静态任务创建 ------------------*/
 	#if 0
 	xHandleTaskMsgPro = xTaskCreateStatic(
 			vTaskMsgPro,			/* 任务函数 */
@@ -231,40 +201,12 @@ void AppTaskCreate (void)
 	);
  
 }
-/*
-*********************************************************************************************************
-*	函 数 名: AppObjCreate
-*	功能说明: 创建任务通信机制
+/**********************************************************************************************************
+*	函 数 名: static void power_run_handler(void)
+*	功能说明: 
 *	形    参: 无
 *	返 回 值: 无
-*********************************************************************************************************
-*/
-//static void AppObjCreate (void)
-//{
-//	/* 创建10个uint8_t型消息队列 */
-//	xQueue1 = xQueueCreate(10, sizeof(uint8_t));
-//    if( xQueue1 == 0 )
-//    {
-//        /* 没有创建成功，用户可以在这里加入创建失败的处理机制 */
-//    }
-	
-////	/* 创建10个存储指针变量的消息队列，由于CM3/CM4内核是32位机，一个指针变量占用4个字节 */
-////	xQueue2 = xQueueCreate(10, sizeof(struct Msg *));
-////    if( xQueue2 == 0 )
-////    {
-////        /* 没有创建成功，用户可以在这里加入创建失败的处理机制 */
-////    }
-//}
-
-
-/********************************************************************************
-	**
-	*Function Name:static void power_run_handler(void)
-	*Function :
-	*Input Ref: 
-	*Return Ref:NO
-	*
-*******************************************************************************/
+**********************************************************************************************************/
 static void power_run_handler(void)
 {
     switch(gpro_t.gpower_on){ 
