@@ -133,6 +133,7 @@ typedef struct PROCESS_T{
 
    uint8_t get_beijing_flag;
    uint8_t stopTwoHours_flag;
+   uint8_t check_twohours_flag;
 
    uint8_t receive_copy_cmd ;
    uint8_t send_ack_cmd;

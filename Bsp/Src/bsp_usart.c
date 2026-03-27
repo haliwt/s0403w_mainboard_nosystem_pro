@@ -576,7 +576,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
          if(pdata[3]==1){ // recach 2 hours fan stop
                gpro_t.fan_rx_stop_flag =1 ;
 			   gpro_t.stopTwoHours_flag=1;
-		     
+			 
 			   gctl_t.gTimer_senddata_panel=0;
                FAN_Stop();
 			   PTC_SetLow(); //ptc off;
@@ -601,9 +601,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 	    if(pdata[3]==1){ // recach 2 hours 
 
            gpro_t.stopTwoHours_flag=1;
-	
-	
-		   gctl_t.gTimer_senddata_panel =0;
+	       gctl_t.gTimer_senddata_panel =0;
 	
 		    PTC_SetLow(); //ptc off;
 			PLASMA_SetLow() ; //plasma turn off.
@@ -612,6 +610,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
 		}
 		else if(pdata[3]==0){
 			  gpro_t.stopTwoHours_flag=0;//WT.EDIT 2026.01.26
+			  gpro_t.check_twohours_flag =0;
 			   gpro_t.fan_rx_stop_flag =0 ;
 		       gctl_t.gTimer_senddata_panel=0;
         

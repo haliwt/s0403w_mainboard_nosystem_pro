@@ -59,6 +59,7 @@ void power_on_handler(void)
 		
        
         gpro_t.stopTwoHours_flag =0;
+		gpro_t.check_twohours_flag=0;
 		gpro_t.set_temp_value_success=0;
 	
          Fan_Full_Speed();//Fan_RunSpeed_Fun();//WT.EDIT 2026.01.26
@@ -524,6 +525,7 @@ void power_off_handler(void)
          fan_run_one_minute_flag=1;
 		 gpro_t.gTimer_poweroff_fan =0;
 		 gpro_t.set_temp_value_success=0;
+		 gpro_t.check_twohours_flag =0;
 		 
 	      SetPowerOff_ForDoing();
 		  gpro_t.power_off_run_step = 2;
