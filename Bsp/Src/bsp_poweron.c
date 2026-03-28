@@ -15,7 +15,7 @@ uint8_t fan_run_one_minute_flag;
 **********************************************************************/
 void power_on_handler(void)
 {
-    static uint8_t counter,sw_flag;
+    static uint8_t counter,sw_flag,counter_flag;
     switch(gpro_t.process_run_step){
 
 	case 0: //1
@@ -255,7 +255,9 @@ void power_on_handler(void)
    break;
 
    case 12:
-     	if(gpro_t.stopTwoHours_flag ==0){
+   	   counter_flag ++;
+     	if(gpro_t.stopTwoHours_flag ==0 && counter_flag > 50){
+			   counter_flag =0;
 			   Fan_RunSpeed_Fun();
 		}
 		else if(gpro_t.fan_rx_stop_flag ==1){

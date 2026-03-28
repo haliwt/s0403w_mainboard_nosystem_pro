@@ -178,7 +178,7 @@ typedef struct PROCESS_T{
    uint8_t gTimer_read_dht11_to_disp;
    uint8_t gTimer_twohours_seconds_counter;	
    uint8_t gTimer_conter_twohours_minutes;
-   uint8_t gTimer_comparetemp_counter;
+
   
 
  }process_t;

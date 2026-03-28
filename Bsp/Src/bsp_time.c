@@ -137,8 +137,8 @@ void works_run_two_hours_state(void)
             ActionEvent_Handler();
       }
 
-     if(gpro_t.gTimer_comparetemp_counter > 5){
-	 	gpro_t.gTimer_comparetemp_counter=0;
+     if(gpro_t.gTimer_poweroff_fan > 5){
+	 	gpro_t.gTimer_poweroff_fan=0;
 	    CompareSetAndActualTemperature();
 	  
      	}
@@ -157,7 +157,7 @@ void works_run_two_hours_state(void)
 **/
 static void CompareSetAndActualTemperature(void)
 {
-    if(gpro_t.stopTwoHours_flag ==1)return ;
+     if(gpro_t.stopTwoHours_flag ==1 || gctl_t.ptc_prohibit_on_flag ==1)return ;
 	// 控制 PTC 加热器开关（带滞后控制）
 	uint8_t real_temp = gctl_t.gDht11_temperature;
 	int8_t target_temp;
