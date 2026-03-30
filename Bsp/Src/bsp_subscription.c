@@ -603,10 +603,15 @@ void Json_Parse_Command_Fun(void)
 	  case PTC_ON_ITEM:
 	  if(gpro_t.gpower_on ==power_on){
 	    if(gctl_t.ptc_warning ==0){
+
+		 PTC_SetHigh();
+		 gpro_t.rx_ptc_flag = 1;//gctl_t.gDry=1;
+		 gctl_t.ptc_prohibit_on_flag =0; //WT.EDIT 2026.03-30
+		 
          MqttData_Publish_SetPtc(0x01);
 		 vTaskDelay(200);
 	
-	      gpro_t.rx_ptc_flag = 1;//gctl_t.gDry=1;
+	     
 	
           gctl_t.gTimer_senddata_panel=8;  
 		  gctl_t.ptc_prohibit_on_flag = 0;
@@ -629,6 +634,11 @@ void Json_Parse_Command_Fun(void)
 
 	  case PTC_OFF_ITEM:
 	  	if(gpro_t.gpower_on ==power_on){
+
+		 PTC_SetLow();
+		 gctl_t.ptc_prohibit_on_flag =1;//WT.EDIT 2026.03-30
+     	 gpro_t.rx_ptc_flag = 0;//gctl_t.gDry=0;
+        
 	
          MqttData_Publish_SetPtc(0);
 		 
@@ -638,9 +648,7 @@ void Json_Parse_Command_Fun(void)
 		 gctl_t.set_temp_first_closeptc =0;
 		 gctl_t.rx_set_temp_flag =0;
 	
-     	 gpro_t.rx_ptc_flag = 0;//gctl_t.gDry=0;
-
-		 PTC_SetLow();
+     	
          gctl_t.app_timer_power_on_flag = 0;
 		
 		 SendWifiData_To_Cmd(0x02,0x0);
