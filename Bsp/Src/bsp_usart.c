@@ -458,6 +458,7 @@ static void usart1_protocol_state_machine(uint8_t *pdata)
      break;
 
 	 case 0x10: //power on or off don't sound .
+	  if(gctl_t.app_timer_power_on_flag ==1) return ; //WT.EDIT 2026-03-31
 	     if(pdata[3] == 0x01){ //open
 
 		   gpro_t.process_run_step=0;
