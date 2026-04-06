@@ -522,6 +522,7 @@ void power_off_handler(void)
          fan_run_one_minute_flag=1;
 		 gpro_t.gTimer_poweroff_fan =0;
 		 gpro_t.set_temp_value_success=0;
+		 gpro_t.first_ptc_on=0;
 		 
 	      SetPowerOff_ForDoing();
 		  gpro_t.power_off_run_step = 2;

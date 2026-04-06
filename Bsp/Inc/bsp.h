@@ -157,6 +157,7 @@ typedef struct PROCESS_T{
    uint8_t fan_counter_error ;
    uint8_t fan_rx_stop_flag;
    uint8_t set_temp_value_success;
+   uint8_t first_ptc_on;
 
    
    uint8_t disp_works_hours ;    

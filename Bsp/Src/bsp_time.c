@@ -175,36 +175,44 @@ static void CompareSetAndActualTemperature(void)
 				
 			    PTC_SetLow();
 		        ptc_state = PTC_STATE_OFF;
+				gpro_t.first_ptc_on = 1;   // 下次重新当作第一次
 				SendData_Set_Command(0x22, 0x00); // close PTC
-				vTaskDelay(50);
+				vTaskDelay(100);
 			    
 			return;
 		}
+
+
+		if(ptc_state == PTC_STATE_OFF){
 	
 
-        if(real_temp < target_temp && gctl_t.ptc_prohibit_on_flag ==0){
+	        // 第一次打开：不需要滞后
+			if(gpro_t.first_ptc_on ==0 || gpro_t.first_ptc_on ==1){
+			        if(real_temp < target_temp && gctl_t.ptc_prohibit_on_flag ==0){
 
-           gpro_t.rx_ptc_flag= 1;
-		   PTC_SetHigh();
-		   ptc_state = PTC_STATE_ON;
-		   SendData_Set_Command(0x22, 0x01); // open PTC
+	           gpro_t.rx_ptc_flag= 1;
+			   PTC_SetHigh();
+			   ptc_state = PTC_STATE_ON;
+			   if(gpro_t.first_ptc_on ==1)gpro_t.first_ptc_on = 2;   // 之后进入滞后模式
+			   SendData_Set_Command(0x22, 0x01); // open PTC
 
-		   vTaskDelay(50);
+			   vTaskDelay(100);
+			   }
 
-
-		}
-        else if (ptc_state == PTC_STATE_OFF) {// 滞后控制逻辑
-			// 当前关闭状态 → 低于 (目标温度 - 2℃) 才打开
-			if (real_temp <= (target_temp - 2)) {
-				
-				gpro_t.rx_ptc_flag  = 1;
-			     PTC_SetHigh();
-				ptc_state = PTC_STATE_ON;
-				SendData_Set_Command(0x22, 0x01); // open PTC
-
-				vTaskDelay(50);
 			}
-		} 
+	        else{
+	            // 当前关闭状态 → 低于 (目标温度 - 2℃) 才打开
+				if (real_temp < (target_temp - 2)) {
+					
+					gpro_t.rx_ptc_flag  = 1;
+				     PTC_SetHigh();
+					ptc_state = PTC_STATE_ON;
+					SendData_Set_Command(0x22, 0x01); // open PTC
+
+					vTaskDelay(100);
+				}
+			} 
+		}
 		else {
 			// 当前开启状态 → 高于等于目标温度才关闭
 			if (real_temp >= target_temp) {
@@ -214,14 +222,10 @@ static void CompareSetAndActualTemperature(void)
 			    PTC_SetLow();
 				ptc_state = PTC_STATE_OFF;
 				SendData_Set_Command(0x22, 0x00); // close PTC
-				vTaskDelay(50);
+				vTaskDelay(100);
 			}
-		}
-	
-
-
+		  }
 }
-
 /********************************************************************************
 	*
 	*Functin Name:void void getBeijingTime_cofirmLinkNetState_handler(void)
