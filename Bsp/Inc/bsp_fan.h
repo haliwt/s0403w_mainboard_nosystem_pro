@@ -3,7 +3,7 @@
 #include "main.h"
 
 
-#if NEWPCB_FAN
+#if NEW_PCB
  
 
 #define FAN_COM_SetHigh()            LL_GPIO_SetOutputPin(FAN_COM_GPIO_Port,FAN_COM_Pin)//(FAN_GPIO,FAN_CCW,GPIO_PIN_SET)    // output high level
